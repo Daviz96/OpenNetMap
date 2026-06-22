@@ -68,6 +68,10 @@ Dai documenti del progetto emergono come previste ma ancora parziali o mancanti:
 
 ## 3. Stato attuale del progetto
 
+### Milestone 1 update
+
+Il progetto ha completato la prima milestone di stabilizzazione e cleanup. Sono stati introdotti strumenti di sviluppo, test automatici e un workflow CI basato su `black`, `ruff`, `mypy` e `pytest`, con copertura incrementale dei test su API e persistenza SQLite.
+
 ### Completato
 
 * Scoperta host base tramite ARP (Scapy) e fallback ping/ARP cache.
