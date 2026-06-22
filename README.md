@@ -53,7 +53,12 @@ Una pipeline CI è configurata in `.github/workflows/ci.yml` e esegue:
 - installazione delle dipendenze runtime e dev
 - `ruff check .`
 - `black --check .`
+- `mypy --ignore-missing-imports .`
 - `pytest -q`
+
+## Documentazione
+
+Ulteriori dettagli sulla roadmap, i piani di milestone e i risultati sono disponibili nella cartella `docs/`.
 
 ## Utilizzo
 
