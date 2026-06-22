@@ -58,7 +58,13 @@ Una pipeline CI è configurata in `.github/workflows/ci.yml` e esegue:
 
 ## Documentazione
 
-Ulteriori dettagli sulla roadmap, i piani di milestone e i risultati sono disponibili nella cartella `docs/`.
+Ulteriori dettagli sulla roadmap, i piani di milestone, i risultati e il changelog sono disponibili nella cartella `docs/`:
+
+- `docs/ROADMAP.md`
+- `docs/MILESTONE_1_PLAN.md`
+- `docs/MILESTONE_1_RESULTS.md`
+- `docs/PROJECT_SNAPSHOT.md`
+- `docs/CHANGELOG.md`
 
 ## Utilizzo
 
