@@ -1,0 +1,264 @@
+ip,hostname,mac,vendor,device_type,classification_confidence,security_score,manufacturer,model,open_ports
+192.168.100.2,192.168.100.2,68:6d:bc:79:04:bf,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.3,192.168.100.3,f8:4d:fc:32:76:23,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.4,192.168.100.4,f8:4d:fc:2e:1c:c8,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.5,192.168.100.5,68:6d:bc:79:04:b8,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.6,192.168.100.6,68:6d:bc:79:04:2e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.7,192.168.100.7,5c:34:5b:eb:54:70,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.8,192.168.100.8,98:df:82:57:d4:7d,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.9,192.168.100.9,08:a1:89:e2:a9:ce,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.10,192.168.100.10,08:a1:89:e2:aa:24,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.11,192.168.100.11,08:a1:89:e2:aa:21,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.12,192.168.100.12,08:a1:89:e2:a9:93,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.13,192.168.100.13,08:a1:89:e2:aa:07,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.14,192.168.100.14,08:a1:89:e2:ab:91,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.15,192.168.100.15,08:a1:89:e2:aa:37,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.16,192.168.100.16,08:a1:89:e2:a9:f7,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.17,192.168.100.17,08:a1:89:e2:a9:9e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.18,192.168.100.18,08:a1:89:e2:a9:9d,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.19,192.168.100.19,08:a1:89:e2:aa:22,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.20,192.168.100.20,08:a1:89:e2:a9:99,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.21,192.168.100.21,08:a1:89:e2:a9:a1,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.22,192.168.100.22,08:a1:89:e2:a9:ba,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.23,192.168.100.23,08:a1:89:e2:a9:ab,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.24,192.168.100.24,08:a1:89:e2:aa:e2,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.25,192.168.100.25,08:a1:89:e2:a9:8e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.26,192.168.100.26,08:a1:89:e2:a8:7e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.27,192.168.100.27,08:a1:89:e2:a9:f6,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.28,192.168.100.28,08:a1:89:e2:a9:bc,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.29,192.168.100.29,3c:2a:f4:8b:98:8e,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-L3730CDN series,80 443 515 631 9100
+192.168.100.30,192.168.100.30,08:a1:89:e2:a9:b2,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.31,192.168.100.31,08:a1:89:e2:aa:f6,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.32,192.168.100.32,40:ac:bf:b5:b5:4d,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.33,192.168.100.33,80:7c:62:4f:3f:67,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.34,192.168.100.34,40:ac:bf:b5:b6:24,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.35,192.168.100.35,80:7c:62:4f:3f:9f,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.36,192.168.100.36,80:7c:62:4f:43:bf,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.37,192.168.100.37,40:ac:bf:b5:b7:2f,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.38,192.168.100.38,80:7c:62:4f:43:3e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.40,192.168.100.40,80:7c:62:4f:40:e4,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.41,192.168.100.41,80:7c:62:4f:43:0d,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.42,192.168.100.42,80:7c:62:4f:3f:8e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.43,192.168.100.43,80:7c:62:4f:43:71,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.44,192.168.100.44,80:7c:62:4f:43:1e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.45,192.168.100.45,54:8c:81:5f:c4:43,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.46,192.168.100.46,80:7c:62:4f:41:a1,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.47,192.168.100.47,80:7c:62:4f:42:f6,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.48,192.168.100.48,80:7c:62:4f:42:f1,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.49,192.168.100.49,80:7c:62:4f:43:bd,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.50,192.168.100.50,b4:22:00:d0:02:c9,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother DCP-L5500DN series,80 443 515 631 9100
+192.168.100.51,192.168.100.51,3c:2a:f4:db:d2:45,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-L3730CDN series,80 443 515 631 9100
+192.168.100.52,192.168.100.52,80:7c:62:4f:43:be,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.53,192.168.100.53,80:7c:62:4f:42:cc,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.55,192.168.100.55,b4:22:00:db:c8:08,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-L5750DW series,80 443 515 631 9100
+192.168.100.58,192.168.100.58,80:7c:62:4f:40:f3,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.59,192.168.100.59,80:7c:62:4f:40:79,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.60,192.168.100.60,80:7c:62:4f:3f:87,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.61,192.168.100.61,80:7c:62:4f:43:27,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.62,192.168.100.62,80:7c:62:4f:41:80,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.63,192.168.100.63,80:7c:62:4f:43:14,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.100,192.168.100.100,6c:2b:59:b6:f7:a1,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.100.101,192.168.100.101,6c:2b:59:b6:f7:a7,Dell Inc.,PC Windows,0.65,77,Dell,,135 139 445 3389
+192.168.100.102,192.168.100.102,00:15:5d:ea:71:00,Microsoft Corporation,PC Windows,0.48,77,Microsoft,,53 135 139 445 3389
+192.168.100.103,192.168.100.103,44:a6:42:88:d8:9e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443 8443
+192.168.100.104,192.168.100.104,44:a6:42:88:d8:a0,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443 8443
+192.168.100.105,192.168.100.105,80:7c:62:52:2b:cb,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.106,192.168.100.106,40:ac:bf:b5:b5:5e,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.107,192.168.100.107,80:7c:62:52:2b:e6,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.108,192.168.100.108,40:ac:bf:b5:b5:b0,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.114,192.168.100.114,08:a1:89:05:a1:e9,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.119,192.168.100.119,40:ac:bf:b5:b5:6b,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.120,192.168.100.120,08:a1:89:e2:a9:74,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.121,192.168.100.121,40:ac:bf:b5:b5:6d,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.122,192.168.100.122,40:ac:bf:b5:b5:6a,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.125,192.168.100.125,94:dd:f8:91:4b:88,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-L2922DW,80 443 515 631 9100
+192.168.100.126,192.168.100.126,cc:96:e5:1f:7a:3f,Dell Inc.,PC Windows,0.65,92,Dell,,135 139 445
+192.168.100.127,192.168.100.127,e8:9c:25:22:87:f0,ASUSTek COMPUTER INC.,PC Windows,1.0,100,ASUSTek COMPUTER INC.,,135
+192.168.100.128,192.168.100.128,80:7c:62:16:1e:20,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.129,192.168.100.129,40:ac:bf:b5:b6:42,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.130,192.168.100.130,3c:49:37:05:e1:ab,ASSMANN Electronic GmbH,Stampante,0.46,72,ASSMANN Electronic GmbH,ZOT-PS-56/9.9.9033,23 80 139 515 9100
+192.168.100.131,192.168.100.131,b4:22:00:99:bc:6d,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-B7715DW series,80 443 515 631 9100
+192.168.100.133,192.168.100.133,40:ac:bf:b5:b5:79,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.137,192.168.100.137,14:ac:60:13:58:12,CLOUD NETWORK TECHNOLOGY SINGAPORE PTE. LTD.,Stampante,0.61,100,Brother,Brother HL-L2442DW,80 443 515 631 9100
+192.168.100.146,192.168.100.146,b4:22:00:c4:40:b0,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother DCP-L5500DN series,80 443 515 631 9100
+192.168.100.147,192.168.100.147,00:41:0e:2d:26:03,CLOUD NETWORK TECHNOLOGY SINGAPORE PTE. LTD.,Stampante,0.61,100,Brother,Brother DCP-B7520DW series,80 443 515 631 9100
+192.168.100.148,192.168.100.148,80:ce:62:5b:39:ad,Hewlett Packard,Stampante,0.68,100,Hewlett Packard,,80 443 515 631 9100
+192.168.100.149,192.168.100.149,94:dd:f8:6b:34:8a,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother HL-L6210DW series,80 443 515 631 9100
+192.168.100.162,192.168.100.162,ac:e2:d3:46:13:47,Hewlett Packard,Stampante,0.61,100,HP,HP LaserJet MFP M426fdw 192.168.100.162,80 443 515 631 8080 9100
+192.168.100.169,192.168.100.169,44:a6:42:88:d9:69,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443 8443
+192.168.100.170,192.168.100.170,cc:5e:f8:30:54:7f,CLOUD NETWORK TECHNOLOGY SINGAPORE PTE. LTD.,Stampante,0.61,100,Brother,Brother MFC-L2710DW series,80 443 515 631 9100
+192.168.100.171,192.168.100.171,3c:0a:f3:f3:e6:6d,CLOUD NETWORK TECHNOLOGY SINGAPORE PTE. LTD.,Stampante,0.61,100,Brother,Brother DCP-B7620DW,80 443 515 631 9100
+192.168.100.172,192.168.100.172,3c:2a:f4:95:5a:bf,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-L6900DW series,80 443 515 631 9100
+192.168.100.179,192.168.100.179,08:a1:89:e2:aa:47,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.182,192.168.100.182,44:a6:42:88:d9:26,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443 8443
+192.168.100.186,192.168.100.186,40:ac:bf:b5:b5:ae,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.187,192.168.100.187,68:6d:bc:79:04:11,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.188,192.168.100.188,40:ac:bf:b5:b5:60,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.191,192.168.100.191,34:64:a9:6f:f1:be,Hewlett Packard,Stampante,0.61,80,HP,HP LaserJet 400 MFP M425dw 192.168.100.191,23 80 443 515 631 8080 9100
+192.168.100.194,192.168.100.194,90:2b:34:43:d3:77,"GIGA-BYTE TECHNOLOGY CO.,LTD.",PC Windows,0.65,77,"GIGA-BYTE TECHNOLOGY CO.,LTD.",,135 139 445 3389
+192.168.100.199,192.168.100.199,40:ac:bf:b5:b5:ba,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.200,192.168.100.200,3c:1b:f8:69:5b:de,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.208,192.168.100.208,40:ac:bf:b5:b5:b9,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.211,192.168.100.211,ac:b9:2f:8d:86:25,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,100,Hikvision,,80 443
+192.168.100.220,192.168.100.220,08:8f:c3:be:fc:97,"COMPAL INFORMATION (KUNSHAN) CO., LTD.",PC Windows,0.65,92,"COMPAL INFORMATION (KUNSHAN) CO., LTD.",,135 139 445
+192.168.100.236,192.168.100.236,64:db:8b:36:88:ee,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,0.45,92,Hikvision,,80
+192.168.100.237,192.168.100.237,64:db:8b:36:89:bf,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.238,192.168.100.238,64:db:8b:36:89:d3,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.239,192.168.100.239,64:db:8b:36:89:a5,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.240,192.168.100.240,b4:a3:82:d6:4c:7b,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.247,192.168.100.247,64:db:8b:41:27:0c,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.248,192.168.100.248,64:db:8b:41:27:8b,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.100.249,192.168.100.249,64:db:8b:41:27:c5,"Hangzhou Hikvision Digital Technology Co.,Ltd.",Telecamera IP,1.0,100,Hikvision,,
+192.168.101.1,192.168.101.1,14:49:bc:36:f8:88,DrayTek Corp.,Server,0.51,92,DrayTek Corp.,Vigor Login Page,22 80
+192.168.101.11,192.168.101.11,14:49:bc:41:47:cf,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.12,192.168.101.12,14:49:bc:59:32:52,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.13,192.168.101.13,14:49:bc:59:32:89,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.15,192.168.101.15,14:49:bc:50:03:b5,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.16,192.168.101.16,14:49:bc:48:14:c8,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.17,192.168.101.17,14:49:bc:5f:b3:94,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.18,192.168.101.18,14:49:bc:50:63:3a,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,Vigor,22 23 80 443
+192.168.101.20,192.168.101.20,14:49:bc:50:6d:a3,DrayTek Corp.,unknown,0.0,100,DrayTek Corp.,,
+192.168.101.21,192.168.101.21,14:49:bc:42:f9:34,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.22,192.168.101.22,14:49:bc:42:f6:d4,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.23,192.168.101.23,14:49:bc:42:f8:78,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.24,192.168.101.24,14:49:bc:42:f6:be,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.25,192.168.101.25,14:49:bc:42:f8:f6,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.27,192.168.101.27,14:49:bc:42:f7:52,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.28,192.168.101.28,14:49:bc:42:f7:56,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.29,192.168.101.29,14:49:bc:42:f8:e8,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.31,192.168.101.31,14:49:bc:42:f6:9e,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.32,192.168.101.32,28:87:ba:14:1b:ee,TP-Link Systems Inc,Router,0.34,100,TP-Link Systems Inc,TP-LINK HTTPD/1.0,80 443
+192.168.101.33,192.168.101.33,14:49:bc:42:f6:98,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.34,192.168.101.34,94:a6:7e:b2:0a:c0,NETGEAR,Router,0.56,100,NETGEAR,lighttpd/1.4.55,53 80 443
+192.168.101.35,192.168.101.35,14:49:bc:44:8a:f6,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.36,192.168.101.36,14:49:bc:44:86:3c,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.37,192.168.101.37,14:49:bc:44:8a:72,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.38,192.168.101.38,14:49:bc:44:86:30,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.39,192.168.101.39,14:49:bc:44:89:64,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.40,192.168.101.40,14:49:bc:44:85:e6,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.41,192.168.101.41,cc:96:e5:fa:58:0a,Dell Inc.,Server,0.62,100,Dell,,22 80 443
+192.168.101.42,192.168.101.42,14:23:f2:41:6b:80,Broadcom Limited,unknown,0.0,100,Broadcom Limited,,
+192.168.101.44,192.168.101.44,00:15:5d:65:ca:00,Microsoft Corporation,PC Windows,0.48,77,Microsoft,,53 135 139 445 3389
+192.168.101.45,192.168.101.45,00:15:5d:65:ca:01,Microsoft Corporation,PC Windows,0.65,77,Microsoft,,135 139 445 3389
+192.168.101.46,192.168.101.46,00:15:5d:65:ca:02,Microsoft Corporation,PC Windows,0.53,77,Microsoft,,80 135 139 443 445 3389
+192.168.101.47,192.168.101.47,00:15:5d:65:ca:03,Microsoft Corporation,PC Windows,0.53,69,Microsoft,,80 135 139 445 3389
+192.168.101.48,192.168.101.48,00:15:5d:65:ca:04,Microsoft Corporation,PC Windows,0.44,69,Microsoft,,80 135 445 3389
+192.168.101.50,192.168.101.50,00:1b:9c:0b:62:f1,SATEL sp. z o.o.,Server,0.52,92,SATEL sp. z o.o.,ETHM-1 Plus,80
+192.168.101.51,192.168.101.51,14:49:bc:44:8a:fc,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.53,192.168.101.53,14:49:bc:44:8b:0c,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.55,192.168.101.55,14:49:bc:44:89:7e,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.56,192.168.101.56,14:49:bc:44:87:42,DrayTek Corp.,Server,0.51,80,DrayTek Corp.,,22 23 80 443
+192.168.101.61,192.168.101.61,90:09:d0:3b:d0:ad,Synology Incorporated,NAS,0.39,92,Synology,,80 139 443 445
+192.168.101.62,192.168.101.62,90:09:d0:3b:d0:ae,Synology Incorporated,NAS,0.39,92,Synology,,80 139 443 445
+192.168.101.66,192.168.101.66,28:29:86:73:3a:01,APC by Schneider Electric,Server,0.51,100,APC by Schneider Electric,,22 443
+192.168.101.69,192.168.101.69,20:88:10:8a:93:74,Dell Inc.,PC Windows,0.65,92,Dell,,135 139 445
+192.168.101.75,192.168.101.75,18:c0:4d:64:3d:8d,"GIGA-BYTE TECHNOLOGY CO.,LTD.",unknown,0.0,100,"GIGA-BYTE TECHNOLOGY CO.,LTD.",,
+192.168.101.150,192.168.101.150,00:07:4d:b2:92:a9,Zebra Technologies Corp.,Stampante,0.51,92,Zebra,ZEBRA1 - GOTOWE,80 515 9100
+192.168.101.197,192.168.101.197,00:11:32:3f:53:70,Synology Incorporated,NAS,0.39,92,Synology,,80 139 443 445
+192.168.102.2,192.168.102.2,48:e7:29:6e:23:f9,Espressif Inc.,unknown,0.0,100,Espressif Inc.,,
+192.168.102.3,192.168.102.3,60:01:94:47:40:58,Espressif Inc.,unknown,0.0,100,Espressif Inc.,,
+192.168.102.6,192.168.102.6,d8:bc:38:83:8e:69,Espressif Inc.,unknown,0.0,100,Espressif Inc.,,
+192.168.102.9,192.168.102.9,9a:e3:be:f2:34:34,,unknown,0.0,100,,,
+192.168.102.15,192.168.102.15,4c:d7:17:8a:a9:57,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.16,192.168.102.16,04:7b:cb:6e:91:10,"Universal Global Scientific Industrial., Ltd",unknown,0.0,100,"Universal Global Scientific Industrial., Ltd",,
+192.168.102.17,192.168.102.17,04:7b:cb:6e:9d:3e,"Universal Global Scientific Industrial., Ltd",unknown,0.0,100,"Universal Global Scientific Industrial., Ltd",,
+192.168.102.18,192.168.102.18,e8:39:35:31:a9:cc,Hewlett Packard,unknown,0.0,100,Hewlett Packard,,
+192.168.102.21,192.168.102.21,d6:c0:38:61:b0:a3,,unknown,0.0,100,,,
+192.168.102.24,192.168.102.24,e4:70:b8:0d:f5:c5,Intel Corporate,unknown,0.0,100,Intel Corporate,,
+192.168.102.30,192.168.102.30,86:e1:23:0c:f0:12,,unknown,0.0,100,,,
+192.168.102.31,192.168.102.31,cc:96:e5:48:78:0e,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.32,192.168.102.32,cc:96:e5:34:ab:a6,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.34,192.168.102.34,08:5a:11:a2:c0:90,D-Link International,Server,0.52,92,D-Link International,,80
+192.168.102.35,192.168.102.35,00:e0:db:6e:23:10,"ViaVideo Communications, Inc.",unknown,0.0,100,"ViaVideo Communications, Inc.",,
+192.168.102.37,192.168.102.37,e0:46:ee:25:a4:d5,NETGEAR,Server,0.4,92,NETGEAR,,22 80
+192.168.102.43,192.168.102.43,00:eb:d8:a6:95:0e,"MERCUSYS TECHNOLOGIES CO., LTD.",PC Windows,1.0,85,"MERCUSYS TECHNOLOGIES CO., LTD.",,3389
+192.168.102.45,192.168.102.45,36:30:a9:82:70:86,,unknown,0.0,100,,,
+192.168.102.46,192.168.102.46,d0:ad:08:57:8a:62,HP Inc.,unknown,0.0,100,HP,,
+192.168.102.48,192.168.102.48,f8:b1:56:b8:6d:77,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.51,192.168.102.51,1a:17:a6:39:01:b1,,unknown,0.0,100,,,
+192.168.102.52,192.168.102.52,82:67:fc:3b:46:77,,unknown,0.0,100,,,
+192.168.102.54,192.168.102.54,04:7b:cb:6d:f3:b8,"Universal Global Scientific Industrial., Ltd",unknown,0.0,100,"Universal Global Scientific Industrial., Ltd",,
+192.168.102.55,192.168.102.55,4c:cc:6a:ba:74:e8,"Micro-Star INTL CO., LTD.",unknown,0.0,100,"Micro-Star INTL CO., LTD.",,
+192.168.102.56,192.168.102.56,04:7b:cb:6e:9e:b8,"Universal Global Scientific Industrial., Ltd",unknown,0.0,100,"Universal Global Scientific Industrial., Ltd",,
+192.168.102.57,192.168.102.57,9a:18:c6:06:0e:de,,unknown,0.0,100,,,
+192.168.102.59,192.168.102.59,28:16:7f:69:d3:48,Xiaomi Communications Co Ltd,unknown,0.0,100,Xiaomi Communications Co Ltd,,
+192.168.102.61,192.168.102.61,ac:fd:ce:93:52:7e,Intel Corporate,unknown,0.0,100,Intel Corporate,,
+192.168.102.65,192.168.102.65,6e:74:90:fa:51:2d,,unknown,0.0,100,,,
+192.168.102.66,192.168.102.66,52:97:61:a8:d9:1f,,unknown,0.0,100,,,
+192.168.102.68,192.168.102.68,06:ef:22:19:f5:f5,,unknown,0.0,100,,,
+192.168.102.76,192.168.102.76,00:1b:21:e5:10:e8,Intel Corporate,unknown,0.0,100,Intel Corporate,,
+192.168.102.77,192.168.102.77,f8:b1:56:c7:7f:ed,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.78,192.168.102.78,20:88:10:95:96:46,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.79,192.168.102.79,62:39:9a:6b:45:b1,,unknown,0.0,100,,,
+192.168.102.81,192.168.102.81,da:f2:f4:61:50:04,,unknown,0.0,100,,,
+192.168.102.83,192.168.102.83,14:49:bc:36:f8:88,DrayTek Corp.,unknown,0.0,100,DrayTek Corp.,,
+192.168.102.85,192.168.102.85,74:86:e2:16:35:eb,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.87,192.168.102.87,d8:bb:c1:bf:cf:cb,"Micro-Star INTL CO., LTD.",unknown,0.0,100,"Micro-Star INTL CO., LTD.",,
+192.168.102.89,192.168.102.89,cc:96:e5:1f:c8:8a,Dell Inc.,PC Windows,0.65,92,Dell,,135 139 445
+192.168.102.90,192.168.102.90,a6:5a:af:29:44:b7,,unknown,0.0,100,,,
+192.168.102.91,192.168.102.91,e8:39:35:30:4e:90,Hewlett Packard,unknown,0.0,100,Hewlett Packard,,
+192.168.102.93,192.168.102.93,a8:8c:ee:00:67:a0,MicroMade Galka i Drozdz sp.j.,Server,0.52,92,MicroMade Galka i Drozdz sp.j.,Kontroler_bibi-K22,80
+192.168.102.94,192.168.102.94,a8:8c:ee:00:67:a2,MicroMade Galka i Drozdz sp.j.,Server,0.52,92,MicroMade Galka i Drozdz sp.j.,Kontroler_bibi-K22,80
+192.168.102.95,192.168.102.95,3e:2c:87:33:cf:f6,,unknown,0.0,100,,,
+192.168.102.101,192.168.102.101,34:17:eb:ba:8d:ca,Dell Inc.,PC Windows,0.65,92,Dell,,135 139 445
+192.168.102.102,192.168.102.102,a8:8c:ee:00:67:a1,MicroMade Galka i Drozdz sp.j.,Server,0.52,92,MicroMade Galka i Drozdz sp.j.,Kontroler_bibi-K22,80
+192.168.102.103,192.168.102.103,aa:64:dd:d7:46:ad,,unknown,0.0,100,,,
+192.168.102.104,192.168.102.104,46:a5:88:ed:a0:35,,unknown,0.0,100,,,
+192.168.102.105,192.168.102.105,e8:9c:25:22:ff:42,ASUSTek COMPUTER INC.,unknown,0.0,100,ASUSTek COMPUTER INC.,,
+192.168.102.106,192.168.102.106,1a:85:c0:d7:8e:b0,,unknown,0.0,100,,,
+192.168.102.107,192.168.102.107,2e:6a:f3:ad:ad:8d,,unknown,0.0,100,,,
+192.168.102.108,192.168.102.108,c2:ed:fb:c9:5d:a3,,unknown,0.0,100,,,
+192.168.102.109,192.168.102.109,34:17:eb:dd:37:fe,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.112,192.168.102.112,04:7b:cb:6e:9e:ce,"Universal Global Scientific Industrial., Ltd",unknown,0.0,100,"Universal Global Scientific Industrial., Ltd",,
+192.168.102.113,192.168.102.113,98:ee:cb:75:f1:a2,Wistron Infocomm (Zhongshan) Corporation,unknown,0.0,100,Wistron Infocomm (Zhongshan) Corporation,,
+192.168.102.116,192.168.102.116,ec:d0:9f:33:a7:8e,Xiaomi Communications Co Ltd,unknown,0.0,100,Xiaomi Communications Co Ltd,,
+192.168.102.118,192.168.102.118,04:34:f6:a7:6e:22,"Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.",unknown,0.0,100,"Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.",,
+192.168.102.121,192.168.102.121,04:34:f6:2a:e6:dc,"Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.",unknown,0.0,100,"Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.",,
+192.168.102.126,192.168.102.126,3a:06:99:80:0d:70,,unknown,0.0,100,,,
+192.168.102.128,192.168.102.128,16:a3:4d:e2:13:68,,unknown,0.0,100,,,
+192.168.102.130,192.168.102.130,a2:be:c5:9e:7c:03,,unknown,0.0,100,,,
+192.168.102.132,192.168.102.132,4e:e2:63:88:6a:7a,,unknown,0.0,100,,,
+192.168.102.133,192.168.102.133,00:be:43:e4:ce:ad,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.135,192.168.102.135,94:dd:f8:38:71:b9,"Brother Industries, LTD.",Stampante,0.61,100,Brother,Brother MFC-L2862DW,80 443 515 631 9100
+192.168.102.136,192.168.102.136,fc:34:97:17:4b:70,ASUSTek COMPUTER INC.,unknown,0.0,100,ASUSTek COMPUTER INC.,,
+192.168.102.137,192.168.102.137,20:53:8d:3b:30:a4,"Hon Hai Precision Industry Co., Ltd.",unknown,0.0,100,"Hon Hai Precision Industry Co., Ltd.",,
+192.168.102.138,192.168.102.138,82:45:9f:22:b9:ab,,unknown,0.0,100,,,
+192.168.102.140,192.168.102.140,90:2b:34:45:50:88,"GIGA-BYTE TECHNOLOGY CO.,LTD.",unknown,0.0,100,"GIGA-BYTE TECHNOLOGY CO.,LTD.",,
+192.168.102.142,192.168.102.142,6c:4b:90:f2:1d:c4,LiteON,unknown,0.0,100,LiteON,,
+192.168.102.144,192.168.102.144,d0:46:0c:a4:7f:24,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.145,192.168.102.145,00:be:43:f5:64:38,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.147,192.168.102.147,d8:9e:f3:3b:6e:26,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.148,192.168.102.148,f4:8e:38:de:60:57,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.149,192.168.102.149,86:e1:05:d9:7e:93,,unknown,0.0,100,,,
+192.168.102.150,192.168.102.150,3c:7c:3f:c3:93:8c,ASUSTek COMPUTER INC.,unknown,0.0,100,ASUSTek COMPUTER INC.,,
+192.168.102.151,192.168.102.151,1a:79:0e:a1:7c:62,,unknown,0.0,100,,,
+192.168.102.152,192.168.102.152,cc:96:e5:2c:3e:f0,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.155,192.168.102.155,60:cf:84:c0:8c:f3,ASUSTek COMPUTER INC.,unknown,0.0,100,ASUSTek COMPUTER INC.,,
+192.168.102.156,192.168.102.156,cc:96:e5:21:8a:95,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.157,192.168.102.157,5e:c0:fe:3d:04:9a,,unknown,0.0,100,,,
+192.168.102.159,192.168.102.159,da:ef:22:ee:ed:9f,,unknown,0.0,100,,,
+192.168.102.160,192.168.102.160,a8:8c:ee:00:98:06,MicroMade Galka i Drozdz sp.j.,Server,0.52,92,MicroMade Galka i Drozdz sp.j.,Kontroler_bibi-K22,80
+192.168.102.161,192.168.102.161,d8:5e:d3:17:51:c6,"GIGA-BYTE TECHNOLOGY CO.,LTD.",unknown,0.0,100,"GIGA-BYTE TECHNOLOGY CO.,LTD.",,
+192.168.102.162,192.168.102.162,ba:b2:30:55:08:9d,,unknown,0.0,100,,,
+192.168.102.163,192.168.102.163,0a:65:22:ec:18:23,,unknown,0.0,100,,,
+192.168.102.164,192.168.102.164,00:be:43:f2:1a:08,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.165,192.168.102.165,ee:be:cb:76:13:93,,unknown,0.0,100,,,
+192.168.102.166,192.168.102.166,76:0a:b5:b9:0c:15,,unknown,0.0,100,,,
+192.168.102.167,192.168.102.167,60:32:b1:d8:e1:e7,"TP-LINK TECHNOLOGIES CO.,LTD.",Router,1.0,100,"TP-LINK TECHNOLOGIES CO.,LTD.",,
+192.168.102.169,192.168.102.169,1a:6e:df:ee:a6:95,,unknown,0.0,100,,,
+192.168.102.176,192.168.102.176,c8:1f:66:12:c0:dd,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.177,192.168.102.177,52:8d:99:83:11:45,,unknown,0.0,100,,,
+192.168.102.178,192.168.102.178,18:c0:4d:e3:12:ae,"GIGA-BYTE TECHNOLOGY CO.,LTD.",unknown,0.0,100,"GIGA-BYTE TECHNOLOGY CO.,LTD.",,
+192.168.102.182,192.168.102.182,3e:2a:1e:e6:82:f9,,unknown,0.0,100,,,
+192.168.102.185,192.168.102.185,08:be:ac:1d:0a:76,Edimax Technology Co. Ltd.,PC Windows,0.33,92,Microsoft,,80 135 139 443 445 515
+192.168.102.186,192.168.102.186,88:ae:dd:b2:60:a5,"EliteGroup Computer Systems Co., LTD",unknown,0.0,100,"EliteGroup Computer Systems Co., LTD",,
+192.168.102.188,192.168.102.188,3a:c3:6b:10:4c:d4,,unknown,0.0,100,,,
+192.168.102.192,192.168.102.192,cc:96:e5:1f:cc:27,Dell Inc.,unknown,0.0,100,Dell,,
+192.168.102.193,192.168.102.193,c6:63:21:fa:c3:e8,,unknown,0.0,100,,,
+192.168.102.195,192.168.102.195,6e:24:96:50:39:63,,unknown,0.0,100,,,
+192.168.102.196,192.168.102.196,a8:8c:ee:00:99:60,MicroMade Galka i Drozdz sp.j.,Server,0.52,92,MicroMade Galka i Drozdz sp.j.,Kontroler_bibi-K22,80
+192.168.102.197,192.168.102.197,5a:57:b7:f6:e5:ae,,unknown,0.0,100,,,
+192.168.102.198,host.docker.internal,18:66:da:1d:f2:00,Dell Inc.,PC Windows,0.65,92,Dell,,135 139 445
+192.168.102.203,192.168.102.203,fc:b3:bc:a0:49:d4,Intel Corporate,unknown,0.0,100,Intel Corporate,,
+192.168.102.205,192.168.102.205,34:b9:8d:ed:de:7e,Xiaomi Communications Co Ltd,unknown,0.0,100,Xiaomi Communications Co Ltd,,
+192.168.102.214,192.168.102.214,b4:6b:fc:e1:be:be,Intel Corporate,unknown,0.0,100,Intel Corporate,,

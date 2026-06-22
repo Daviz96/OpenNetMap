@@ -1,0 +1,15 @@
+{
+  "Brother": {
+    "type": "Stampante",
+    "keywords": ["Brother", "MFC-", "DCP-", "HL-L"]
+  },
+  "HP": {
+    "type": "Stampante",
+    "keywords": ["HP LaserJet", "Hewlett Packard"]
+  },
+  "Hikvision": {
+    "type": "Telecamera IP",
+    "keywords": ["Hikvision", "webserver"]
+  }
+}
+
