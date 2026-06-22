@@ -1,47 +1,50 @@
 # Milestone 1 Results — Stabilizzazione e Cleanup
 
 ## Obiettivo
-Stabilizzare il progetto esistente introducendo strumenti di sviluppo, test e pipeline CI, senza modificare radicalmente la struttura del codice.
+Stabilizzare il progetto esistente introducendo strumenti di sviluppo, test e pipeline CI, mantenendo la struttura attuale del codice e migliorando la qualità complessiva.
 
 ## Cosa è stato fatto
 
 - Aggiunta configurazione di sviluppo:
   - `pyproject.toml` con `black`, `ruff`, `mypy`, `isort`
-  - `requirements/dev.txt` con dipendenze dev
+  - `requirements/dev.txt` con dipendenze dev, inclusa `httpx2` per i test FastAPI
   - `.pre-commit-config.yaml` con hook per `black` e `ruff`
   - `.github/workflows/ci.yml` con pipeline CI per `ruff`, `black`, `mypy` e `pytest`
-- Aggiunta folder `docs/` per i documenti Markdown, mantenendo solo `README.md` nella root
+- Consolidamento della documentazione in `docs/`, mantenendo solo `README.md` nella root
 - Creazione di report e piani:
   - `docs/ROADMAP.md`
   - `docs/MILESTONE_1_PLAN.md`
   - `docs/PROJECT_SNAPSHOT.md`
-- Aggiunta supporto iniziale per il packaging:
-  - `src/opennetmap/__init__.py`
-- Aggiunta test di base:
+- Estensione della copertura dei test per moduli chiave:
   - `tests/test_smoke.py`
   - `tests/test_inventory.py`
   - `tests/test_topology.py`
   - `tests/test_network_utils.py`
+  - `tests/test_main.py`
+  - `tests/test_reports.py`
+  - `tests/test_api.py`
+  - `tests/test_store.py`
 - Aggiunte regole di `.gitignore` per ambienti virtuali e file Python compilati
 
 ## Verifiche eseguite
 
-- `python -m pytest -q` → **13 passed**
+- `python -m pytest -q` → **25 passed**
 - `python -m ruff check .` → passato
 - `python -m black --check .` → passato
 - `python -m mypy --ignore-missing-imports .` → passato
 
 ## Risultati principali
 
-- Il progetto ora dispone di una base di sviluppo e di qualità del codice replicabile
-- La documentazione è centralizzata in `docs/`
-- La pipeline CI è pronta per eseguire i controlli automatici su GitHub
-- È stato aggiunto un primo set di test unitari per l'inventario, la topologia e le utilità di rete
+- Il progetto ora dispone di una base di sviluppo e qualità del codice stabile e replicabile
+- La documentazione è centralizzata in `docs/`, con milestone e roadmap chiare
+- La pipeline CI su GitHub esegue i controlli di formattazione, linting, tipizzazione e test
+- È stata introdotta copertura di test aggiuntiva per API FastAPI e persistenza SQLite
+- `requirements/dev.txt` include la dipendenza `httpx2` necessaria per i test di integrazione API
 
 ## Prossimi passi suggeriti
 
-1. Estendere la copertura dei test ai moduli API e report
-2. Migrare gradualmente il codice in `src/opennetmap` e aggiornare gli import
-3. Introdurre tipizzazione più completa nei moduli critici
-4. Verificare i flussi reali di scansione in ambiente controllato
-5. Documentare i casi d'uso principali e le istruzioni di deployment
+1. Continuare a estendere la copertura dei test verso i moduli di reportistica e discovery
+2. Verificare i flussi reali di scansione e di salvataggio inventario in ambiente di test
+3. Aggiungere documentazione d'uso per CLI, API e pipeline CI
+4. Valutare la separazione del codice in un package installabile, se necessario per il deployment
+5. Integrare casi d'uso reali e scenari di regressione nel set di test
