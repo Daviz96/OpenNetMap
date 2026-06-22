@@ -83,6 +83,7 @@ _JOBS_LOCK = threading.Lock()
 
 def create_app(db_path: str = "inventory.db") -> FastAPI:
     """Create the REST API and dashboard application."""
+    InventoryStore(db_path)
     app = FastAPI(title="Network Inventory API", version="0.2.0")
 
     @app.get("/", response_class=HTMLResponse)
