@@ -39,10 +39,17 @@ def _favicon_hash(base_url: str, html: str, timeout: float) -> str | None:
     soup = BeautifulSoup(html, "html.parser")
     href = None
     for link in soup.find_all("link"):
-        rel = " ".join(link.get("rel", [])).lower()
+        rel_values: str | list[str] | None = link.get("rel")
+        if isinstance(rel_values, str):
+            rel_values = [rel_values]
+        elif rel_values is None or not isinstance(rel_values, list):
+            rel_values = []
+        rel = " ".join(rel_values).lower()
         if "icon" in rel:
-            href = link.get("href")
-            break
+            href_value = link.get("href")
+            if isinstance(href_value, str):
+                href = href_value
+                break
     favicon_url = urljoin(base_url, href or "/favicon.ico")
     try:
         response = requests.get(favicon_url, timeout=timeout, verify=False)
@@ -51,4 +58,3 @@ def _favicon_hash(base_url: str, html: str, timeout: float) -> str | None:
     except requests.RequestException:
         return None
     return None
-

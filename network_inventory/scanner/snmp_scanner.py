@@ -46,4 +46,3 @@ def scan_snmp(ip: str, timeout: float = 1.0) -> dict[str, object]:
         if success:
             return result
     return {}
-

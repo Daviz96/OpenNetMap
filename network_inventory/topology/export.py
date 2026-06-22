@@ -5,15 +5,20 @@ from __future__ import annotations
 import html
 import json
 from pathlib import Path
+from typing import cast
 
 from network_inventory.inventory.device import Device
 
 
-def build_topology(devices: list[Device], subnet: str | None = None) -> dict[str, object]:
+def build_topology(
+    devices: list[Device], subnet: str | None = None
+) -> dict[str, object]:
     """Build a simple star topology from the scan result."""
     root_id = subnet or "network"
-    nodes = [{"id": root_id, "label": root_id, "type": "network"}]
-    edges = []
+    nodes: list[dict[str, object]] = [
+        {"id": root_id, "label": root_id, "type": "network"}
+    ]
+    edges: list[dict[str, object]] = []
     for device in devices:
         node_id = f"{device.mac or 'no-mac'}|{device.ip}"
         nodes.append(
@@ -30,7 +35,9 @@ def build_topology(devices: list[Device], subnet: str | None = None) -> dict[str
     return {"nodes": nodes, "edges": edges}
 
 
-def write_topology_exports(devices: list[Device], stats: dict[str, object], output_dir: str | Path) -> list[Path]:
+def write_topology_exports(
+    devices: list[Device], stats: dict[str, object], output_dir: str | Path
+) -> list[Path]:
     """Write topology JSON, GraphML and HTML files."""
     path = Path(output_dir)
     path.mkdir(parents=True, exist_ok=True)
@@ -44,13 +51,15 @@ def write_topology_exports(devices: list[Device], stats: dict[str, object], outp
 
 
 def _write_json(topology: dict[str, object], path: Path) -> Path:
-    path.write_text(json.dumps(topology, indent=2, ensure_ascii=False), encoding="utf-8")
+    path.write_text(
+        json.dumps(topology, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     return path
 
 
 def _write_graphml(topology: dict[str, object], path: Path) -> Path:
-    nodes = topology["nodes"]
-    edges = topology["edges"]
+    nodes = cast(list[dict[str, object]], topology["nodes"])
+    edges = cast(list[dict[str, object]], topology["edges"])
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<graphml xmlns="http://graphml.graphdrawing.org/xmlns">',
@@ -59,7 +68,13 @@ def _write_graphml(topology: dict[str, object], path: Path) -> Path:
     for node in nodes:
         node_id = html.escape(str(node["id"]))
         label = html.escape(str(node.get("label") or node_id))
-        lines.extend([f'    <node id="{node_id}">', f'      <data key="label">{label}</data>', "    </node>"])
+        lines.extend(
+            [
+                f'    <node id="{node_id}">',
+                f'      <data key="label">{label}</data>',
+                "    </node>",
+            ]
+        )
     for index, edge in enumerate(edges):
         source = html.escape(str(edge["source"]))
         target = html.escape(str(edge["target"]))
@@ -70,8 +85,8 @@ def _write_graphml(topology: dict[str, object], path: Path) -> Path:
 
 
 def _write_html(topology: dict[str, object], path: Path) -> Path:
-    nodes = topology["nodes"]
-    edges = topology["edges"]
+    nodes = cast(list[dict[str, object]], topology["nodes"])
+    edges = cast(list[dict[str, object]], topology["edges"])
     items = "\n".join(
         f"<li><strong>{html.escape(str(node.get('label')))}</strong> "
         f"<span>{html.escape(str(node.get('type', '')))}</span> "

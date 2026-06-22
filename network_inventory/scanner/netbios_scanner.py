@@ -9,7 +9,13 @@ import subprocess
 def scan_netbios(ip: str, timeout: float = 2.0) -> dict[str, object]:
     """Collect NetBIOS names with nbtstat if the command exists."""
     try:
-        completed = subprocess.run(["nbtstat", "-A", ip], capture_output=True, check=False, text=True, timeout=timeout)
+        completed = subprocess.run(
+            ["nbtstat", "-A", ip],
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=timeout,
+        )
     except (OSError, subprocess.SubprocessError):
         return {}
 
@@ -28,4 +34,3 @@ def scan_netbios(ip: str, timeout: float = 2.0) -> dict[str, object]:
         elif suffix == "00" and kind.upper() == "GROUP":
             workgroup = name
     return {"names": names, "workgroup": workgroup}
-

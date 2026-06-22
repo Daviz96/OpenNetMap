@@ -49,13 +49,19 @@ def detect_local_network() -> NetworkInfo:
 
     _, local_ip, netmask = candidates[0]
     network = ipaddress.IPv4Network(f"{local_ip}/{netmask}", strict=False)
-    return NetworkInfo(local_ip=local_ip, netmask=netmask, gateway=gateway, cidr=str(network))
+    return NetworkInfo(
+        local_ip=local_ip, netmask=netmask, gateway=gateway, cidr=str(network)
+    )
 
 
 def subnet_stats(cidr: str, active_hosts: int) -> dict[str, object]:
     """Calculate basic subnet utilization statistics."""
     network = ipaddress.ip_network(cidr, strict=False)
-    total_hosts = max(network.num_addresses - 2, 0) if network.version == 4 else network.num_addresses
+    total_hosts = (
+        max(network.num_addresses - 2, 0)
+        if network.version == 4
+        else network.num_addresses
+    )
     free_hosts = max(total_hosts - active_hosts, 0)
     utilization = round((active_hosts / total_hosts) * 100, 2) if total_hosts else 0.0
     return {
@@ -96,8 +102,9 @@ def _gateway_interface(gateway: str | None) -> str | None:
         for addr in addrs:
             if addr.family != socket.AF_INET or not addr.address or not addr.netmask:
                 continue
-            network = ipaddress.ip_network(f"{addr.address}/{addr.netmask}", strict=False)
+            network = ipaddress.ip_network(
+                f"{addr.address}/{addr.netmask}", strict=False
+            )
             if gateway_ip in network:
                 return iface_name
     return None
-

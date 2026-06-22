@@ -28,6 +28,33 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Sviluppo
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+pip install -r requirements/dev.txt
+```
+
+Esegui i controlli localmente con:
+
+```bash
+python -m ruff check .
+python -m black --check .
+python -m mypy --ignore-missing-imports .
+python -m pytest -q
+```
+
+## CI / GitHub Actions
+
+Una pipeline CI è configurata in `.github/workflows/ci.yml` e esegue:
+
+- installazione delle dipendenze runtime e dev
+- `ruff check .`
+- `black --check .`
+- `pytest -q`
+
 ## Utilizzo
 
 ```bash

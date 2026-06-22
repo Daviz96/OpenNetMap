@@ -4,9 +4,28 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-DEFAULT_PORTS = [22, 23, 53, 80, 135, 139, 443, 445, 515, 631, 9100, 161, 3389, 8080, 8443, 10001]
+DEFAULT_PORTS = [
+    22,
+    23,
+    53,
+    80,
+    135,
+    139,
+    443,
+    445,
+    515,
+    631,
+    9100,
+    161,
+    3389,
+    8080,
+    8443,
+    10001,
+]
 TOP_PORTS = [22, 53, 80, 135, 139, 443, 445, 631, 9100, 161, 3389, 8080]
-FULL_PORTS = sorted(set(DEFAULT_PORTS + [21, 25, 110, 143, 587, 993, 995, 3306, 5432, 5900]))
+FULL_PORTS = sorted(
+    set(DEFAULT_PORTS + [21, 25, 110, 143, 587, 993, 995, 3306, 5432, 5900])
+)
 SNMP_COMMUNITIES = ["public", "private"]
 
 
@@ -22,4 +41,3 @@ class ScanConfig:
     verbose: bool = False
     report_formats: list[str] = field(default_factory=lambda: ["json"])
     output_dir: str = "reports_output"
-

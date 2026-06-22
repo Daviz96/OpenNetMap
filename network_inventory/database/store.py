@@ -83,15 +83,25 @@ class InventoryStore:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._init_schema()
 
-    def save_scan(self, devices: list[Device], stats: dict[str, object], events: list[InventoryEvent] | None = None) -> int:
+    def save_scan(
+        self,
+        devices: list[Device],
+        stats: dict[str, object],
+        events: list[InventoryEvent] | None = None,
+    ) -> int:
         """Persist a scan snapshot and return scan id."""
         with sqlite3.connect(self.path) as connection:
             connection.executescript(SCHEMA)
             cursor = connection.execute(
                 "INSERT INTO scans(started_at, stats_json) VALUES(?, ?)",
-                (str(stats.get("started_at") or ""), json.dumps(stats, ensure_ascii=False)),
+                (
+                    str(stats.get("started_at") or ""),
+                    json.dumps(stats, ensure_ascii=False),
+                ),
             )
-            scan_id = int(cursor.lastrowid)
+            scan_id = cursor.lastrowid
+            assert scan_id is not None
+            scan_id = int(scan_id)
             for device in devices:
                 key = _device_key(device)
                 payload = json.dumps(device.to_dict(), ensure_ascii=False)
@@ -128,7 +138,10 @@ class InventoryStore:
                     (scan_id, key, payload),
                 )
                 for port in device.open_ports:
-                    connection.execute("INSERT INTO ports(scan_id, device_key, port) VALUES(?, ?, ?)", (scan_id, key, port))
+                    connection.execute(
+                        "INSERT INTO ports(scan_id, device_key, port) VALUES(?, ?, ?)",
+                        (scan_id, key, port),
+                    )
                 if device.services:
                     connection.execute(
                         "INSERT INTO services(scan_id, device_key, service_json) VALUES(?, ?, ?)",
@@ -137,7 +150,12 @@ class InventoryStore:
             for event in events or []:
                 connection.execute(
                     "INSERT INTO events(event_type, device_key, message, timestamp) VALUES(?, ?, ?, ?)",
-                    (event.event_type, event.device_key, event.message, event.timestamp),
+                    (
+                        event.event_type,
+                        event.device_key,
+                        event.message,
+                        event.timestamp,
+                    ),
                 )
             return scan_id
 

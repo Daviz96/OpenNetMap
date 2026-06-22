@@ -26,7 +26,9 @@ def assess_device(device: Device) -> SecurityAssessment:
     if 23 in ports:
         score -= 20
         findings.append("Telnet aperto")
-        recommendations.append("Disabilitare Telnet e usare SSH con credenziali robuste.")
+        recommendations.append(
+            "Disabilitare Telnet e usare SSH con credenziali robuste."
+        )
     if 21 in ports:
         score -= 12
         findings.append("FTP aperto")
@@ -38,7 +40,9 @@ def assess_device(device: Device) -> SecurityAssessment:
     if 80 in ports and 443 not in ports:
         score -= 8
         findings.append("HTTP senza HTTPS rilevato")
-        recommendations.append("Abilitare HTTPS o limitare l'interfaccia HTTP alla rete di gestione.")
+        recommendations.append(
+            "Abilitare HTTPS o limitare l'interfaccia HTTP alla rete di gestione."
+        )
     if 3389 in ports:
         score -= 15
         findings.append("RDP esposto")
@@ -53,4 +57,3 @@ def assess_device(device: Device) -> SecurityAssessment:
         recommendations.append("Rimuovere community public/private o migrare a SNMPv3.")
 
     return SecurityAssessment(max(score, 0), findings, recommendations)
-

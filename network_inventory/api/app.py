@@ -21,13 +21,25 @@ from network_inventory.database.store import InventoryStore
 from network_inventory.events.engine import compare_snapshots
 from network_inventory.fingerprint.classifier import classify_with_details
 from network_inventory.inventory.device import Device
-from network_inventory.inventory.inventory import InventoryRunner, enrich_device_identity
+from network_inventory.inventory.inventory import (
+    InventoryRunner,
+    enrich_device_identity,
+)
 from network_inventory.reports.csv_report import write_csv
 from network_inventory.reports.html_report import write_html
 from network_inventory.reports.json_report import write_json
 from network_inventory.security.assessment import assess_device
 from network_inventory.topology.export import write_topology_exports
-from network_inventory.utils.config import DEFAULT_PORTS, FULL_PORTS, TOP_PORTS, ScanConfig
+from network_inventory.utils.config import (
+    DEFAULT_PORTS,
+    FULL_PORTS,
+    TOP_PORTS,
+    ScanConfig,
+)
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
 @dataclass(slots=True)
@@ -50,7 +62,9 @@ class ScanRequest(BaseModel):
     """Request body for POST /scan."""
 
     subnet: str | None = None
-    ports: str = Field(default="default", description="default, top, full, or comma-separated ports")
+    ports: str = Field(
+        default="default", description="default, top, full, or comma-separated ports"
+    )
     report: list[str] = Field(default_factory=lambda: ["json", "html"])
     threads: int = Field(default=100, ge=1, le=1000)
     timeout: float = Field(default=1.0, ge=0.1, le=30.0)
@@ -58,7 +72,9 @@ class ScanRequest(BaseModel):
     output_dir: str = "reports_output"
     db: str | None = None
     topology: bool = True
-    dry_run_from_json: str | None = Field(default=None, description="Load an existing inventory JSON instead of scanning")
+    dry_run_from_json: str | None = Field(
+        default=None, description="Load an existing inventory JSON instead of scanning"
+    )
 
 
 _JOBS: dict[str, ScanJob] = {}
@@ -78,7 +94,9 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         with _JOBS_LOCK:
             jobs = [_job_to_dict(job) for job in _JOBS.values()]
         jobs.sort(key=lambda item: item["created_at"], reverse=True)
-        return _render_dashboard(stats_payload, recent_events, risky_devices, counts, jobs[:5])
+        return _render_dashboard(
+            stats_payload, recent_events, risky_devices, counts, jobs[:5]
+        )
 
     @app.get("/dashboard/devices", response_class=HTMLResponse)
     def devices_page(q: str | None = None, sort: str = "ip") -> str:
@@ -86,7 +104,9 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         return _render_devices_page(rows, q or "", sort)
 
     @app.get("/dashboard/events", response_class=HTMLResponse)
-    def events_page(q: str | None = None, limit: int = Query(250, ge=1, le=2000)) -> str:
+    def events_page(
+        q: str | None = None, limit: int = Query(250, ge=1, le=2000)
+    ) -> str:
         rows = _query_events(db_path, limit, q)
         return _render_events_page(rows, q or "")
 
@@ -98,7 +118,13 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         sort: str = "ip",
     ) -> dict[str, Any]:
         rows = _query_devices(db_path, limit, offset, q, sort)
-        return {"items": rows, "limit": limit, "offset": offset, "query": q, "sort": sort}
+        return {
+            "items": rows,
+            "limit": limit,
+            "offset": offset,
+            "query": q,
+            "sort": sort,
+        }
 
     @app.get("/devices/{device_key}")
     def device(device_key: str) -> dict[str, Any]:
@@ -110,7 +136,9 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         return _latest_stats(db_path)
 
     @app.get("/events")
-    def events(limit: int = Query(100, ge=1, le=1000), q: str | None = None) -> dict[str, Any]:
+    def events(
+        limit: int = Query(100, ge=1, le=1000), q: str | None = None
+    ) -> dict[str, Any]:
         return {"items": _query_events(db_path, limit, q), "query": q}
 
     @app.get("/topology")
@@ -133,7 +161,9 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         job = ScanJob(id=str(uuid.uuid4()))
         with _JOBS_LOCK:
             _JOBS[job.id] = job
-        thread = threading.Thread(target=_run_scan_job, args=(job.id, request, db_path), daemon=True)
+        thread = threading.Thread(
+            target=_run_scan_job, args=(job.id, request, db_path), daemon=True
+        )
         thread.start()
         return _job_to_dict(job)
 
@@ -191,7 +221,9 @@ def _load_or_scan(request: ScanRequest) -> tuple[list[Device], dict[str, object]
     return InventoryRunner(config).run()
 
 
-def _write_scan_outputs(devices: list[Device], stats: dict[str, object], request: ScanRequest) -> list[str]:
+def _write_scan_outputs(
+    devices: list[Device], stats: dict[str, object], request: ScanRequest
+) -> list[str]:
     paths: list[Path] = []
     formats = set(request.report)
     if "json" in formats:
@@ -214,8 +246,12 @@ def _load_inventory_json(path: str) -> tuple[list[Device], dict[str, object]]:
         classification = classify_with_details(device)
         device.device_type = device.device_type or classification.device_type
         device.os_guess = device.os_guess or classification.os_guess
-        device.classification_confidence = device.classification_confidence or classification.confidence
-        device.classification_reasons = device.classification_reasons or classification.reasons
+        device.classification_confidence = (
+            device.classification_confidence or classification.confidence
+        )
+        device.classification_reasons = (
+            device.classification_reasons or classification.reasons
+        )
         assessment = assess_device(device)
         device.security_score = assessment.score
         device.findings = assessment.findings
@@ -260,17 +296,15 @@ def _job_to_dict(job: ScanJob) -> dict[str, Any]:
     }
 
 
-def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
-
 def _connect(db_path: str) -> sqlite3.Connection:
     connection = sqlite3.connect(db_path)
     connection.row_factory = sqlite3.Row
     return connection
 
 
-def _query_devices(db_path: str, limit: int, offset: int, q: str | None, sort: str = "ip") -> list[dict[str, Any]]:
+def _query_devices(
+    db_path: str, limit: int, offset: int, q: str | None, sort: str = "ip"
+) -> list[dict[str, Any]]:
     with _connect(db_path) as connection:
         rows = connection.execute(
             "SELECT device_key, ip, mac, hostname, vendor, device_type, manufacturer, model, last_json FROM devices"
@@ -283,17 +317,23 @@ def _query_devices(db_path: str, limit: int, offset: int, q: str | None, sort: s
 
 def _query_device(db_path: str, device_key: str) -> dict[str, Any] | None:
     with _connect(db_path) as connection:
-        row = connection.execute("SELECT last_json FROM devices WHERE device_key = ?", (device_key,)).fetchone()
+        row = connection.execute(
+            "SELECT last_json FROM devices WHERE device_key = ?", (device_key,)
+        ).fetchone()
     return json.loads(row["last_json"]) if row else None
 
 
 def _latest_stats(db_path: str) -> dict[str, Any]:
     with _connect(db_path) as connection:
-        row = connection.execute("SELECT stats_json FROM scans ORDER BY id DESC LIMIT 1").fetchone()
+        row = connection.execute(
+            "SELECT stats_json FROM scans ORDER BY id DESC LIMIT 1"
+        ).fetchone()
     return json.loads(row["stats_json"]) if row else {}
 
 
-def _query_events(db_path: str, limit: int, q: str | None = None) -> list[dict[str, Any]]:
+def _query_events(
+    db_path: str, limit: int, q: str | None = None
+) -> list[dict[str, Any]]:
     with _connect(db_path) as connection:
         rows = connection.execute(
             "SELECT event_type, device_key, message, timestamp FROM events ORDER BY id DESC LIMIT ?",
@@ -302,20 +342,36 @@ def _query_events(db_path: str, limit: int, q: str | None = None) -> list[dict[s
     events = [dict(row) for row in rows]
     if q:
         query = q.lower()
-        events = [event for event in events if query in " ".join(str(value).lower() for value in event.values())]
+        events = [
+            event
+            for event in events
+            if query in " ".join(str(value).lower() for value in event.values())
+        ]
     return events[:limit]
 
 
 def _query_vlans(db_path: str) -> list[dict[str, Any]]:
     with _connect(db_path) as connection:
-        rows = connection.execute("SELECT vlan_id, vlan_name, subnet, source FROM vlans ORDER BY vlan_id").fetchall()
+        rows = connection.execute(
+            "SELECT vlan_id, vlan_name, subnet, source FROM vlans ORDER BY vlan_id"
+        ).fetchall()
     return [dict(row) for row in rows]
 
 
 def _query_scans(db_path: str, limit: int) -> list[dict[str, Any]]:
     with _connect(db_path) as connection:
-        rows = connection.execute("SELECT id, started_at, stats_json FROM scans ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
-    return [{"id": row["id"], "started_at": row["started_at"], "stats": json.loads(row["stats_json"])} for row in rows]
+        rows = connection.execute(
+            "SELECT id, started_at, stats_json FROM scans ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+    return [
+        {
+            "id": row["id"],
+            "started_at": row["started_at"],
+            "stats": json.loads(row["stats_json"]),
+        }
+        for row in rows
+    ]
 
 
 def _query_risky_devices(db_path: str, limit: int) -> list[dict[str, Any]]:
@@ -326,9 +382,15 @@ def _query_risky_devices(db_path: str, limit: int) -> list[dict[str, Any]]:
 
 def _summary_counts(db_path: str) -> dict[str, int]:
     with _connect(db_path) as connection:
-        devices_count = connection.execute("SELECT COUNT(*) AS count FROM devices").fetchone()["count"]
-        events_count = connection.execute("SELECT COUNT(*) AS count FROM events").fetchone()["count"]
-        scans_count = connection.execute("SELECT COUNT(*) AS count FROM scans").fetchone()["count"]
+        devices_count = connection.execute(
+            "SELECT COUNT(*) AS count FROM devices"
+        ).fetchone()["count"]
+        events_count = connection.execute(
+            "SELECT COUNT(*) AS count FROM events"
+        ).fetchone()["count"]
+        scans_count = connection.execute(
+            "SELECT COUNT(*) AS count FROM scans"
+        ).fetchone()["count"]
     return {"devices": devices_count, "events": events_count, "scans": scans_count}
 
 
@@ -338,11 +400,17 @@ def _device_row(row: sqlite3.Row) -> dict[str, Any]:
     return data
 
 
-def _filter_devices(devices: list[dict[str, Any]], query: str | None) -> list[dict[str, Any]]:
+def _filter_devices(
+    devices: list[dict[str, Any]], query: str | None
+) -> list[dict[str, Any]]:
     if not query:
         return devices
     clauses = [clause.strip() for clause in query.split(" and ") if clause.strip()]
-    return [device for device in devices if all(_match_clause(device, clause) for clause in clauses)]
+    return [
+        device
+        for device in devices
+        if all(_match_clause(device, clause) for clause in clauses)
+    ]
 
 
 def _match_clause(device: dict[str, Any], clause: str) -> bool:
@@ -352,7 +420,10 @@ def _match_clause(device: dict[str, Any], clause: str) -> bool:
     field = field.strip().lower()
     value = raw_value.strip().lower()
     if field == "vendor":
-        return value in str(device.get("vendor") or device.get("manufacturer") or "").lower()
+        return (
+            value
+            in str(device.get("vendor") or device.get("manufacturer") or "").lower()
+        )
     if field in {"type", "device_type"}:
         return value in str(device.get("device_type") or "").lower()
     if field == "port":
@@ -392,7 +463,7 @@ def _device_search_text(device: dict[str, Any]) -> str:
     )
 
 
-def _sort_value(device: dict[str, Any], sort: str) -> object:
+def _sort_value(device: dict[str, Any], sort: str) -> str | int:
     key = sort.strip().lower()
     if key == "security":
         return int(device.get("security_score") or 100)
@@ -460,7 +531,11 @@ def _render_dashboard(
       <table><thead><tr><th>Timestamp</th><th>Tipo</th><th>Messaggio</th></tr></thead><tbody>{event_rows}</tbody></table>
     </section>
 """
-    return _page_shell("Network Inventory Dashboard", content, subtitle=f"Subnet {_esc(stats.get('subnet', ''))}")
+    return _page_shell(
+        "Network Inventory Dashboard",
+        content,
+        subtitle=f"Subnet {_esc(stats.get('subnet', ''))}",
+    )
 
 
 def _render_devices_page(devices: list[dict[str, Any]], query: str, sort: str) -> str:

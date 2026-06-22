@@ -13,4 +13,3 @@ def collect_banners(ip: str, ports: list[int], timeout: float = 1.0) -> dict[int
         if banner:
             banners[port] = banner
     return banners
-

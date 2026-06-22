@@ -7,9 +7,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import re
 
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    BarColumn,
+    TaskProgressColumn,
+)
 
-from network_inventory.fingerprint.classifier import classify, classify_with_details
+from network_inventory.fingerprint.classifier import classify_with_details
 from network_inventory.fingerprint.services import fingerprint_services
 from network_inventory.inventory.device import Device
 from network_inventory.scanner.arp_scanner import scan_subnet
@@ -36,7 +42,14 @@ class InventoryRunner:
     def run(self) -> tuple[list[Device], dict[str, object]]:
         """Discover and fingerprint devices."""
         network_info = detect_local_network() if self.config.subnet is None else None
-        subnet = self.config.subnet or network_info.cidr
+        if self.config.subnet is None:
+            if network_info is None:
+                raise RuntimeError(
+                    "Unable to detect local network and no subnet was configured"
+                )
+            subnet = network_info.cidr
+        else:
+            subnet = self.config.subnet
         _validate_subnet_size(subnet)
 
         if network_info:
@@ -49,7 +62,9 @@ class InventoryRunner:
             )
 
         LOGGER.info("Scanning subnet %s", subnet)
-        devices = scan_subnet(subnet, threads=self.config.threads, timeout=self.config.timeout)
+        devices = scan_subnet(
+            subnet, threads=self.config.threads, timeout=self.config.timeout
+        )
         for device in devices:
             _mark_discovery(device)
         LOGGER.info("Discovered %d active host(s)", len(devices))
@@ -61,14 +76,21 @@ class InventoryRunner:
             TaskProgressColumn(),
         ) as progress:
             task = progress.add_task("Fingerprinting devices", total=len(devices))
-            with ThreadPoolExecutor(max_workers=max(min(self.config.threads, 64), 1)) as executor:
-                futures = {executor.submit(self._fingerprint_device, device): device for device in devices}
+            with ThreadPoolExecutor(
+                max_workers=max(min(self.config.threads, 64), 1)
+            ) as executor:
+                futures = {
+                    executor.submit(self._fingerprint_device, device): device
+                    for device in devices
+                }
                 for future in as_completed(futures):
                     future.result()
                     progress.advance(task)
 
         stats = subnet_stats(subnet, len(devices))
-        stats["started_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        stats["started_at"] = (
+            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        )
         return devices, stats
 
     def _fingerprint_device(self, device: Device) -> Device:
@@ -87,7 +109,9 @@ class InventoryRunner:
         if {5353, 80, 443} & set(device.open_ports):
             device.mdns_info = scan_mdns(device.ip, timeout=self.config.timeout)
         if {137, 139, 445} & set(device.open_ports):
-            device.netbios_info = scan_netbios(device.ip, timeout=max(self.config.timeout, 2.0))
+            device.netbios_info = scan_netbios(
+                device.ip, timeout=max(self.config.timeout, 2.0)
+            )
 
         enrich_device_identity(device)
         classification = classify_with_details(device)
@@ -109,7 +133,9 @@ def _validate_subnet_size(subnet: str) -> None:
     if network.version != 4:
         raise ValueError("Only IPv4 subnets are supported.")
     if network.num_addresses > 4096:
-        raise ValueError("Subnet too large for the default scanner. Use /20 or smaller.")
+        raise ValueError(
+            "Subnet too large for the default scanner. Use /20 or smaller."
+        )
 
 
 def _mark_discovery(device: Device) -> None:
@@ -124,7 +150,9 @@ def _mark_discovery(device: Device) -> None:
         methods.append("unknown")
     device.discovery_methods = methods
     known_methods = [method for method in methods if method != "unknown"]
-    device.discovery_confidence = round(min(0.35 + (0.25 * len(known_methods)), 0.95), 2)
+    device.discovery_confidence = round(
+        min(0.35 + (0.25 * len(known_methods)), 0.95), 2
+    )
     device.sources["ip"] = methods.copy()
     if device.mac:
         device.sources["mac"] = ["arp_cache_or_arp_scan"]
@@ -196,8 +224,8 @@ def _model_from_services(services: dict[str, object]) -> str | None:
 
 def _clean_model(value: str) -> str | None:
     text = re.sub(r"\s+", " ", value).strip()
-    text = re.sub(r"^Basic realm=", "", text).strip("\" ")
-    text = re.sub(r"^Digest .*realm=", "", text).strip("\" ")
+    text = re.sub(r"^Basic realm=", "", text).strip('" ')
+    text = re.sub(r"^Digest .*realm=", "", text).strip('" ')
     ignored = {
         "app-webs/",
         "login",
@@ -207,6 +235,12 @@ def _clean_model(value: str) -> str | None:
         "webserver",
     }
     lower = text.lower()
-    if not text or lower in ignored or lower.startswith(("error ", "iis", "apache", "nginx", "microsoft-iis", "jetty")):
+    if (
+        not text
+        or lower in ignored
+        or lower.startswith(
+            ("error ", "iis", "apache", "nginx", "microsoft-iis", "jetty")
+        )
+    ):
         return None
     return text[:120]

@@ -41,7 +41,10 @@ class OuiDatabase:
             if match:
                 vendors[match.group(1).upper()] = match.group(2).strip()
                 continue
-            match = re.search(r"^([0-9A-Fa-f]{2})-([0-9A-Fa-f]{2})-([0-9A-Fa-f]{2})\s+\(hex\)\s+(.+)", clean)
+            match = re.search(
+                r"^([0-9A-Fa-f]{2})-([0-9A-Fa-f]{2})-([0-9A-Fa-f]{2})\s+\(hex\)\s+(.+)",
+                clean,
+            )
             if match:
                 vendors["".join(match.groups()[:3]).upper()] = match.group(4).strip()
         return vendors
@@ -50,7 +53,9 @@ class OuiDatabase:
 def update_oui_database(path: str | Path = "oui.txt") -> Path:
     """Download the IEEE OUI database to a local file."""
     target = Path(path)
-    request = Request(IEEE_OUI_URL, headers={"User-Agent": "Mozilla/5.0 network-inventory-tool"})
+    request = Request(
+        IEEE_OUI_URL, headers={"User-Agent": "Mozilla/5.0 network-inventory-tool"}
+    )
     with urlopen(request, timeout=30) as response:
         target.write_bytes(response.read())
     return target

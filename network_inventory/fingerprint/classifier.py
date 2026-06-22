@@ -66,10 +66,14 @@ def classify_with_details(device: Device) -> ClassificationResult:
     total_score = max(sum(score for score in scores.values() if score > 0), 1)
     confidence = round(min(best_score / total_score, 1.0), 2)
     os_guess = _guess_os(haystack, ports)
-    return ClassificationResult(_normalize_type(device_type), os_guess, confidence, reasons[device_type])
+    return ClassificationResult(
+        _normalize_type(device_type), os_guess, confidence, reasons[device_type]
+    )
 
 
-def _score_ports(scores: dict[str, int], reasons: dict[str, list[str]], ports: set[int]) -> None:
+def _score_ports(
+    scores: dict[str, int], reasons: dict[str, list[str]], ports: set[int]
+) -> None:
     if 9100 in ports or 515 in ports or 631 in ports:
         scores["printer"] += 50
         reasons["printer"].append("porte stampa aperte")
@@ -103,10 +107,30 @@ def _score_ports(scores: dict[str, int], reasons: dict[str, list[str]], ports: s
         reasons["access_point"].append("porta discovery/AP aperta")
 
 
-def _score_text(scores: dict[str, int], reasons: dict[str, list[str]], text: str) -> None:
+def _score_text(
+    scores: dict[str, int], reasons: dict[str, list[str]], text: str
+) -> None:
     keywords = {
-        "printer": ("printer", "epson", "laserjet", "brother", "canon", "xerox", "ipp", "jetdirect"),
-        "router": ("router", "gateway", "mikrotik", "openwrt", "fritz", "tplink", "tp-link", "netgear"),
+        "printer": (
+            "printer",
+            "epson",
+            "laserjet",
+            "brother",
+            "canon",
+            "xerox",
+            "ipp",
+            "jetdirect",
+        ),
+        "router": (
+            "router",
+            "gateway",
+            "mikrotik",
+            "openwrt",
+            "fritz",
+            "tplink",
+            "tp-link",
+            "netgear",
+        ),
         "switch": ("switch", "catalyst", "procurve", "aruba", "juniper"),
         "access_point": ("unifi", "ubiquiti", "access point", "ap-", "u6 pro"),
         "nas": ("synology", "qnap", "nas", "diskstation", "truenas"),

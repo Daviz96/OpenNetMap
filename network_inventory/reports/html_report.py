@@ -9,7 +9,9 @@ from pathlib import Path
 from network_inventory.inventory.device import Device
 
 
-def write_html(devices: list[Device], stats: dict[str, object], output_dir: str | Path) -> Path:
+def write_html(
+    devices: list[Device], stats: dict[str, object], output_dir: str | Path
+) -> Path:
     """Write a searchable HTML report."""
     path = Path(output_dir) / "inventory.html"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -80,7 +82,7 @@ def _row(device: Device) -> str:
     ports = ", ".join(str(port) for port in device.open_ports)
     return (
         "<tr>"
-        f"<td class=\"mono\">{html.escape(device.ip)}</td>"
+        f'<td class="mono">{html.escape(device.ip)}</td>'
         f"<td class=\"mono\">{html.escape(device.mac or '')}</td>"
         f"<td>{html.escape(device.hostname or '')}</td>"
         f"<td><span class=\"badge\">{html.escape(device.device_type or 'Sconosciuto')}</span></td>"
@@ -88,6 +90,6 @@ def _row(device: Device) -> str:
         f"<td>{html.escape(str(device.security_score))}</td>"
         f"<td>{html.escape(device.manufacturer or device.vendor or '')}</td>"
         f"<td>{html.escape(device.model or '')}</td>"
-        f"<td class=\"ports\">{html.escape(ports)}</td>"
+        f'<td class="ports">{html.escape(ports)}</td>'
         "</tr>"
     )

@@ -95,7 +95,9 @@ def _ping_host(ip: str, timeout: float) -> Device | None:
 
     start = time.perf_counter()
     try:
-        completed = subprocess.run(command, capture_output=True, check=False, text=True, timeout=timeout + 1)
+        completed = subprocess.run(
+            command, capture_output=True, check=False, text=True, timeout=timeout + 1
+        )
     except (OSError, subprocess.SubprocessError):
         return None
     elapsed = (time.perf_counter() - start) * 1000
@@ -106,7 +108,9 @@ def _ping_host(ip: str, timeout: float) -> Device | None:
 
 def _arp_cache() -> dict[str, str]:
     try:
-        output = subprocess.run(["arp", "-a"], capture_output=True, check=False, text=True, timeout=3).stdout
+        output = subprocess.run(
+            ["arp", "-a"], capture_output=True, check=False, text=True, timeout=3
+        ).stdout
     except (OSError, subprocess.SubprocessError):
         return {}
 
@@ -116,4 +120,3 @@ def _arp_cache() -> dict[str, str]:
         if match:
             entries[match.group(1)] = match.group(2).replace("-", ":").lower()
     return entries
-

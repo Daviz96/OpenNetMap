@@ -14,5 +14,7 @@ def scan_mdns(ip: str, timeout: float = 1.0) -> dict[str, object]:
         import zeroconf  # noqa: F401
     except ImportError:
         return {}
-    return {"available": True, "note": "zeroconf installed; targeted mDNS lookup not implemented"}
-
+    return {
+        "available": True,
+        "note": "zeroconf installed; targeted mDNS lookup not implemented",
+    }

@@ -87,27 +87,43 @@ class Device:
             manufacturer=_optional_str(data.get("manufacturer")),
             model=_optional_str(data.get("model")),
             firmware=_optional_str(data.get("firmware")),
-            open_ports=[int(port) for port in data.get("open_ports", []) or []],
-            services=dict(data.get("services") or {}),
-            snmp_info=dict(data.get("snmp_info") or {}),
-            mdns_info=dict(data.get("mdns_info") or {}),
-            netbios_info=dict(data.get("netbios_info") or {}),
-            tls_info=dict(data.get("tls_info") or {}),
+            open_ports=[
+                int(str(port)) for port in _optional_list(data.get("open_ports"))
+            ],
+            services=_optional_mapping(data.get("services")),
+            snmp_info=_optional_mapping(data.get("snmp_info")),
+            mdns_info=_optional_mapping(data.get("mdns_info")),
+            netbios_info=_optional_mapping(data.get("netbios_info")),
+            tls_info=_optional_mapping(data.get("tls_info")),
             os_guess=_optional_str(data.get("os_guess")),
             response_time_ms=_optional_float(data.get("response_time_ms")),
-            discovery_methods=[str(item) for item in data.get("discovery_methods", []) or []],
-            discovery_confidence=_optional_float(data.get("discovery_confidence")) or 0.0,
+            discovery_methods=[
+                str(item) for item in _optional_list(data.get("discovery_methods"))
+            ],
+            discovery_confidence=_optional_float(data.get("discovery_confidence"))
+            or 0.0,
             first_seen=_optional_str(data.get("first_seen")) or utc_now_iso(),
             last_seen=_optional_str(data.get("last_seen")) or utc_now_iso(),
-            classification_confidence=_optional_float(data.get("classification_confidence")) or 0.0,
-            classification_reasons=[str(item) for item in data.get("classification_reasons", []) or []],
+            classification_confidence=_optional_float(
+                data.get("classification_confidence")
+            )
+            or 0.0,
+            classification_reasons=[
+                str(item) for item in _optional_list(data.get("classification_reasons"))
+            ],
             security_score=int(_optional_float(data.get("security_score")) or 100),
-            findings=[str(item) for item in data.get("findings", []) or []],
-            recommendations=[str(item) for item in data.get("recommendations", []) or []],
-            confidence={str(key): float(value) for key, value in dict(data.get("confidence") or {}).items()},
+            findings=[str(item) for item in _optional_list(data.get("findings"))],
+            recommendations=[
+                str(item) for item in _optional_list(data.get("recommendations"))
+            ],
+            confidence={
+                str(key): float(value)
+                for key, value in _optional_mapping(data.get("confidence")).items()
+                if isinstance(value, (int, float, str))
+            },
             sources={
                 str(key): [str(item) for item in value]
-                for key, value in dict(data.get("sources") or {}).items()
+                for key, value in _optional_mapping(data.get("sources")).items()
                 if isinstance(value, list)
             },
         )
@@ -121,9 +137,21 @@ def _optional_str(value: object) -> str | None:
 
 
 def _optional_float(value: object) -> float | None:
-    if value is None:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
+    if isinstance(value, (int, float, str)):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+    return None
+
+
+def _optional_list(value: object) -> list[object]:
+    if isinstance(value, list):
+        return value
+    return []
+
+
+def _optional_mapping(value: object) -> dict[str, object]:
+    if isinstance(value, dict):
+        return {str(key): val for key, val in value.items()}
+    return {}

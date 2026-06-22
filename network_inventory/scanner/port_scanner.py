@@ -6,7 +6,9 @@ import socket
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-def scan_ports(ip: str, ports: list[int], timeout: float = 1.0, threads: int = 32) -> list[int]:
+def scan_ports(
+    ip: str, ports: list[int], timeout: float = 1.0, threads: int = 32
+) -> list[int]:
     """Return open TCP ports for an IP address."""
     open_ports: list[int] = []
     with ThreadPoolExecutor(max_workers=min(threads, max(len(ports), 1))) as executor:
@@ -41,4 +43,3 @@ def _is_open(ip: str, port: int, timeout: float) -> bool:
             return True
     except OSError:
         return False
-

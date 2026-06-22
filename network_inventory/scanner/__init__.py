@@ -1,2 +1,1 @@
 """Network scanner modules."""
-
