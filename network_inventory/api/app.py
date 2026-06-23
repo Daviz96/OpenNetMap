@@ -9,7 +9,7 @@ import sqlite3
 import threading
 import uuid
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ from network_inventory.utils.config import (
 
 
 def _utc_now() -> str:
-    return datetime.now(UTC).replace(microsecond=0).isoformat()
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
 @dataclass(slots=True)

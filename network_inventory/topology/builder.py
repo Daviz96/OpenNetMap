@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import ipaddress
 from dataclasses import asdict, dataclass, field
-from typing import Any
 
 from network_inventory.inventory.device import Device
 
@@ -32,9 +31,19 @@ class TopologyLink:
     metadata: dict[str, object] = field(default_factory=dict)
 
 
-def build_topology(devices: list[Device], stats: dict[str, object] | None = None) -> dict[str, object]:
+def build_topology(
+    devices: list[Device],
+    stats: dict[str, object] | None = None,
+    *,
+    subnet: str | None = None,
+    gateway: str | None = None,
+) -> dict[str, object]:
     """Build a topology model from a device inventory and scan stats."""
     stats = stats or {}
+    if subnet:
+        stats["subnet"] = subnet
+    if gateway:
+        stats["gateway"] = gateway
     subnet = str(stats.get("subnet") or "network")
     root_id = subnet
     nodes: dict[str, TopologyNode] = {}
@@ -89,17 +98,19 @@ def build_topology(devices: list[Device], stats: dict[str, object] | None = None
             nodes[vlan_id] = vlan_node
         for device in devices:
             device_vlan = _extract_vlan(device)
-            if device_vlan and str(device_vlan) == vlan_id:
-                device_id = _build_device_id(device)
-                links.append(
-                    TopologyLink(
-                        source=device_id,
-                        target=vlan_id,
-                        relationship="MEMBER_OF_VLAN",
-                        confidence=_edge_confidence(device),
-                        discovery_method=_edge_discovery_method(device),
+            if device_vlan:
+                device_vlan_id = f"vlan-{device_vlan}"
+                if device_vlan_id == vlan_id:
+                    device_id = _build_device_id(device)
+                    links.append(
+                        TopologyLink(
+                            source=device_id,
+                            target=vlan_id,
+                            relationship="MEMBER_OF_VLAN",
+                            confidence=_edge_confidence(device),
+                            discovery_method=_edge_discovery_method(device),
+                        )
                     )
-                )
 
     return {
         "nodes": [asdict(node) for node in nodes.values()],
@@ -146,7 +157,9 @@ def _extract_vlan(device: Device) -> int | None:
     vlan = device.snmp_info.get("vlan") if isinstance(device.snmp_info, dict) else None
     if isinstance(vlan, (int, str)) and str(vlan).isdigit():
         return int(vlan)
-    vlans = device.snmp_info.get("vlans") if isinstance(device.snmp_info, dict) else None
+    vlans = (
+        device.snmp_info.get("vlans") if isinstance(device.snmp_info, dict) else None
+    )
     if isinstance(vlans, list) and vlans:
         first = vlans[0]
         if isinstance(first, (int, str)) and str(first).isdigit():

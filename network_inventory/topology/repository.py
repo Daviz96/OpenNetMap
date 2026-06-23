@@ -6,7 +6,6 @@ import datetime
 import json
 import sqlite3
 from pathlib import Path
-from typing import Any
 
 from .diff import diff_topology
 
@@ -57,7 +56,7 @@ class TopologyRepository:
                 "INSERT INTO topology(scan_id, topology_json, recorded_at) VALUES(?, ?, ?)",
                 (scan_id, json.dumps(topology, ensure_ascii=False), recorded_at),
             )
-            topology_id = int(cursor.lastrowid)
+            topology_id = int(cursor.lastrowid or 0)
             if changes:
                 self._save_changes(connection, scan_id, changes, recorded_at)
         return topology_id
@@ -71,7 +70,8 @@ class TopologyRepository:
             ).fetchone()
         if not row:
             return None
-        return json.loads(row[0])
+        data = json.loads(row[0])
+        return data if isinstance(data, dict) else None
 
     def _save_changes(
         self,
@@ -89,7 +89,12 @@ class TopologyRepository:
                         scan_id,
                         change_type,
                         entity_type,
-                        str(item.get("id") or item.get("source") or item.get("target") or ""),
+                        str(
+                            item.get("id")
+                            or item.get("source")
+                            or item.get("target")
+                            or ""
+                        ),
                         json.dumps(item, ensure_ascii=False),
                         recorded_at,
                     ),

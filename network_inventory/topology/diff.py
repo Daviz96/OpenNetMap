@@ -10,13 +10,21 @@ def diff_topology(
     previous_nodes = {node["id"]: node for node in _normalize_nodes(previous)}
     current_nodes = {node["id"]: node for node in _normalize_nodes(current)}
 
-    previous_edges = { _edge_key(edge): edge for edge in _normalize_edges(previous) }
-    current_edges = { _edge_key(edge): edge for edge in _normalize_edges(current) }
+    previous_edges = {_edge_key(edge): edge for edge in _normalize_edges(previous)}
+    current_edges = {_edge_key(edge): edge for edge in _normalize_edges(current)}
 
-    removed_nodes = [node for node_id, node in previous_nodes.items() if node_id not in current_nodes]
-    added_nodes = [node for node_id, node in current_nodes.items() if node_id not in previous_nodes]
-    removed_edges = [edge for key, edge in previous_edges.items() if key not in current_edges]
-    added_edges = [edge for key, edge in current_edges.items() if key not in previous_edges]
+    removed_nodes = [
+        node for node_id, node in previous_nodes.items() if node_id not in current_nodes
+    ]
+    added_nodes = [
+        node for node_id, node in current_nodes.items() if node_id not in previous_nodes
+    ]
+    removed_edges = [
+        edge for key, edge in previous_edges.items() if key not in current_edges
+    ]
+    added_edges = [
+        edge for key, edge in current_edges.items() if key not in previous_edges
+    ]
 
     return {
         "nodes_added": added_nodes,
