@@ -106,5 +106,5 @@ def _gateway_interface(gateway: str | None) -> str | None:
                 f"{addr.address}/{addr.netmask}", strict=False
             )
             if gateway_ip in network:
-                return iface_name
+                return str(iface_name)
     return None

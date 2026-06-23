@@ -25,7 +25,7 @@ ignore = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 ignore_missing_imports = true
 strict_optional = true
 warn_unused_ignores = true
@@ -50,6 +50,7 @@ pythonpath = ["."]
 name = "opennetmap"
 version = "0.1.0"
 description = "Network discovery and inventory tool (OpenNetMap)"
+requires-python = ">=3.13"
 
 [build-system]
 requires = ["setuptools", "wheel"]

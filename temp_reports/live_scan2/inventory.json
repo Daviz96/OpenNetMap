@@ -1,0 +1,238 @@
+{
+  "stats": {
+    "subnet": "192.168.100.0/24",
+    "total_hosts": 254,
+    "active_hosts": 4,
+    "free_hosts": 250,
+    "utilization_percent": 1.57,
+    "started_at": "2026-06-22T22:04:33+00:00"
+  },
+  "devices": [
+    {
+      "ip": "192.168.100.146",
+      "mac": "d6:6a:83:44:0e:34",
+      "vendor": null,
+      "hostname": "192.168.100.146",
+      "device_type": "unknown",
+      "manufacturer": null,
+      "model": null,
+      "firmware": null,
+      "open_ports": [],
+      "services": {},
+      "snmp_info": {},
+      "mdns_info": {},
+      "netbios_info": {},
+      "tls_info": {},
+      "os_guess": null,
+      "response_time_ms": 595.16,
+      "discovery_methods": [
+        "arp",
+        "icmp",
+        "reverse_dns"
+      ],
+      "discovery_confidence": 0.95,
+      "first_seen": "2026-06-22T22:04:23+00:00",
+      "last_seen": "2026-06-22T22:04:23+00:00",
+      "classification_confidence": 0.0,
+      "classification_reasons": [],
+      "security_score": 100,
+      "findings": [],
+      "recommendations": [],
+      "confidence": {
+        "classification": 0.0,
+        "discovery": 0.95
+      },
+      "sources": {
+        "ip": [
+          "arp",
+          "icmp",
+          "reverse_dns"
+        ],
+        "mac": [
+          "arp_cache_or_arp_scan"
+        ],
+        "hostname": [
+          "reverse_dns"
+        ]
+      }
+    },
+    {
+      "ip": "192.168.100.153",
+      "mac": "72:a5:fe:74:b4:a4",
+      "vendor": null,
+      "hostname": "192.168.100.153",
+      "device_type": "unknown",
+      "manufacturer": null,
+      "model": null,
+      "firmware": null,
+      "open_ports": [],
+      "services": {},
+      "snmp_info": {},
+      "mdns_info": {},
+      "netbios_info": {},
+      "tls_info": {},
+      "os_guess": null,
+      "response_time_ms": 258.25,
+      "discovery_methods": [
+        "arp",
+        "icmp",
+        "reverse_dns"
+      ],
+      "discovery_confidence": 0.95,
+      "first_seen": "2026-06-22T22:04:23+00:00",
+      "last_seen": "2026-06-22T22:04:23+00:00",
+      "classification_confidence": 0.0,
+      "classification_reasons": [],
+      "security_score": 100,
+      "findings": [],
+      "recommendations": [],
+      "confidence": {
+        "classification": 0.0,
+        "discovery": 0.95
+      },
+      "sources": {
+        "ip": [
+          "arp",
+          "icmp",
+          "reverse_dns"
+        ],
+        "mac": [
+          "arp_cache_or_arp_scan"
+        ],
+        "hostname": [
+          "reverse_dns"
+        ]
+      }
+    },
+    {
+      "ip": "192.168.100.158",
+      "mac": null,
+      "vendor": null,
+      "hostname": "LAPTOP-BGDUJJ6C",
+      "device_type": "PC Windows",
+      "manufacturer": null,
+      "model": null,
+      "firmware": null,
+      "open_ports": [
+        135,
+        139,
+        445
+      ],
+      "services": {},
+      "snmp_info": {},
+      "mdns_info": {},
+      "netbios_info": {},
+      "tls_info": {},
+      "os_guess": null,
+      "response_time_ms": 154.64,
+      "discovery_methods": [
+        "icmp",
+        "reverse_dns"
+      ],
+      "discovery_confidence": 0.85,
+      "first_seen": "2026-06-22T22:04:23+00:00",
+      "last_seen": "2026-06-22T22:04:23+00:00",
+      "classification_confidence": 0.65,
+      "classification_reasons": [
+        "porte Windows/RDP aperte",
+        "SMB aperto"
+      ],
+      "security_score": 92,
+      "findings": [
+        "SMB esposto"
+      ],
+      "recommendations": [
+        "Verificare SMBv1, patch e segmentazione della rete."
+      ],
+      "confidence": {
+        "classification": 0.65,
+        "discovery": 0.85
+      },
+      "sources": {
+        "ip": [
+          "icmp",
+          "reverse_dns"
+        ],
+        "hostname": [
+          "reverse_dns"
+        ]
+      }
+    },
+    {
+      "ip": "192.168.100.252",
+      "mac": "6c:11:ba:ab:db:97",
+      "vendor": "zte corporation",
+      "hostname": "192.168.100.252",
+      "device_type": "Router",
+      "manufacturer": "zte corporation",
+      "model": "F6705",
+      "firmware": null,
+      "open_ports": [
+        53,
+        80,
+        443
+      ],
+      "services": {
+        "http": {
+          "80": {
+            "url": "http://192.168.100.252:80/",
+            "status_code": 200,
+            "server": "",
+            "www_authenticate": null,
+            "title": "F6705",
+            "favicon_hash": "5e966bb5036dc2624a0187a91e59d3dd"
+          },
+          "443": {
+            "url": "https://192.168.100.252:443/",
+            "status_code": 200,
+            "server": "",
+            "www_authenticate": null,
+            "title": "F6705",
+            "favicon_hash": "5e966bb5036dc2624a0187a91e59d3dd"
+          }
+        }
+      },
+      "snmp_info": {},
+      "mdns_info": {
+        "available": true,
+        "note": "zeroconf installed; targeted mDNS lookup not implemented"
+      },
+      "netbios_info": {},
+      "tls_info": {},
+      "os_guess": null,
+      "response_time_ms": 75.99,
+      "discovery_methods": [
+        "arp",
+        "icmp",
+        "reverse_dns"
+      ],
+      "discovery_confidence": 0.95,
+      "first_seen": "2026-06-22T22:04:24+00:00",
+      "last_seen": "2026-06-22T22:04:24+00:00",
+      "classification_confidence": 0.42,
+      "classification_reasons": [
+        "DNS aperto"
+      ],
+      "security_score": 100,
+      "findings": [],
+      "recommendations": [],
+      "confidence": {
+        "classification": 0.42,
+        "discovery": 0.95
+      },
+      "sources": {
+        "ip": [
+          "arp",
+          "icmp",
+          "reverse_dns"
+        ],
+        "mac": [
+          "arp_cache_or_arp_scan"
+        ],
+        "hostname": [
+          "reverse_dns"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <graph edgedefault="undirected">
+    <node id="192.168.100.0/24">
+      <data key="label">192.168.100.0/24</data>
+    </node>
+    <node id="72:a5:fe:74:b4:a4|192.168.100.153">
+      <data key="label">192.168.100.153</data>
+    </node>
+    <node id="no-mac|192.168.100.158">
+      <data key="label">LAPTOP-BGDUJJ6C</data>
+    </node>
+    <node id="6c:11:ba:ab:db:97|192.168.100.252">
+      <data key="label">192.168.100.252</data>
+    </node>
+    <edge id="e0" source="192.168.100.0/24" target="72:a5:fe:74:b4:a4|192.168.100.153" />
+    <edge id="e1" source="192.168.100.0/24" target="no-mac|192.168.100.158" />
+    <edge id="e2" source="192.168.100.0/24" target="6c:11:ba:ab:db:97|192.168.100.252" />
+  </graph>
+</graphml>

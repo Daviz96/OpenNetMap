@@ -4,8 +4,8 @@ from .builder import build_topology
 from .diff import diff_topology
 from .engine import TopologyEngine
 from .export import write_topology_exports
+from .layout import force_directed_layout, hierarchical_layout, radial_layout
 from .repository import TopologyRepository
-from .layout import hierarchical_layout, force_directed_layout, radial_layout
 
 __all__ = [
     "build_topology",

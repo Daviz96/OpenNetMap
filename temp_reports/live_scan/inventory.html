@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Inventory</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #f6f8fb; color: #18212f; }
+    header { padding: 24px 32px; background: #18212f; color: white; }
+    main { padding: 24px 32px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat { background: white; border: 1px solid #dce3ee; border-radius: 8px; padding: 14px; }
+    .stat b { display: block; font-size: 22px; margin-top: 4px; }
+    input { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 12px; }
+    .table-wrap { overflow-x: auto; border: 1px solid #dce3ee; background: white; }
+    table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #dce3ee; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e7edf5; text-align: left; vertical-align: top; }
+    th { cursor: pointer; background: #edf2f7; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 12px; }
+    .mono, .ports { font-family: Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <header><h1>Network Inventory</h1><div>192.168.100.0/24</div></header>
+  <main>
+    <section class="stats" data-stats="{&quot;subnet&quot;: &quot;192.168.100.0/24&quot;, &quot;total_hosts&quot;: 254, &quot;active_hosts&quot;: 3, &quot;free_hosts&quot;: 251, &quot;utilization_percent&quot;: 1.18, &quot;started_at&quot;: &quot;2026-06-22T22:03:14+00:00&quot;}">
+      <div class="stat">Host totali<b>254</b></div>
+      <div class="stat">Host attivi<b>3</b></div>
+      <div class="stat">Host liberi<b>251</b></div>
+      <div class="stat">Utilizzo<b>1.18%</b></div>
+    </section>
+    <input id="search" placeholder="Cerca dispositivi">
+    <div class="table-wrap">
+      <table id="inventory">
+        <thead><tr><th>IP</th><th>MAC</th><th>Hostname</th><th>Tipo</th><th>Conf.</th><th>Security</th><th>Produttore</th><th>Modello</th><th>Porte</th></tr></thead>
+        <tbody><tr><td class="mono">192.168.100.153</td><td class="mono">72:a5:fe:74:b4:a4</td><td>192.168.100.153</td><td><span class="badge">unknown</span></td><td></td><td>100</td><td></td><td></td><td class="ports"></td></tr>
+<tr><td class="mono">192.168.100.158</td><td class="mono"></td><td>LAPTOP-BGDUJJ6C</td><td><span class="badge">PC Windows</span></td><td>0.65</td><td>92</td><td></td><td></td><td class="ports">135, 139, 445</td></tr>
+<tr><td class="mono">192.168.100.252</td><td class="mono">6c:11:ba:ab:db:97</td><td>192.168.100.252</td><td><span class="badge">Router</span></td><td>0.42</td><td>100</td><td>zte corporation</td><td>F6705</td><td class="ports">53, 80, 443</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+  <script>
+    const search = document.querySelector("#search");
+    search.addEventListener("input", () => {
+      const q = search.value.toLowerCase();
+      document.querySelectorAll("#inventory tbody tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+    document.querySelectorAll("th").forEach((th, index) => {
+      th.addEventListener("click", () => {
+        const tbody = document.querySelector("#inventory tbody");
+        [...tbody.rows].sort((a, b) => a.cells[index].innerText.localeCompare(b.cells[index].innerText, undefined, {numeric: true}))
+          .forEach(row => tbody.appendChild(row));
+      });
+    });
+  </script>
+</body>
+</html>

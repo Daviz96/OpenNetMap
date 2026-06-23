@@ -1,0 +1,63 @@
+{
+  "nodes": [
+    {
+      "id": "192.168.100.0/24",
+      "label": "192.168.100.0/24",
+      "type": "network"
+    },
+    {
+      "id": "d6:6a:83:44:0e:34|192.168.100.146",
+      "label": "192.168.100.146",
+      "ip": "192.168.100.146",
+      "mac": "d6:6a:83:44:0e:34",
+      "type": "unknown",
+      "security_score": 100
+    },
+    {
+      "id": "72:a5:fe:74:b4:a4|192.168.100.153",
+      "label": "192.168.100.153",
+      "ip": "192.168.100.153",
+      "mac": "72:a5:fe:74:b4:a4",
+      "type": "unknown",
+      "security_score": 100
+    },
+    {
+      "id": "no-mac|192.168.100.158",
+      "label": "LAPTOP-BGDUJJ6C",
+      "ip": "192.168.100.158",
+      "mac": null,
+      "type": "PC Windows",
+      "security_score": 92
+    },
+    {
+      "id": "6c:11:ba:ab:db:97|192.168.100.252",
+      "label": "192.168.100.252",
+      "ip": "192.168.100.252",
+      "mac": "6c:11:ba:ab:db:97",
+      "type": "Router",
+      "security_score": 100
+    }
+  ],
+  "edges": [
+    {
+      "source": "192.168.100.0/24",
+      "target": "d6:6a:83:44:0e:34|192.168.100.146",
+      "relation": "discovered"
+    },
+    {
+      "source": "192.168.100.0/24",
+      "target": "72:a5:fe:74:b4:a4|192.168.100.153",
+      "relation": "discovered"
+    },
+    {
+      "source": "192.168.100.0/24",
+      "target": "no-mac|192.168.100.158",
+      "relation": "discovered"
+    },
+    {
+      "source": "192.168.100.0/24",
+      "target": "6c:11:ba:ab:db:97|192.168.100.252",
+      "relation": "discovered"
+    }
+  ]
+}
