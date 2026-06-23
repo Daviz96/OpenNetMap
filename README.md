@@ -14,25 +14,55 @@ Scanner LAN in Python per inventariare dispositivi di rete, porte e servizi espo
 
 ## Installazione
 
+### Windows
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Su Linux/macOS:
+### Linux/macOS
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### WSL
+
+```bash
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
 ## Sviluppo
 
+### Windows
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
+pip install -r requirements.txt
+pip install -r requirements/dev.txt
+```
+
+### Linux/macOS
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -r requirements/dev.txt
+```
+
+### WSL
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements/dev.txt
 ```
@@ -56,6 +86,8 @@ Una pipeline CI è configurata in `.github/workflows/ci.yml` e esegue:
 - `mypy --ignore-missing-imports .`
 - `pytest -q`
 
+> Nota: se usi WSL, assicurati di attivare l'ambiente virtuale e installare le dipendenze all'interno di WSL prima di eseguire i comandi locali.
+
 ## Documentazione
 
 Ulteriori dettagli sulla roadmap, i piani di milestone, i risultati e il changelog sono disponibili nella cartella `docs/`:
@@ -65,6 +97,7 @@ Ulteriori dettagli sulla roadmap, i piani di milestone, i risultati e il changel
 - `docs/MILESTONE_1_RESULTS.md`
 - `docs/PROJECT_SNAPSHOT.md`
 - `docs/CHANGELOG.md`
+- `docs/USO.md`
 
 ## Utilizzo
 
