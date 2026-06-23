@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import ipaddress
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import UTC, datetime
 
 from rich.progress import (
+    BarColumn,
     Progress,
     SpinnerColumn,
-    TextColumn,
-    BarColumn,
     TaskProgressColumn,
+    TextColumn,
 )
 
 from network_inventory.fingerprint.classifier import classify_with_details
@@ -88,9 +88,7 @@ class InventoryRunner:
                     progress.advance(task)
 
         stats = subnet_stats(subnet, len(devices))
-        stats["started_at"] = (
-            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-        )
+        stats["started_at"] = datetime.now(UTC).replace(microsecond=0).isoformat()
         return devices, stats
 
     def _fingerprint_device(self, device: Device) -> Device:

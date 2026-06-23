@@ -1,8 +1,9 @@
-import pytest
 from pathlib import Path
 
-from network_inventory.inventory.device import Device
+import pytest
+
 from main import _parse_ports, parse_args, write_reports
+from network_inventory.inventory.device import Device
 
 
 def test_parse_args_defaults():

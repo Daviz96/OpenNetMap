@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from fastapi.testclient import TestClient
-from network_inventory.api.app import create_app, _match_clause, _filter_devices
+
+from network_inventory.api.app import _filter_devices, _match_clause, create_app
 from network_inventory.database.store import InventoryStore
 from network_inventory.inventory.device import Device
 

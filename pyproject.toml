@@ -1,15 +1,50 @@
 [tool.black]
 line-length = 88
-target-version = ['py310']
+target-version = ["py312"]
 include = '\.pyi?$'
 
 [tool.isort]
 profile = "black"
+line_length = 88
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "UP",
+    "B",
+]
+ignore = [
+"E501",
+]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 ignore_missing_imports = true
 strict_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unreachable = true
+no_implicit_optional = true
+pretty = true
+show_error_codes = true
+exclude = [
+    "^\\.venv/",
+    "^build/",
+    "^dist/",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
 
 [project]
 name = "opennetmap"

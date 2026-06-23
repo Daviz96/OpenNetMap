@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
 
@@ -36,7 +37,7 @@ def build_topology(
 
 
 def write_topology_exports(
-    devices: list[Device], stats: dict[str, object], output_dir: str | Path
+    devices: list[Device], stats: Mapping[str, object], output_dir: str | Path
 ) -> list[Path]:
     """Write topology JSON, GraphML and HTML files."""
     path = Path(output_dir)

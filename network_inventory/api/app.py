@@ -9,7 +9,7 @@ import sqlite3
 import threading
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ from network_inventory.utils.config import (
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 @dataclass(slots=True)
@@ -147,7 +147,10 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         path = Path("reports_output") / "topology.json"
         if not path.exists():
             return {"nodes": [], "edges": []}
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            return payload
+        return {"nodes": [], "edges": []}
 
     @app.get("/vlans")
     def vlans() -> dict[str, Any]:
@@ -240,8 +243,18 @@ def _write_scan_outputs(
 
 def _load_inventory_json(path: str) -> tuple[list[Device], dict[str, object]]:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    stats = dict(payload.get("stats") or {})
-    devices = [Device.from_dict(item) for item in payload.get("devices", [])]
+    if isinstance(payload, dict):
+        stats_payload = payload.get("stats")
+        if isinstance(stats_payload, dict):
+            stats = {str(key): value for key, value in stats_payload.items()}
+        else:
+            stats = {}
+        devices_payload = payload.get("devices")
+        devices_items = devices_payload if isinstance(devices_payload, list) else []
+    else:
+        stats = {}
+        devices_items = []
+    devices = [Device.from_dict(item) for item in devices_items]
     for device in devices:
         enrich_device_identity(device)
         classification = classify_with_details(device)
@@ -303,6 +316,12 @@ def _connect(db_path: str) -> sqlite3.Connection:
     return connection
 
 
+def _ensure_dict(value: object) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
 def _query_devices(
     db_path: str, limit: int, offset: int, q: str | None, sort: str = "ip"
 ) -> list[dict[str, Any]]:
@@ -321,7 +340,10 @@ def _query_device(db_path: str, device_key: str) -> dict[str, Any] | None:
         row = connection.execute(
             "SELECT last_json FROM devices WHERE device_key = ?", (device_key,)
         ).fetchone()
-    return json.loads(row["last_json"]) if row else None
+    if not row:
+        return None
+    data = json.loads(row["last_json"])
+    return data if isinstance(data, dict) else None
 
 
 def _latest_stats(db_path: str) -> dict[str, Any]:
@@ -329,7 +351,10 @@ def _latest_stats(db_path: str) -> dict[str, Any]:
         row = connection.execute(
             "SELECT stats_json FROM scans ORDER BY id DESC LIMIT 1"
         ).fetchone()
-    return json.loads(row["stats_json"]) if row else {}
+    if not row:
+        return {}
+    data = json.loads(row["stats_json"])
+    return data if isinstance(data, dict) else {}
 
 
 def _query_events(
@@ -369,7 +394,7 @@ def _query_scans(db_path: str, limit: int) -> list[dict[str, Any]]:
         {
             "id": row["id"],
             "started_at": row["started_at"],
-            "stats": json.loads(row["stats_json"]),
+            "stats": _ensure_dict(json.loads(row["stats_json"])),
         }
         for row in rows
     ]
@@ -397,6 +422,8 @@ def _summary_counts(db_path: str) -> dict[str, int]:
 
 def _device_row(row: sqlite3.Row) -> dict[str, Any]:
     data = json.loads(row["last_json"])
+    if not isinstance(data, dict):
+        data = {}
     data["device_key"] = row["device_key"]
     return data
 

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import re
-from urllib.request import Request, urlopen
 from pathlib import Path
+from urllib.request import Request, urlopen
 
 IEEE_OUI_URL = "https://standards-oui.ieee.org/oui/oui.txt"
 

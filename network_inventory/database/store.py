@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from collections.abc import Mapping
 from pathlib import Path
 
 from network_inventory.events.engine import InventoryEvent
 from network_inventory.inventory.device import Device
-
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS scans (
@@ -86,7 +86,7 @@ class InventoryStore:
     def save_scan(
         self,
         devices: list[Device],
-        stats: dict[str, object],
+        stats: Mapping[str, object],
         events: list[InventoryEvent] | None = None,
     ) -> int:
         """Persist a scan snapshot and return scan id."""

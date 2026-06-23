@@ -8,8 +8,8 @@ import sys
 import time
 from pathlib import Path
 
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.packages.urllib3 import disable_warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from rich.console import Console
 from rich.table import Table
 

@@ -14,7 +14,7 @@ OIDS = {
 def scan_snmp(ip: str, timeout: float = 1.0) -> dict[str, object]:
     """Try common SNMP community strings and return basic system info."""
     try:
-        from pysnmp.hlapi import (  # type: ignore
+        from pysnmp.hlapi import (
             CommunityData,
             ContextData,
             ObjectIdentity,
