@@ -9,31 +9,7 @@ from pathlib import Path
 from typing import cast
 
 from network_inventory.inventory.device import Device
-
-
-def build_topology(
-    devices: list[Device], subnet: str | None = None
-) -> dict[str, object]:
-    """Build a simple star topology from the scan result."""
-    root_id = subnet or "network"
-    nodes: list[dict[str, object]] = [
-        {"id": root_id, "label": root_id, "type": "network"}
-    ]
-    edges: list[dict[str, object]] = []
-    for device in devices:
-        node_id = f"{device.mac or 'no-mac'}|{device.ip}"
-        nodes.append(
-            {
-                "id": node_id,
-                "label": device.hostname or device.ip,
-                "ip": device.ip,
-                "mac": device.mac,
-                "type": device.device_type or "unknown",
-                "security_score": device.security_score,
-            }
-        )
-        edges.append({"source": root_id, "target": node_id, "relation": "discovered"})
-    return {"nodes": nodes, "edges": edges}
+from network_inventory.topology.builder import build_topology
 
 
 def write_topology_exports(
@@ -42,7 +18,7 @@ def write_topology_exports(
     """Write topology JSON, GraphML and HTML files."""
     path = Path(output_dir)
     path.mkdir(parents=True, exist_ok=True)
-    topology = build_topology(devices, str(stats.get("subnet") or "network"))
+    topology = build_topology(devices, dict(stats))
     outputs = [
         _write_json(topology, path / "topology.json"),
         _write_graphml(topology, path / "topology.graphml"),
