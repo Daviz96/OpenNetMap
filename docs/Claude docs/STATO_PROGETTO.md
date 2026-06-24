@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
-**Data riepilogo:** 2026-06-24  
-**Branch attivo:** `compat/python-3.13-fixes`  
+**Data riepilogo:** 2026-06-25  
+**Branch attivo:** `sprint/3-discovery` (PR aperta verso `main`)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -14,9 +14,9 @@ Strumento Python per la **scoperta automatica e l'inventario di dispositivi in u
 ## Architettura generale
 
 ```
-DISCOVERY (ARP / ping fallback)
+DISCOVERY (ARP / ping fallback + mDNS + SSDP + NetBIOS)
    ↓
-FINGERPRINTING (porte TCP, HTTP, SNMP, NetBIOS, mDNS stub)
+FINGERPRINTING (porte TCP, HTTP, SNMP, banner matching con firme)
    ↓
 CLASSIFICAZIONE (punteggio euristico per tipo dispositivo)
    ↓
@@ -41,9 +41,9 @@ Concorrenza tramite `ThreadPoolExecutor` sia per la discovery che per il fingerp
 | psutil | Rilevamento automatico della subnet locale |
 | Rich | Progress bar e output console |
 | Requests + BeautifulSoup4 | Fingerprinting HTTP/HTTPS |
-| pysnmp | Scansione SNMP |
+| pysnmp | Scansione SNMP (community configurabili) |
+| Zeroconf | mDNS discovery reale (Sprint 3) |
 | SQLite3 (built-in) | Persistenza locale |
-| Zeroconf | mDNS (implementazione stub) |
 | Pydantic | Validazione dati API |
 
 ---
@@ -55,26 +55,42 @@ OpenNetMap/
 ├── main.py                          # Entry point CLI
 ├── pyproject.toml                   # Configurazione build e tool
 ├── requirements.txt                 # Dipendenze runtime
+├── pytest.ini                       # Configurazione pytest (soglia coverage 60%)
 ├── oui.txt                          # Database vendor MAC IEEE (6.5 MB)
 ├── network_inventory/
-│   ├── api/app.py                   # FastAPI (~600 righe), ~15 endpoint
-│   ├── scanner/                     # arp_scanner, port_scanner, snmp, netbios, mdns(stub)
-│   ├── fingerprint/                 # banners, http_fingerprint, classifier, services
+│   ├── api/app.py                   # FastAPI (~700 righe), ~15 endpoint, auth X-API-Key
+│   ├── scanner/
+│   │   ├── arp_scanner.py           # ARP + fallback ping
+│   │   ├── port_scanner.py          # TCP port scan concorrente
+│   │   ├── snmp_scanner.py          # SNMPv2c (community configurabili)
+│   │   ├── netbios_scanner.py       # nbtstat (Win) + nmblookup (Linux/macOS)
+│   │   ├── mdns_scanner.py          # mDNS reale con zeroconf (10 service type)
+│   │   └── ssdp_scanner.py          # SSDP/UPnP UDP multicast M-SEARCH
+│   ├── fingerprint/
+│   │   ├── banners.py               # Banner collection + match_banner() con firme
+│   │   ├── http_fingerprint.py      # HTTP/HTTPS fingerprinting
+│   │   ├── classifier.py            # Classificatore euristico score-based
+│   │   └── services.py              # Pipeline fingerprinting
 │   ├── inventory/                   # Device dataclass + InventoryRunner
 │   ├── security/                    # Port-based security scoring
+│   ├── signatures/
+│   │   ├── banners.json             # 22 firme banner (SSH/HTTP/FTP/SMTP/Telnet)
+│   │   ├── favicon_hashes.json      # (vuoto — Sprint futuro)
+│   │   ├── tls_signatures.json      # (vuoto — Sprint futuro)
+│   │   └── products.json            # Firme prodotti
 │   ├── reports/                     # csv_report, html_report, json_report
 │   ├── topology/                    # builder (star), export (JSON/GraphML/HTML)
 │   ├── database/                    # SQLite store (8 tabelle)
 │   ├── events/                      # Snapshot comparison → eventi
-│   ├── utils/                       # config, logger, network, oui
-│   ├── cli/          ← PLACEHOLDER VUOTO
-│   ├── core/         ← PLACEHOLDER VUOTO
-│   ├── dashboard/    ← PLACEHOLDER VUOTO
-│   ├── discovery/    ← PLACEHOLDER VUOTO
-│   └── monitor/      ← PLACEHOLDER VUOTO
-├── tests/                           # 8 file, ~425 righe, 27 test (tutti ✅)
+│   ├── utils/                       # config (ScanConfig), logger, network, oui
+│   ├── cli/          ← PLACEHOLDER (roadmap M1)
+│   ├── core/         ← PLACEHOLDER (roadmap M4)
+│   ├── dashboard/    ← PLACEHOLDER (roadmap M10)
+│   ├── discovery/    ← PLACEHOLDER (roadmap M7)
+│   └── monitor/      ← PLACEHOLDER (roadmap M4)
+├── tests/                           # 13 file, 119 test (tutti ✅), coverage 68%
 ├── docs/                            # Documentazione e roadmap
-└── .github/workflows/ci.yml        # GitHub Actions CI
+└── .github/workflows/ci.yml        # GitHub Actions CI (Python 3.13)
 ```
 
 ---
@@ -87,63 +103,69 @@ OpenNetMap/
 | Rilevamento automatico subnet locale | ✅ Completo |
 | Scansione porte TCP concorrente | ✅ Completo |
 | Fingerprinting HTTP/HTTPS | ✅ Completo |
-| Banner collection TCP | ✅ Completo |
-| Scansione SNMP (SNMPv2c) | ✅ Funzionale |
-| Rilevamento NetBIOS/SMB | ✅ Funzionale |
+| Banner collection TCP + matching firme | ✅ Completo (22 firme) |
+| Scansione SNMP (SNMPv2c, community configurabili) | ✅ Funzionale |
+| Rilevamento NetBIOS/SMB cross-platform | ✅ Windows + Linux/macOS |
+| mDNS discovery (zeroconf) | ✅ Reale (Sprint 3) |
+| SSDP/UPnP discovery (multicast) | ✅ Nuovo (Sprint 3) |
 | Classificazione dispositivo (euristica) | ✅ 15+ tipi |
 | Security assessment (punteggio porte) | ✅ Funzionale |
 | Report JSON / CSV / HTML | ✅ Completo |
 | Export topologia (JSON, GraphML, HTML) | ✅ Completo (topologia a stella) |
-| Persistenza SQLite | ✅ Parziale |
+| Persistenza SQLite | ✅ Parziale (tabelle topology/vlans non popolate) |
 | Engine eventi (confronto snapshot) | ✅ Funzionale |
-| API REST FastAPI | ✅ Base (~15 endpoint) |
+| API REST FastAPI (~15 endpoint) | ✅ Con auth X-API-Key opzionale |
 | Dashboard web inline | ✅ Minimale |
 | Modalità monitoring (`--monitor`) | ✅ Funzionale |
 | Lookup vendor OUI | ✅ Completo |
 | CLI con argparse | ✅ Completo |
-| mDNS discovery | ⚠️ Stub |
+| Rate limiting POST /scan | ✅ (1 job globale) |
 | Topologia avanzata (inferenza relazioni) | ❌ Non implementato |
 | VLAN discovery | ❌ Non implementato |
 | LLDP / CDP discovery | ❌ Non implementato |
-| Sistema firme/plugin (signatures/) | ❌ File presenti, mai caricati |
-| Autenticazione API | ❌ Assente |
-| Notifiche (email, Slack, webhook) | ❌ Assente |
-| Docker / containerizzazione | ❌ Assente |
+| Notifiche (email, Slack, webhook) | ❌ Non implementato |
+| Docker / containerizzazione | ❌ Non implementato |
 
 ---
 
 ## Stato dei test
 
-- **27 test totali**, tutti passano su Python 3.13.14 ✅
-- Copertura: smoke, CLI, network utils, inventory, reports, store, API, topology
-- Mancano: test di integrazione reali, mocking rete, scenari di errore, performance
+- **119 test totali**, tutti passano su Python 3.13.14 ✅
+- **Coverage: 68.07%** (soglia CI: 60%)
+- File di test: smoke, CLI, network utils, inventory, reports, store, API (con auth), topology, classifier, events, arp_scanner, assessment, mdns, netbios, ssdp, banners
+- Mancano: test di integrazione reali, mocking rete end-to-end, scenari di errore rete
 
 ---
 
-## Dipendenze dichiarate ma mai usate
+## Sprint completati
 
-`pandas`, `sqlalchemy`, `networkx`, `pyvis`, `matplotlib`, `jinja2`, `python-nmap`  
-Appesantiscono l'installazione e creano confusione senza contribuire funzionalità.
-
----
-
-## Milestone completate
-
-| Milestone | Descrizione | Stato |
+| Sprint | Branch | Risultati |
 |---|---|---|
-| M1 | Cleanup, Python 3.13 compat, CI base | ✅ Completata |
+| Sprint 1 — Pulizia e stabilizzazione | `sprint/1-cleanup` (merged) | 27 test, coverage 50.77% |
+| Sprint 2 — Sicurezza API e test | `sprint/2-api-security-tests` (merged) | 82 test, coverage 64.37% |
+| Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR aperta) | 119 test, coverage 68.07% |
 
 ---
 
-## Milestone pianificate (da roadmap)
+## Prossimi sprint
 
-Da M2 a M16: testing avanzato, engine firme, LLDP/mDNS reale, topologia avanzata, notifiche, autenticazione, database upgrade, Docker, scanning distribuito, hardening produzione.
+| Sprint | Obiettivo | Task principali |
+|---|---|---|
+| Sprint 4 | Persistenza e topologia | Popolare tabelle topology/vlans nel DB, endpoint /topology da DB, graceful shutdown |
+| Sprint 5 | Dashboard e UX | Template Jinja2, grafico storico, topologia interattiva vis.js |
+| Sprint 6 | Deployment Docker | Dockerfile, docker-compose.yml, variabili d'ambiente |
 
 ---
 
-## Rischi principali
+## Dipendenze pianificate (non ancora usate)
 
-- **Sicurezza**: nessuna autenticazione sull'API, `verify=False` su HTTPS, community SNMP hardcoded
-- **Portabilità**: dipendenza da comandi di sistema (`ping`, `arp`, `nbtstat`, `route`) diversi per OS
-- **Scope creep**: 5 package vuoti e dipendenze dichiarate ma mai usate suggeriscono funzionalità pianificate ma abbandonate
-- **Coverage**: rapporto test/codice sorgente molto basso (~425 righe test vs ~2500+ righe sorgente)
+`sqlalchemy` (M12), `networkx` + `pyvis` (M6), `jinja2` (M10) — mantenute perché esplicitamente pianificate nella roadmap a 16 milestone.
+
+---
+
+## Rischi attuali
+
+- **Coverage bassa in aree chiave**: `http_fingerprint.py` 17%, `port_scanner.py` 19%, `snmp_scanner.py` 18%, `utils/network.py` 34%
+- **Tabelle DB non popolate**: `topology` e `vlans` esistono ma non vengono riempite dallo scan
+- **Nessun graceful shutdown**: il monitor non gestisce `SIGINT`/`SIGTERM` correttamente
+- **Docker assente**: deploy richiede installazione manuale con Python 3.13

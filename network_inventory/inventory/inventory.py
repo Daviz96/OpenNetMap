@@ -23,6 +23,7 @@ from network_inventory.scanner.mdns_scanner import scan_mdns
 from network_inventory.scanner.netbios_scanner import scan_netbios
 from network_inventory.scanner.port_scanner import scan_ports
 from network_inventory.scanner.snmp_scanner import scan_snmp
+from network_inventory.scanner.ssdp_scanner import scan_ssdp
 from network_inventory.security.assessment import assess_device
 from network_inventory.utils.config import ScanConfig
 from network_inventory.utils.logger import get_logger
@@ -105,13 +106,20 @@ class InventoryRunner:
         )
 
         if self.config.snmp_enabled or 161 in device.open_ports:
-            device.snmp_info = scan_snmp(device.ip, timeout=self.config.timeout)
+            device.snmp_info = scan_snmp(
+                device.ip,
+                timeout=self.config.timeout,
+                communities=self.config.snmp_communities,
+            )
         if {5353, 80, 443} & set(device.open_ports):
             device.mdns_info = scan_mdns(device.ip, timeout=self.config.timeout)
         if {137, 139, 445} & set(device.open_ports):
             device.netbios_info = scan_netbios(
                 device.ip, timeout=max(self.config.timeout, 2.0)
             )
+        ssdp = scan_ssdp(device.ip, timeout=self.config.timeout)
+        if ssdp:
+            device.services["ssdp"] = ssdp
 
         enrich_device_identity(device)
         classification = classify_with_details(device)

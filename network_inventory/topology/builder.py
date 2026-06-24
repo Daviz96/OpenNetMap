@@ -88,7 +88,9 @@ def build_topology(
                 target=node.id,
                 relationship=relationship,
                 confidence=50 if node.type == "unknown" else 90,
-                discovery_method=str(node.metadata.get("discovery_method", "inventory")),
+                discovery_method=str(
+                    node.metadata.get("discovery_method", "inventory")
+                ),
             )
         )
 

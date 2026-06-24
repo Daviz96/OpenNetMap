@@ -38,6 +38,7 @@ class ScanConfig:
     threads: int = 100
     timeout: float = 1.0
     snmp_enabled: bool = False
+    snmp_communities: list[str] = field(default_factory=lambda: SNMP_COMMUNITIES.copy())
     verify_ssl: bool = False
     verbose: bool = False
     report_formats: list[str] = field(default_factory=lambda: ["json"])
