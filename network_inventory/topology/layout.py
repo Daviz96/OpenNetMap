@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import networkx as nx
 from typing import cast
+
+import networkx as nx
 
 
 def hierarchical_layout(graph: nx.Graph) -> dict[str, tuple[float, float]]:
@@ -25,9 +26,12 @@ def radial_layout(
     """Compute a radial layout around an optional center node."""
     try:
         if center and center in graph:
-            return nx.shell_layout(
-                graph, nlist=[[center], [n for n in graph if n != center]]
+            return cast(
+                dict[str, tuple[float, float]],
+                nx.shell_layout(
+                    graph, nlist=[[center], [n for n in graph if n != center]]
+                ),
             )
-        return nx.shell_layout(graph)
+        return cast(dict[str, tuple[float, float]], nx.shell_layout(graph))
     except nx.NetworkXError:
-        return nx.spring_layout(graph, seed=42)
+        return cast(dict[str, tuple[float, float]], nx.spring_layout(graph, seed=42))
