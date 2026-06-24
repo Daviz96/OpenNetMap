@@ -9,13 +9,18 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def fingerprint_http(ip: str, port: int, timeout: float = 2.0) -> dict[str, object]:
-    """Collect basic HTTP metadata from a host."""
+def fingerprint_http(
+    ip: str, port: int, timeout: float = 2.0, verify_ssl: bool = False
+) -> dict[str, object]:
+    """Collect basic HTTP metadata from a host.
+
+    verify_ssl=False by default to handle self-signed certs common on LAN devices.
+    """
     scheme = "https" if port in {443, 8443} else "http"
     base_url = f"{scheme}://{ip}:{port}/"
     result: dict[str, object] = {"url": base_url}
     try:
-        response = requests.get(base_url, timeout=timeout, verify=False)
+        response = requests.get(base_url, timeout=timeout, verify=verify_ssl)
     except requests.RequestException as exc:
         result["error"] = str(exc)
         return result
@@ -24,7 +29,7 @@ def fingerprint_http(ip: str, port: int, timeout: float = 2.0) -> dict[str, obje
     result["server"] = response.headers.get("Server")
     result["www_authenticate"] = response.headers.get("WWW-Authenticate")
     result["title"] = _title(response.text)
-    result["favicon_hash"] = _favicon_hash(base_url, response.text, timeout)
+    result["favicon_hash"] = _favicon_hash(base_url, response.text, timeout, verify_ssl)
     return result
 
 
@@ -35,7 +40,9 @@ def _title(html: str) -> str | None:
     return None
 
 
-def _favicon_hash(base_url: str, html: str, timeout: float) -> str | None:
+def _favicon_hash(
+    base_url: str, html: str, timeout: float, verify_ssl: bool = False
+) -> str | None:
     soup = BeautifulSoup(html, "html.parser")
     href = None
     for link in soup.find_all("link"):
@@ -52,7 +59,7 @@ def _favicon_hash(base_url: str, html: str, timeout: float) -> str | None:
                 break
     favicon_url = urljoin(base_url, href or "/favicon.ico")
     try:
-        response = requests.get(favicon_url, timeout=timeout, verify=False)
+        response = requests.get(favicon_url, timeout=timeout, verify=verify_ssl)
         if response.ok and response.content:
             return hashlib.md5(response.content).hexdigest()
     except requests.RequestException:

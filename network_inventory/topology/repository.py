@@ -49,7 +49,7 @@ class TopologyRepository:
         """Save a topology snapshot and related change events."""
         previous = self.load_latest_topology()
         changes = diff_topology(previous, topology) if previous else None
-        recorded_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        recorded_at = datetime.datetime.now(datetime.UTC).isoformat()
         with sqlite3.connect(self.path) as connection:
             connection.executescript(TOPOLOGY_SCHEMA)
             cursor = connection.execute(

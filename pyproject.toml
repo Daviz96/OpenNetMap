@@ -45,6 +45,7 @@ exclude = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+addopts = "--cov=network_inventory --cov-report=term-missing --cov-fail-under=50"
 
 [project]
 name = "opennetmap"

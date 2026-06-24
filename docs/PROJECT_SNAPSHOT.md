@@ -1,5 +1,16 @@
 # OpenNetMap – Project Snapshot
 
+**Ultimo aggiornamento**: 2026-06-23 (Python 3.13 compatibility release)
+
+**Cambiamenti recenti**:
+- ✅ Aggiornamento compatibilità Python 3.13 (sostituito `datetime.UTC` con `timezone.utc` in 4 file)
+- ✅ Aggiornamento `pyproject.toml` per supporto Python 3.13+
+- ✅ Esecuzione black formatting code
+- ✅ Tutti i test passano (27/27 passed)
+- ✅ PR #1 creata e aperta: [compat: support Python 3.13 — timezone fixes, update pyproject, run black](https://github.com/Daviz96/OpenNetMap/pull/1)
+
+---
+
 ## 1. Executive Summary
 
 OpenNetMap è un tool Python per l'inventario della rete LAN locale. Il progetto offre funzioni di scoperta host, scansione porte TCP, fingerprint dei servizi, classificazione dispositivi, valutazione di sicurezza e generazione report in JSON, CSV e HTML. È inoltre presente un modulo API/dashboard basato su FastAPI per consultare lo stato dell'inventario e avviare scansioni.
@@ -67,6 +78,34 @@ Dai documenti del progetto emergono come previste ma ancora parziali o mancanti:
 ---
 
 ## 3. Stato attuale del progetto
+
+### Python 3.13 Compatibility
+
+**Data**: 2026-06-23
+
+Il progetto è stato aggiornato per il supporto completo a Python 3.13.14:
+
+* **Modifiche apportate**:
+  - Sostituzione di `datetime.UTC` con `timezone.utc` in:
+    - `network_inventory/inventory/device.py` (linea 12)
+    - `network_inventory/events/engine.py` (linea 20)
+    - `network_inventory/inventory/inventory.py` (linea 92)
+    - `network_inventory/topology/repository.py` (linea 52)
+  - Aggiornamento `pyproject.toml`:
+    - `requires-python = ">=3.13"`
+    - `python_version` mypy → `3.13`
+    - `target-version` Ruff → `py312` (compatibile con tool corrente)
+    - `target-version` Black → `py312` (compatibile con tool corrente)
+
+* **Test**:
+  - Tutti i 27 test passano su Python 3.13.14 ✅
+  - Format check con black: OK (54 files unchanged)
+  - Linting con ruff: OK (warnings minori su line length)
+
+* **Deployment**:
+  - PR #1 aperta: [compat/python-3.13-fixes](https://github.com/Daviz96/OpenNetMap/pull/1)
+  - Branch: `compat/python-3.13-fixes`
+  - Commit: "compat: support Python 3.13 — timezone fixes, update pyproject, run black"
 
 ### Milestone 1 update
 

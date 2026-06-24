@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from network_inventory.inventory.device import Device
 
@@ -16,9 +16,7 @@ class InventoryEvent:
     device_key: str
     message: str
     timestamp: str = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-        .replace(microsecond=0)
-        .isoformat()
+        default_factory=lambda: datetime.now(UTC).replace(microsecond=0).isoformat()
     )
 
 

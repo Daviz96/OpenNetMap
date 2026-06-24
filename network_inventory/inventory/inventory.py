@@ -5,7 +5,7 @@ from __future__ import annotations
 import ipaddress
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from rich.progress import (
     BarColumn,
@@ -88,9 +88,7 @@ class InventoryRunner:
                     progress.advance(task)
 
         stats = subnet_stats(subnet, len(devices))
-        stats["started_at"] = (
-            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-        )
+        stats["started_at"] = datetime.now(UTC).replace(microsecond=0).isoformat()
         return devices, stats
 
     def _fingerprint_device(self, device: Device) -> Device:
@@ -102,7 +100,9 @@ class InventoryRunner:
             timeout=self.config.timeout,
             threads=min(len(self.config.ports), 32),
         )
-        fingerprint_services(device, timeout=self.config.timeout)
+        fingerprint_services(
+            device, timeout=self.config.timeout, verify_ssl=self.config.verify_ssl
+        )
 
         if self.config.snmp_enabled or 161 in device.open_ports:
             device.snmp_info = scan_snmp(device.ip, timeout=self.config.timeout)

@@ -9,7 +9,9 @@ from network_inventory.inventory.device import Device
 HTTP_PORTS = {80, 443, 8080, 8443}
 
 
-def fingerprint_services(device: Device, timeout: float = 1.0) -> None:
+def fingerprint_services(
+    device: Device, timeout: float = 1.0, verify_ssl: bool = False
+) -> None:
     """Populate a device with service fingerprints."""
     services: dict[str, object] = {}
 
@@ -24,7 +26,9 @@ def fingerprint_services(device: Device, timeout: float = 1.0) -> None:
     http = {}
     for port in device.open_ports:
         if port in HTTP_PORTS:
-            http[port] = fingerprint_http(device.ip, port, timeout=max(timeout, 2.0))
+            http[port] = fingerprint_http(
+                device.ip, port, timeout=max(timeout, 2.0), verify_ssl=verify_ssl
+            )
     if http:
         services["http"] = http
 

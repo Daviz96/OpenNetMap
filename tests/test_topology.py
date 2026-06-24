@@ -68,12 +68,14 @@ def test_build_topology_includes_gateway_and_vlan():
     )
 
     assert isinstance(topology, dict)
-    assert any(node["type"] == "network" for node in topology["nodes"])
-    assert any(
-        node["id"] == "aa:bb:cc:dd:ee:01|192.168.0.1" for node in topology["nodes"]
-    )
-    assert any(edge["relationship"] == "DEFAULT_GATEWAY" for edge in topology["edges"])
-    assert any(edge["relationship"] == "MEMBER_OF_VLAN" for edge in topology["edges"])
+    nodes = topology["nodes"]
+    edges = topology["edges"]
+    assert isinstance(nodes, list)
+    assert isinstance(edges, list)
+    assert any(node["type"] == "network" for node in nodes)
+    assert any(node["id"] == "aa:bb:cc:dd:ee:01|192.168.0.1" for node in nodes)
+    assert any(edge["relationship"] == "DEFAULT_GATEWAY" for edge in edges)
+    assert any(edge["relationship"] == "MEMBER_OF_VLAN" for edge in edges)
 
 
 def test_diff_topology_detects_added_and_removed():
