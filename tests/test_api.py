@@ -55,3 +55,39 @@ def test_filter_devices_composes_and_clauses():
     filtered = _filter_devices(devices, "vendor:Cisco and hostname:office")
     assert len(filtered) == 1
     assert filtered[0]["ip"] == "10.0.0.5"
+
+
+def test_api_returns_401_when_api_key_set_and_missing(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("OPENNETMAP_API_KEY", "secret123")
+    db_path = tmp_path / "inventory.db"
+    app = create_app(str(db_path))
+    client = TestClient(app, raise_server_exceptions=False)
+    response = client.get("/devices")
+    assert response.status_code == 401
+
+
+def test_api_returns_200_with_correct_api_key(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("OPENNETMAP_API_KEY", "secret123")
+    db_path = tmp_path / "inventory.db"
+    app = create_app(str(db_path))
+    client = TestClient(app, raise_server_exceptions=False)
+    response = client.get("/devices", headers={"x-api-key": "secret123"})
+    assert response.status_code == 200
+
+
+def test_api_dashboard_accessible_without_api_key(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("OPENNETMAP_API_KEY", "secret123")
+    db_path = tmp_path / "inventory.db"
+    app = create_app(str(db_path))
+    client = TestClient(app, raise_server_exceptions=False)
+    response = client.get("/")
+    assert response.status_code == 200
+
+
+def test_api_no_auth_required_when_env_not_set(tmp_path: Path, monkeypatch):
+    monkeypatch.delenv("OPENNETMAP_API_KEY", raising=False)
+    db_path = tmp_path / "inventory.db"
+    app = create_app(str(db_path))
+    client = TestClient(app)
+    response = client.get("/devices")
+    assert response.status_code == 200

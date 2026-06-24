@@ -26,15 +26,21 @@ Obiettivo: eliminare il debito tecnico evidente prima di aggiungere funzionalit�
 ---
 
 ## Sprint 2 — Sicurezza API e test (M3)
+**Eseguito:** 2026-06-24 | **Branch:** `sprint/2-api-security-tests`
 
 Obiettivo: rendere l'API usabile in contesti non solo locali.
 
-- [ ] **Aggiungere autenticazione API** — token statico via header `X-API-Key`, configurabile con variabile d'ambiente `OPENNETMAP_API_KEY`
-- [ ] **Aggiungere rate limiting** all'endpoint `POST /scan` (max 1 scan attivo per client)
-- [ ] **Scrivere test per `classifier.py`** — coprire almeno 10 scenari di input diversi (printer, router, camera, PC Windows, IoT sconosciuto, ecc.)
-- [ ] **Scrivere test per `events/engine.py`** — verificare ogni tipo di evento: `NEW_DEVICE`, `DEVICE_OFFLINE`, `PORT_OPENED`, `PORT_CLOSED`, `IP_CHANGED`, `SECURITY_SCORE_CHANGED`
-- [ ] **Scrivere test con mock per `arp_scanner.py`** — simulare risposta Scapy e ping senza rete reale
-- [ ] **Scrivere test per `assessment.py`** — verificare penalità per Telnet, FTP, SNMP, RDP, SMB
+- [x] **Autenticazione API** — middleware `X-API-Key` in `api/app.py`; attivo solo se `OPENNETMAP_API_KEY` è impostato; escludi `/` e `/dashboard/*`; risponde 401 con messaggio esplicito
+- [x] **Rate limiting `POST /scan`** — max 1 job `queued`/`running` globale; risponde 429 se già attivo (approccio in-memory, nessuna dipendenza extra)
+- [x] **Test `classifier.py`** — 16 scenari: printer (porta/keyword), router, switch, access point, NAS, camera, Windows PC, Linux server, Mac, IoT, unknown, confidence/reasons
+- [x] **Test `events/engine.py`** — tutti i tipi di evento: NEW_DEVICE, DEVICE_OFFLINE, PORT_OPENED, PORT_CLOSED, HOSTNAME_CHANGED, VENDOR_CHANGED, CLASSIFICATION_CHANGED, SECURITY_SCORE_CHANGED, IP_CHANGED
+- [x] **Test `arp_scanner.py` con mock** — mock di subprocess (ping, arp -a), socket (reverse_dns), scapy path, ping fallback; 9 test
+- [x] **Test `assessment.py`** — ogni penalità (Telnet/FTP/SNMP/HTTP/RDP/SMB/community), score floor ≥ 0, sum totale, recommendations; 12 test
+- [x] **Fix classifier** — `classify_with_details` ora normalizza il tipo anche nel ritorno anticipato ("unknown" → "Dispositivo sconosciuto")
+- [x] **Test API auth** — 4 nuovi test in `test_api.py`: 401 senza key, 200 con key corretta, dashboard pubblica, nessuna auth senza env var
+- [x] **Aggiornato `pytest.ini` soglia** — rimane 50% (baseline); coverage raggiunta: **64.37%** ✅
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (58 file) | pytest 82/82 ✅ | coverage 64.37% ✅
 
 ---
 

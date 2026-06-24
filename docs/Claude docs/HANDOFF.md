@@ -1,0 +1,172 @@
+# Handoff — Contesto di lavoro OpenNetMap
+**Creato:** 2026-06-24  
+**Scopo:** permettere a Claude di riprendere il lavoro in una nuova sessione senza perdere contesto
+
+---
+
+## Stato attuale del progetto
+
+**Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
+**Versione:** 0.1.0 (Alpha)  
+**Branch principale:** `main`  
+**Branch di lavoro attivo:** `sprint/2-api-security-tests` (pushato, non ancora PR)
+
+---
+
+## Struttura branch Git
+
+```
+main
+└── compat/python-3.13-fixes   (PR #1 aperta)
+    └── sprint/1-cleanup        (PR #2 aperta verso main)
+        └── sprint/2-api-security-tests  (pushato, PR NON ancora aperta)
+```
+
+**Azione immediata suggerita:** aprire PR da `sprint/2-api-security-tests` → `main` prima di iniziare Sprint 3.
+
+---
+
+## Sprint completati
+
+### Sprint 1 — Pulizia e stabilizzazione ✅
+**Branch:** `sprint/1-cleanup` | **PR #2** aperta
+
+Modifiche principali:
+- `requirements.txt`: rimossi `pandas`, `matplotlib`, `python-nmap`, `tabulate`
+- `mypy` aggiornato 1.5.1 → 2.1.0 (fix crash stub numpy)
+- `verify_ssl: bool = False` aggiunto a `fingerprint_http()`, `_favicon_hash()`, `fingerprint_services()`, `ScanConfig`
+- CI (`ci.yml`): Python 3.12 → 3.13, aggiunto step pytest-cov
+- `pytest.ini`: attivato `--cov=network_inventory --cov-fail-under=50`
+- ruff auto-fix: `timezone.utc` → `datetime.UTC` in 5 file
+- Fix mypy: `topology/layout.py`, `topology/builder.py`, `tests/test_topology.py`
+- Package placeholder (`cli/`, `core/`, `dashboard/`, `discovery/`, `monitor/`) **MANTENUTI** (tutti pianificati in roadmap)
+
+### Sprint 2 — Sicurezza API e test ✅
+**Branch:** `sprint/2-api-security-tests` | **PR non ancora aperta**
+
+Modifiche principali:
+- `api/app.py`: middleware `X-API-Key` (401 se `OPENNETMAP_API_KEY` env var impostata e header mancante/errato); `/` e `/dashboard/*` sono pubblici
+- `api/app.py`: rate limit `POST /scan` — max 1 job `queued`/`running` globale → 429
+- `fingerprint/classifier.py`: fix ritorno anticipato per device sconosciuto (`"unknown"` → `"Dispositivo sconosciuto"`)
+- Nuovi file test: `test_classifier.py` (16 test), `test_events.py` (12 test), `test_arp_scanner.py` (9 test), `test_assessment.py` (12 test)
+- `test_api.py`: +4 test auth middleware
+
+**Risultati Sprint 2:** pytest 82/82 ✅ | coverage 64.37% ✅ | black ✅ | ruff ✅ | mypy ✅
+
+---
+
+## Stato test e coverage
+
+| Metrica | Sprint 1 | Sprint 2 |
+|---|---|---|
+| Test totali | 27 | 82 |
+| Coverage | 50.77% | 64.37% |
+| Soglia CI | 50% | 50% |
+
+**Coverage bassa nei moduli (opportunità Sprint 2+):**
+- `scanner/arp_scanner.py`: 22%
+- `fingerprint/classifier.py`: 18% (ora migliorata dopo Sprint 2)
+- `fingerprint/http_fingerprint.py`: 17%
+- `security/assessment.py`: 21% (ora migliorata dopo Sprint 2)
+- `utils/oui.py`: 24%
+- `utils/network.py`: 34%
+- `api/app.py`: 44%
+
+---
+
+## Prossimi sprint (da TODO.md)
+
+### Sprint 3 — Discovery e fingerprinting
+**Branch da creare:** `sprint/3-discovery` da `sprint/2-api-security-tests`
+
+Task:
+1. **mDNS reale** in `scanner/mdns_scanner.py` — usare `zeroconf` già installato
+   - Scoprire `_http._tcp`, `_smb._tcp`, `_printer._tcp`, `_airplay._tcp`
+   - Integrare hostname e tipo servizio nel `Device`
+2. **Esternalizzare community SNMP** — `snmp_communities: list[str]` già in `utils/config.py` come `SNMP_COMMUNITIES = ["public", "private"]`; renderle configurabili via `ScanConfig`
+3. **Cross-platform `nbtstat`** — `scanner/netbios_scanner.py` usa `nbtstat` (solo Windows); aggiungere fallback su Linux
+4. **SSDP discovery** — UDP multicast 239.255.255.250:1900 per dispositivi UPnP/IoT
+5. **File firme** — popolare `signatures/banners.json` con ~20 firme comuni
+
+### Sprint 4 — Persistenza e topologia
+### Sprint 5 — Dashboard e UX  
+### Sprint 6 — Deployment Docker
+
+(Dettagli completi in `docs/Claude docs/TODO.md`)
+
+---
+
+## Decisioni architetturali prese (non rinegoziare)
+
+| Decisione | Motivazione |
+|---|---|
+| Package placeholder mantenuti | Tutti pianificati in roadmap a 16 milestone |
+| `sqlalchemy`, `networkx`, `pyvis`, `jinja2` mantenute in requirements | Usate in M6, M10, M12 della roadmap |
+| `verify_ssl=False` default | Dispositivi LAN con self-signed cert sono la norma |
+| Rate limit `POST /scan` globale (non per IP) | Tool single-instance per LAN |
+| Soglia coverage 50% per ora | Sprint 2 ha già portato al 64%; si alzerà con Sprint 3+ |
+| Tutti i documenti Claude → `docs/Claude docs/` | Preferenza esplicita dell'utente |
+
+---
+
+## File chiave del progetto
+
+| File | Ruolo |
+|---|---|
+| `main.py` | Entry point CLI (argparse, orchestrazione) |
+| `network_inventory/api/app.py` | FastAPI (~700 righe), 15 endpoint, auth middleware |
+| `network_inventory/inventory/inventory.py` | `InventoryRunner` — pipeline principale |
+| `network_inventory/inventory/device.py` | `Device` dataclass (modello centrale) |
+| `network_inventory/utils/config.py` | `ScanConfig`, liste porte, community SNMP |
+| `network_inventory/fingerprint/classifier.py` | Classificatore euristico (score-based) |
+| `network_inventory/security/assessment.py` | Security scoring per porta |
+| `network_inventory/scanner/arp_scanner.py` | Discovery ARP + fallback ping |
+| `network_inventory/database/store.py` | SQLite persistence (8 tabelle) |
+| `network_inventory/events/engine.py` | Confronto snapshot → eventi |
+| `network_inventory/topology/builder.py` | Topologia a stella |
+| `docs/ROADMAP.md` | 16 milestone da seguire |
+| `docs/Claude docs/TODO.md` | Sprint plan con stato aggiornato |
+| `docs/Claude docs/CONSIGLI.md` | Raccomandazioni tecniche per il progetto |
+
+---
+
+## Comandi utili da riprendere
+
+```bash
+# Checkout branch attivo
+git checkout sprint/2-api-security-tests
+
+# Aprire PR Sprint 2
+gh pr create --title "feat: Sprint 2 — auth API, rate limiting, 55 nuovi test" --base main
+
+# Creare branch Sprint 3
+git checkout -b sprint/3-discovery
+
+# Suite di verifica da eseguire dopo ogni modifica
+python -m black --check .
+python -m ruff check .
+python -m mypy --ignore-missing-imports .
+python -m pytest -q
+```
+
+---
+
+## Workflow stabilito
+
+1. **Prima di ogni sprint:** presentare il piano all'utente e attendere conferma
+2. **Durante lo sprint:** eseguire i task, verifica con black → ruff → mypy → pytest
+3. **Dopo ogni sprint:** aggiornare `docs/Claude docs/TODO.md` con data, branch e risultati
+4. **Commit + push** al termine di ogni sprint verificato
+5. **PR** verso `main` quando l'utente lo richiede
+
+---
+
+## Note sull'ambiente
+
+- **OS:** Windows 11, shell PowerShell (primaria) + Bash disponibile
+- **Python:** 3.13.14 (venv in `.venv/`)
+- **Git user:** Daviz96
+- **Repo:** https://github.com/Daviz96/OpenNetMap
+- **mypy:** 2.1.0 (aggiornato in Sprint 1 — NON retrocedere a 1.5.1)
+- **pytest-cov:** 7.1.0
+- Il file `pytest.ini` ha **priorità** su `pyproject.toml` per le opzioni pytest
