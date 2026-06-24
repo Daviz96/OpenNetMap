@@ -11,8 +11,13 @@ OIDS = {
 }
 
 
-def scan_snmp(ip: str, timeout: float = 1.0) -> dict[str, object]:
-    """Try common SNMP community strings and return basic system info."""
+def scan_snmp(
+    ip: str, timeout: float = 1.0, communities: list[str] | None = None
+) -> dict[str, object]:
+    """Try SNMP community strings and return basic system info.
+
+    *communities* overrides the module-level default list when provided.
+    """
     try:
         from pysnmp.hlapi import (
             CommunityData,
@@ -26,7 +31,7 @@ def scan_snmp(ip: str, timeout: float = 1.0) -> dict[str, object]:
     except ImportError:
         return {}
 
-    for community in SNMP_COMMUNITIES:
+    for community in communities if communities is not None else SNMP_COMMUNITIES:
         result: dict[str, object] = {"community": community}
         success = False
         for key, oid in OIDS.items():

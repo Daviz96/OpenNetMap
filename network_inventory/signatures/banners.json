@@ -1,2 +1,152 @@
-{}
-
+{
+  "SSH": [
+    {
+      "pattern": "SSH-2\\.0-OpenSSH_(\\d+\\.\\d+)",
+      "vendor": "OpenBSD",
+      "product": "OpenSSH",
+      "device_type": "server",
+      "capture": "version"
+    },
+    {
+      "pattern": "SSH-2\\.0-Dropbear_(\\d+\\.\\d+)",
+      "vendor": "Dropbear",
+      "product": "Dropbear SSH",
+      "device_type": "router",
+      "capture": "version"
+    },
+    {
+      "pattern": "SSH-2\\.0-RouterOS",
+      "vendor": "MikroTik",
+      "product": "RouterOS",
+      "device_type": "router"
+    },
+    {
+      "pattern": "SSH-2\\.0-Cisco",
+      "vendor": "Cisco",
+      "product": "IOS",
+      "device_type": "router"
+    },
+    {
+      "pattern": "SSH-2\\.0-HUAWEI",
+      "vendor": "Huawei",
+      "product": "VRP",
+      "device_type": "router"
+    }
+  ],
+  "HTTP": [
+    {
+      "pattern": "Apache/(\\d+\\.\\d+)",
+      "vendor": "Apache",
+      "product": "Apache HTTP Server",
+      "device_type": "server",
+      "capture": "version"
+    },
+    {
+      "pattern": "nginx/(\\d+\\.\\d+)",
+      "vendor": "Nginx",
+      "product": "nginx",
+      "device_type": "server",
+      "capture": "version"
+    },
+    {
+      "pattern": "lighttpd/(\\d+\\.\\d+)",
+      "vendor": "lighttpd",
+      "product": "lighttpd",
+      "device_type": "server",
+      "capture": "version"
+    },
+    {
+      "pattern": "micro_httpd",
+      "vendor": "acme",
+      "product": "micro_httpd",
+      "device_type": "iot"
+    },
+    {
+      "pattern": "GoAhead-Webs",
+      "vendor": "EmbedThis",
+      "product": "GoAhead",
+      "device_type": "iot"
+    },
+    {
+      "pattern": "TP-LINK",
+      "vendor": "TP-Link",
+      "product": "Router",
+      "device_type": "router"
+    },
+    {
+      "pattern": "MikroTik",
+      "vendor": "MikroTik",
+      "product": "RouterOS",
+      "device_type": "router"
+    },
+    {
+      "pattern": "Synology",
+      "vendor": "Synology",
+      "product": "DiskStation",
+      "device_type": "nas"
+    },
+    {
+      "pattern": "QNAP",
+      "vendor": "QNAP",
+      "product": "NAS",
+      "device_type": "nas"
+    }
+  ],
+  "FTP": [
+    {
+      "pattern": "vsftpd (\\d+\\.\\d+)",
+      "vendor": "vsftpd",
+      "product": "vsftpd",
+      "device_type": "server",
+      "capture": "version"
+    },
+    {
+      "pattern": "ProFTPD (\\d+\\.\\d+)",
+      "vendor": "ProFTPD",
+      "product": "ProFTPD",
+      "device_type": "server",
+      "capture": "version"
+    },
+    {
+      "pattern": "FileZilla Server",
+      "vendor": "FileZilla",
+      "product": "FileZilla Server",
+      "device_type": "server"
+    }
+  ],
+  "SMTP": [
+    {
+      "pattern": "Postfix",
+      "vendor": "Postfix",
+      "product": "Postfix MTA",
+      "device_type": "server"
+    },
+    {
+      "pattern": "Exim (\\d+\\.\\d+)",
+      "vendor": "Exim",
+      "product": "Exim MTA",
+      "device_type": "server",
+      "capture": "version"
+    }
+  ],
+  "TELNET": [
+    {
+      "pattern": "RouterOS",
+      "vendor": "MikroTik",
+      "product": "RouterOS",
+      "device_type": "router"
+    },
+    {
+      "pattern": "DD-WRT",
+      "vendor": "DD-WRT",
+      "product": "DD-WRT",
+      "device_type": "router"
+    },
+    {
+      "pattern": "OpenWrt",
+      "vendor": "OpenWrt",
+      "product": "OpenWrt",
+      "device_type": "router"
+    }
+  ]
+}

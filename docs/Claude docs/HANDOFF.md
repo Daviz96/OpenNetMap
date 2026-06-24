@@ -9,20 +9,18 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/2-api-security-tests` (pushato, non ancora PR)
+**Branch di lavoro attivo:** `sprint/3-discovery` (pushato, PR non ancora aperta)
 
 ---
 
 ## Struttura branch Git
 
 ```
-main
-└── compat/python-3.13-fixes   (PR #1 aperta)
-    └── sprint/1-cleanup        (PR #2 aperta verso main)
-        └── sprint/2-api-security-tests  (pushato, PR NON ancora aperta)
+main  (Sprint 1+2+3 già integrati via merge)
+└── sprint/3-discovery  (pushato, PR NON ancora aperta)
 ```
 
-**Azione immediata suggerita:** aprire PR da `sprint/2-api-security-tests` → `main` prima di iniziare Sprint 3.
+**Azione immediata suggerita:** aprire PR da `sprint/3-discovery` → `main`.
 
 ---
 
@@ -53,15 +51,32 @@ Modifiche principali:
 
 **Risultati Sprint 2:** pytest 82/82 ✅ | coverage 64.37% ✅ | black ✅ | ruff ✅ | mypy ✅
 
+### Sprint 3 — Discovery e fingerprinting ✅
+**Branch:** `sprint/3-discovery` | **PR non ancora aperta**
+
+Modifiche principali:
+- `scanner/mdns_scanner.py`: implementazione reale con `zeroconf.ServiceBrowser` su 10 tipi di servizio; filtra per IP; estrae hostname
+- `utils/config.py`: aggiunto `snmp_communities: list[str]` a `ScanConfig`
+- `scanner/snmp_scanner.py`: aggiunto parametro `communities` a `scan_snmp()`
+- `inventory/inventory.py`: propagato `snmp_communities` e aggiunta chiamata SSDP; `device.services["ssdp"]`
+- `scanner/netbios_scanner.py`: refactored con `_try_nbtstat()` / `_try_nmblookup()` / `_parse_nbtstat()` / `_parse_nmblookup()`
+- `scanner/ssdp_scanner.py` (**nuovo**): M-SEARCH UDP multicast 239.255.255.250:1900
+- `signatures/banners.json`: 22 firme comuni (SSH/HTTP/FTP/SMTP/Telnet)
+- `fingerprint/banners.py`: aggiunto `match_banner()` con caricamento lazy delle firme
+- `pytest.ini`: soglia coverage alzata da 50% a 60%
+- Nuovi test: `test_mdns_scanner.py`, `test_netbios_scanner.py`, `test_ssdp_scanner.py`, `test_banners.py`
+
+**Risultati Sprint 3:** pytest 119/119 ✅ | coverage 68.07% ✅ | black ✅ | ruff ✅ | mypy ✅
+
 ---
 
 ## Stato test e coverage
 
-| Metrica | Sprint 1 | Sprint 2 |
-|---|---|---|
-| Test totali | 27 | 82 |
-| Coverage | 50.77% | 64.37% |
-| Soglia CI | 50% | 50% |
+| Metrica | Sprint 1 | Sprint 2 | Sprint 3 |
+|---|---|---|---|
+| Test totali | 27 | 82 | 119 |
+| Coverage | 50.77% | 64.37% | 68.07% |
+| Soglia CI | 50% | 50% | 60% |
 
 **Coverage bassa nei moduli (opportunità Sprint 2+):**
 - `scanner/arp_scanner.py`: 22%
@@ -76,17 +91,16 @@ Modifiche principali:
 
 ## Prossimi sprint (da TODO.md)
 
-### Sprint 3 — Discovery e fingerprinting
-**Branch da creare:** `sprint/3-discovery` da `sprint/2-api-security-tests`
+### Sprint 3 — Discovery e fingerprinting ✅ (completato 2026-06-25)
+
+### Sprint 4 — Persistenza e topologia
+**Branch da creare:** `sprint/4-persistence` da `main` (dopo merge Sprint 3)
 
 Task:
-1. **mDNS reale** in `scanner/mdns_scanner.py` — usare `zeroconf` già installato
-   - Scoprire `_http._tcp`, `_smb._tcp`, `_printer._tcp`, `_airplay._tcp`
-   - Integrare hostname e tipo servizio nel `Device`
-2. **Esternalizzare community SNMP** — `snmp_communities: list[str]` già in `utils/config.py` come `SNMP_COMMUNITIES = ["public", "private"]`; renderle configurabili via `ScanConfig`
-3. **Cross-platform `nbtstat`** — `scanner/netbios_scanner.py` usa `nbtstat` (solo Windows); aggiungere fallback su Linux
-4. **SSDP discovery** — UDP multicast 239.255.255.250:1900 per dispositivi UPnP/IoT
-5. **File firme** — popolare `signatures/banners.json` con ~20 firme comuni
+1. **Popolare tabella `topology`** nel DB durante ogni scan — allineare `database/store.py` con i dati di `topology/builder.py`
+2. **Popolare tabella `vlans`** — struttura dati placeholder con VLAN 0 (default)
+3. **Endpoint API `/topology`** — restituire dati reali dal DB invece di richiedere file su disco
+4. **Graceful shutdown monitor** — aggiungere `threading.Event` e handler `SIGINT`/`SIGTERM` in `main.py`
 
 ### Sprint 4 — Persistenza e topologia
 ### Sprint 5 — Dashboard e UX  
@@ -134,13 +148,13 @@ Task:
 
 ```bash
 # Checkout branch attivo
-git checkout sprint/2-api-security-tests
+git checkout sprint/3-discovery
 
-# Aprire PR Sprint 2
-gh pr create --title "feat: Sprint 2 — auth API, rate limiting, 55 nuovi test" --base main
+# Aprire PR Sprint 3
+gh pr create --title "feat: Sprint 3 — mDNS, SSDP, nbtstat cross-platform, banner signatures" --base main
 
-# Creare branch Sprint 3
-git checkout -b sprint/3-discovery
+# Creare branch Sprint 4 (dopo merge Sprint 3)
+git checkout main && git pull && git checkout -b sprint/4-persistence
 
 # Suite di verifica da eseguire dopo ogni modifica
 python -m black --check .

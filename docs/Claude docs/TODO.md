@@ -45,16 +45,21 @@ Obiettivo: rendere l'API usabile in contesti non solo locali.
 ---
 
 ## Sprint 3 — Discovery e fingerprinting (M4)
+**Eseguito:** 2026-06-25 | **Branch:** `sprint/3-discovery`
 
 Obiettivo: migliorare la qualità dei dati raccolti.
 
-- [ ] **Implementare mDNS reale** in `scanner/mdns_scanner.py` con `zeroconf`
-  - Scoprire servizi: `_http._tcp`, `_smb._tcp`, `_printer._tcp`, `_airplay._tcp`
-  - Integrare hostname e tipo servizio nel `Device`
-- [ ] **Esternalizzare community SNMP** — aggiungere `snmp_communities: list[str]` a `ScanConfig` e passarle allo scanner invece di hardcodarle
-- [ ] **Verificare cross-platform `nbtstat`** — aggiungere fallback su Linux (usare libreria `impacket` o ignorare silenziosamente)
-- [ ] **Implementare SSDP discovery** — UDP multicast su 239.255.255.250:1900 per dispositivi UPnP/IoT
-- [ ] **Popolare file firme** — iniziare a compilare `signatures/banners.json` con almeno 20 firme comuni (SSH versioni, HTTP server, router noti)
+- [x] **Implementare mDNS reale** in `scanner/mdns_scanner.py` con `zeroconf`
+  - `ServiceBrowser` su 10 tipi di servizio (`_http._tcp`, `_smb._tcp`, `_printer._tcp`, `_airplay._tcp`, `_ssh._tcp`, ecc.)
+  - Filtra per IP, estrae hostname da `info.server`
+- [x] **Esternalizzare community SNMP** — aggiunto `snmp_communities: list[str]` a `ScanConfig`; `scan_snmp()` ora accetta parametro `communities`; passato da `_fingerprint_device()`
+- [x] **Cross-platform `nbtstat`** — refactored `scanner/netbios_scanner.py`: tenta `nbtstat -A` (Windows) poi fallback `nmblookup -A` (Linux/macOS); parser separati per i due formati
+- [x] **Implementare SSDP discovery** — nuovo `scanner/ssdp_scanner.py`: M-SEARCH UDP multicast 239.255.255.250:1900; parse header `SERVER`, `LOCATION`, `ST`; integrato in `_fingerprint_device()` → `device.services["ssdp"]`
+- [x] **Popolare file firme + matcher** — `signatures/banners.json` con 22 firme (SSH OpenSSH/Dropbear/RouterOS/Cisco/Huawei, HTTP Apache/nginx/lighttpd/GoAhead/TP-Link/MikroTik/Synology/QNAP, FTP vsftpd/ProFTPD/FileZilla, SMTP Postfix/Exim, Telnet RouterOS/DD-WRT/OpenWrt); aggiunto `match_banner()` in `fingerprint/banners.py`
+- [x] **Alzata soglia coverage** — `--cov-fail-under` da 50% a 60% in `pytest.ini`
+- [x] **Nuovi test** — `test_mdns_scanner.py` (6 test), `test_netbios_scanner.py` (8 test), `test_ssdp_scanner.py` (6 test), `test_banners.py` (12 test)
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (63 file) | pytest 119/119 ✅ | coverage 68.07% ✅
 
 ---
 
