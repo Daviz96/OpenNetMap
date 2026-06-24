@@ -1,5 +1,5 @@
 # Handoff — Contesto di lavoro OpenNetMap
-**Creato:** 2026-06-24  
+**Aggiornato:** 2026-06-25  
 **Scopo:** permettere a Claude di riprendere il lavoro in una nuova sessione senza perdere contesto
 
 ---
@@ -9,7 +9,7 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/3-discovery` (pushato, PR non ancora aperta)
+**Branch di lavoro attivo:** `sprint/3-discovery` (PR aperta verso `main`)
 
 ---
 
