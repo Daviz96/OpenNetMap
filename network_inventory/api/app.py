@@ -5,6 +5,7 @@ from __future__ import annotations
 import fnmatch
 import html
 import json
+import os
 import sqlite3
 import threading
 import uuid
@@ -13,8 +14,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Query
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Query, Request, status
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from network_inventory.database.store import InventoryStore
@@ -85,6 +86,24 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
     """Create the REST API and dashboard application."""
     InventoryStore(db_path)
     app = FastAPI(title="Network Inventory API", version="0.2.0")
+
+    @app.middleware("http")
+    async def _api_key_middleware(request: Request, call_next: Any) -> Any:
+        """Enforce X-API-Key on all non-dashboard routes when env var is set."""
+        expected = os.environ.get("OPENNETMAP_API_KEY")
+        if expected:
+            path = request.url.path
+            public = path == "/" or path.startswith("/dashboard")
+            if not public:
+                provided = request.headers.get("x-api-key")
+                if provided != expected:
+                    return JSONResponse(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        content={
+                            "detail": "Unauthorized: X-API-Key mancante o non valida"
+                        },
+                    )
+        return await call_next(request)
 
     @app.get("/", response_class=HTMLResponse)
     def dashboard() -> str:
@@ -162,8 +181,14 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
 
     @app.post("/scan")
     def scan(request: ScanRequest) -> dict[str, Any]:
-        job = ScanJob(id=str(uuid.uuid4()))
         with _JOBS_LOCK:
+            active = any(job.status in {"queued", "running"} for job in _JOBS.values())
+            if active:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Scansione già in corso. Attendere il completamento prima di avviarne una nuova.",
+                )
+            job = ScanJob(id=str(uuid.uuid4()))
             _JOBS[job.id] = job
         thread = threading.Thread(
             target=_run_scan_job, args=(job.id, request, db_path), daemon=True

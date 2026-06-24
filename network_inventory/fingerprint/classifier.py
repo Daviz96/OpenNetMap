@@ -60,7 +60,7 @@ def classify_with_details(device: Device) -> ClassificationResult:
         reasons["nas"].append("SMB presente")
 
     if not scores:
-        return ClassificationResult("unknown", None, 0.0, [])
+        return ClassificationResult(_normalize_type("unknown"), None, 0.0, [])
 
     device_type, best_score = max(scores.items(), key=lambda item: item[1])
     total_score = max(sum(score for score in scores.values() if score > 0), 1)
