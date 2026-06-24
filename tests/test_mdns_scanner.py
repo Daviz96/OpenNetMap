@@ -39,7 +39,7 @@ def _make_info(ip: str, port: int, server: str) -> MagicMock:
 
 class TestScanMdns:
     def test_returns_empty_when_zeroconf_missing(self) -> None:
-        with patch.dict("sys.modules", {"zeroconf": None}):  # type: ignore[dict-item]
+        with patch.dict("sys.modules", {"zeroconf": None}):
             result = scan_mdns("192.168.1.1")
         assert result == {}
 
