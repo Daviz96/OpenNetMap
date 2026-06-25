@@ -1,0 +1,8 @@
+# Normalizzazione line ending cross-platform.
+# Gli script shell DEVONO restare LF, altrimenti si rompono su Linux/macOS
+# (errore "bad interpreter"). Gli script PowerShell restano CRLF su Windows.
+*.sh   text eol=lf
+*.ps1  text eol=crlf
+
+# Default: lascia decidere a Git in base al contenuto.
+* text=auto

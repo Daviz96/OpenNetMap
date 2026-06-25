@@ -4,11 +4,34 @@ Questo documento descrive come installare, configurare ed eseguire OpenNetMap in
 
 ## Requisiti
 
-- Python 3.12 o successivo
+- Python 3.13 (versione di riferimento del progetto e della CI)
 - Accesso alla rete locale per la scansione dei dispositivi
 - Permessi di amministratore se si usa Scapy per l'ARP scan
 
-## Installazione
+## Installazione rapida (script)
+
+Gli script in `scripts/` verificano che Python 3.13 sia disponibile, creano il
+virtualenv `.venv` e installano le dipendenze. Non installano Python da soli: se
+3.13 manca, stampano le istruzioni per il tuo sistema operativo. Sono idempotenti
+(riusano un `.venv` esistente valido).
+
+### Windows (PowerShell)
+
+```powershell
+.\scripts\install.ps1          # ambiente base (solo runtime)
+.\scripts\install.ps1 -Dev     # ambiente di sviluppo (+ requirements/dev.txt)
+.\scripts\install.ps1 -Recreate -Dev  # ricrea il .venv da zero
+```
+
+### Linux / macOS / WSL
+
+```bash
+./scripts/install.sh           # ambiente base (solo runtime)
+./scripts/install.sh --dev     # ambiente di sviluppo (+ requirements/dev.txt)
+./scripts/install.sh --recreate --dev  # ricrea il .venv da zero
+```
+
+## Installazione manuale
 
 ### Windows
 
