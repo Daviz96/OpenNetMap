@@ -50,6 +50,12 @@ Creare o aggiornare se durante la sessione l'utente ha:
 - [ ] Aggiungere data esecuzione e branch al titolo dello sprint
 - [ ] Aggiungere riepilogo risultati (black/ruff/mypy/pytest/coverage)
 
+### 6. Documenti da aggiornare a OGNI sprint (regola esplicita)
+- [ ] `docs/Claude docs/STATO_PROGETTO.md` — stato corrente, tabella sprint, funzionalità
+- [ ] `docs/CHANGELOG.md` — nuova sezione sprint (Added/Changed/Fixed + test/coverage)
+- [ ] `docs/Claude docs/HANDOFF.md` — vedi punto 1
+- [ ] **Se necessario:** `README.md`, `docs/USO.md`, `docs/Claude docs/COMANDI.md` (nuovi comandi/flag/endpoint)
+
 ---
 
 ## Struttura delle memorie (riferimento rapido)

@@ -22,3 +22,4 @@ Per lo stato attuale del progetto vedi:
 | `MILESTONE_1_RESULTS.md` | Risultati della Milestone 1 (baseline 25 test). |
 | `PROGETTO_ENTERPRISE.md` | Piano a "blocchi" dell'evoluzione enterprise (poi confluito nella ROADMAP). |
 | `PROGRAMMA.md` | Descrizione dettagliata iniziale del programma (superata da README). |
+| `PROJECT_SNAPSHOT.md` | Fotografia del progetto al 2026-06-23, precedente agli Sprint 1-5. |

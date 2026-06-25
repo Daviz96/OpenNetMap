@@ -8,8 +8,11 @@ e procede per **sprint** allineati alla `docs/ROADMAP.md`.
 
 ### Changed
 - Pulizia documentazione: spostati in `docs/archive/` i documenti storici di
-  Milestone 1 ed enterprise; CHANGELOG riscritto; CONSIGLI e guida context-refresh
-  aggiornati allo stato corrente.
+  Milestone 1 ed enterprise (incluso `PROJECT_SNAPSHOT.md`); prompt sorgente
+  raccolti in `docs/prompts/`; CHANGELOG riscritto; CONSIGLI e guida
+  context-refresh aggiornati allo stato corrente.
+- Workflow: da ora ogni sprint aggiorna anche `STATO_PROGETTO.md`, `CHANGELOG.md`,
+  `HANDOFF.md` e, se necessario, `README.md` / `USO.md` / `COMANDI.md`.
 
 ---
 
