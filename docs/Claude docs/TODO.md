@@ -114,28 +114,21 @@ Obiettivo: rendere il progetto deployabile fuori dal proprio laptop.
 ---
 
 ## Sprint 7 — Topology Engine: logica + consolidamento (M6, parte 1)
+**Eseguito:** 2026-06-25 | **Branch:** `sprint/7-topology`
 
 Obiettivo: trasformare la topologia a stella in un grafo logico arricchito e cablare
-nella pipeline lo scaffolding `topology/` già esistente ma scollegato.
-**Riferimento:** `docs/prompts/topology_engine_prompt.md` (Livelli 0-2). Tutto fattibile senza
-hardware gestito.
+nella pipeline lo scaffolding `topology/`. **Riferimento:** `docs/prompts/topology_engine_prompt.md`.
 
-- [ ] **Riconciliare la doppia persistenza topologia** — oggi `database/store.py` e
-      `topology/repository.py` scrivono tabelle `topology` con schemi diversi e
-      `TopologyEngine`/`TopologyRepository` non sono usati dalla pipeline. Scegliere
-      una sola sorgente (preferibile estendere `store.py` con `recorded_at` +
-      `topology_changes`) ed eliminare/integrare il codice duplicato.
-- [ ] **Builder basato su NetworkX** — sostituire la costruzione manuale con un grafo
-      `networkx` (già in requirements); centralizzare nodi/edge e calcolo gerarchie.
-- [ ] **Inferenza ruoli L2** — identificare router/gateway/switch/firewall/AP da
-      device_type + posizione (gateway) e generare `UPLINK`/`DOWNLINK`/`LAYER3_NEIGHBOR`.
-- [ ] **Correlation engine (parziale, senza SNMP avanzato)** — unire ARP + inventory +
-      mDNS/SSDP per consolidare identità; deduplica nodi.
-- [ ] **Change detection come eventi** — esporre `diff_topology` (già esistente) come
-      eventi `TOPOLOGY_NODE_ADDED/REMOVED`, `TOPOLOGY_LINK_ADDED/REMOVED` nel DB e API.
-- [ ] **Dashboard topologia avanzata** — layout gerarchico opzionale in vis-network,
-      filtri per tipo/VLAN, badge VLAN, evidenziazione uplink/downlink, tooltip ricchi.
-- [ ] **Export GEXF/SVG** (oltre a JSON/GraphML/HTML già presenti).
+- [x] **Riconciliata la doppia persistenza** — `database/store.py` resta l'unica sorgente; **eliminati** `topology/engine.py` e `topology/repository.py` (codice morto, schema duplicato).
+- [x] **Builder su NetworkX** — nuova `build_graph()` costruisce un `nx.DiGraph` (nodi/edge/livelli gerarchici); `build_topology()` lo serializza preservando il contratto di output.
+- [x] **Inferenza ruoli L2** — `UPLINK` per switch/router/firewall verso il gateway + `LAYER3_NEIGHBOR`; `DEFAULT_GATEWAY`/`MEMBER_OF_VLAN` mantenuti.
+- [x] **Correlation/dedup** — `_correlate_devices()` collassa voci con stessa chiave `mac|ip`.
+- [x] **Change detection come eventi** — `save_scan()` confronta con la topologia precedente (`diff_topology`) e scrive eventi `TOPOLOGY_NODE_ADDED/REMOVED`, `TOPOLOGY_LINK_ADDED/REMOVED` nella tabella `events`.
+- [x] **Dashboard topologia avanzata** — filtri per tipo/VLAN, legenda, badge colore, archi stilizzati per relazione (uplink/gateway/VLAN), tooltip ricchi, toggle layout **fisico ↔ gerarchico**.
+- [x] **Export GEXF** aggiunto (`topology.gexf`); SVG saltato per non re-introdurre `matplotlib`.
+- [x] **Test** — `test_topology.py` (+2: build_graph/livelli, dedup), `test_store.py` (+1: change-events), aggiornato export test.
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (64 file) | pytest 140/140 ✅ | coverage 72.12% ✅
 
 ## Sprint 8 — Topology Engine: topologia fisica L3 (M4 + M6, parte 2)
 

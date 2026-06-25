@@ -198,6 +198,7 @@ I report generati vengono salvati in `reports_output/` e includono formati come:
 - `topology.json`
 - `topology.html`
 - `topology.graphml`
+- `topology.gexf`
 
 ## Note su WSL
 

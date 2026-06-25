@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `sprint/6-docker` (Sprint 1-5 mergiati; Sprint 6 implementato, PR da aprire)  
+**Branch attivo:** `sprint/7-topology` (Sprint 1-6 mergiati; Sprint 7 implementato, PR da aprire)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -111,7 +111,7 @@ OpenNetMap/
 | Classificazione dispositivo (euristica) | ✅ 15+ tipi |
 | Security assessment (punteggio porte) | ✅ Funzionale |
 | Report JSON / CSV / HTML | ✅ Completo |
-| Export topologia (JSON, GraphML, HTML) | ✅ Completo (topologia a stella) |
+| Export topologia (JSON, GraphML, GEXF, HTML) | ✅ Builder NetworkX (Sprint 7) |
 | Persistenza SQLite | ✅ Completa (tabelle topology/vlans popolate — Sprint 4) |
 | Engine eventi (confronto snapshot) | ✅ Funzionale |
 | API REST FastAPI (~15 endpoint) | ✅ Con auth X-API-Key opzionale |
@@ -120,7 +120,8 @@ OpenNetMap/
 | Lookup vendor OUI | ✅ Completo |
 | CLI con argparse | ✅ Completo |
 | Rate limiting POST /scan | ✅ (1 job globale) |
-| Topologia avanzata (inferenza relazioni) | ❌ Non implementato |
+| Topologia logica avanzata (inferenza ruoli L2, change events) | ✅ Sprint 7 |
+| Topologia fisica L3 (porta-switch, LLDP/CDP) | ❌ Pianificato Sprint 8 (richiede switch managed) |
 | VLAN discovery | ❌ Non implementato |
 | LLDP / CDP discovery | ❌ Non implementato |
 | Notifiche (email, Slack, webhook) | ❌ Non implementato |
@@ -146,7 +147,8 @@ OpenNetMap/
 | Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR #4 merged) | 119 test, coverage 68.07% |
 | Sprint 4 — Persistenza e topologia | `sprint/4-persistence` (PR #5 merged) | 127 test, coverage 68.45% |
 | Sprint 5 — Dashboard e UX | `sprint/5-dashboard` (PR #7 merged) | 135 test, coverage 70.24% |
-| Sprint 6 — Deployment Docker | `sprint/6-docker` (PR da aprire) | 137 test, coverage 70.24% |
+| Sprint 6 — Deployment Docker | `sprint/6-docker` (PR #9 merged) | 137 test, coverage 70.24% |
+| Sprint 7 — Topology Engine (logico) | `sprint/7-topology` (PR da aprire) | 140 test, coverage 72.12% |
 
 ---
 
@@ -154,7 +156,6 @@ OpenNetMap/
 
 | Sprint | Obiettivo | Task principali |
 |---|---|---|
-| Sprint 7 | Topology Engine (logico) | Builder NetworkX, inferenza ruoli L2, riconciliare persistenza, dashboard topologia avanzata |
 | Sprint 8 | Topology Engine (fisico L3) | SNMP BRIDGE/Q-BRIDGE/LLDP-MIB, CDP, `CONNECTED_ON_PORT` (richiede switch managed) |
 
 ---

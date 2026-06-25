@@ -16,6 +16,26 @@ e procede per **sprint** allineati alla `docs/ROADMAP.md`.
 
 ---
 
+## Sprint 7 — Topology Engine (logico) — 2026-06-25
+
+### Added
+- `build_graph()` — costruzione della topologia su `nx.DiGraph` con livelli gerarchici.
+- Change detection topologia: eventi `TOPOLOGY_NODE_ADDED/REMOVED`, `TOPOLOGY_LINK_ADDED/REMOVED` nella tabella `events`.
+- Export `topology.gexf` (NetworkX).
+- Dashboard topologia: filtri per tipo/VLAN, legenda, archi stilizzati per relazione, tooltip ricchi, toggle layout fisico ↔ gerarchico.
+
+### Changed
+- `build_topology()` serializza dal grafo NetworkX preservando il contratto di output.
+- Inferenza ruoli L2 (`UPLINK`/`LAYER3_NEIGHBOR`); correlation/dedup dei dispositivi.
+
+### Removed
+- `topology/engine.py` e `topology/repository.py` (codice morto, persistenza duplicata): consolidata in `database/store.py`.
+
+### Tests
+- 140 test, coverage 72.12%.
+
+---
+
 ## Sprint 6 — Deployment Docker — 2026-06-25
 
 ### Added

@@ -1,10 +1,31 @@
 import json
 from pathlib import Path
 
+import networkx as nx
+
 from network_inventory.inventory.device import Device
-from network_inventory.topology.builder import build_topology
+from network_inventory.topology.builder import build_graph, build_topology
 from network_inventory.topology.diff import diff_topology
 from network_inventory.topology.export import write_topology_exports
+
+
+def test_build_graph_returns_digraph_with_levels():
+    devices = [Device(ip="192.168.0.10", mac="aa:bb:cc:dd:ee:10", device_type="switch")]
+    graph = build_graph(devices, {"subnet": "192.168.0.0/24"})
+
+    assert isinstance(graph, nx.DiGraph)
+    assert graph.nodes["192.168.0.0/24"]["level"] == 0  # nodo rete
+    assert graph.nodes["aa:bb:cc:dd:ee:10|192.168.0.10"]["level"] == 2  # switch
+
+
+def test_correlate_devices_dedupes_same_key():
+    device = Device(ip="192.168.0.10", mac="aa:bb:cc:dd:ee:10")
+    topology = build_topology([device, device], subnet="192.168.0.0/24")
+
+    nodes = topology["nodes"]
+    assert isinstance(nodes, list)
+    device_nodes = [n for n in nodes if n["type"] != "network"]
+    assert len(device_nodes) == 1
 
 
 def test_build_topology_contains_network_root_and_device_node():
@@ -29,10 +50,12 @@ def test_write_topology_exports_writes_files(tmp_path: Path):
     expected_files = {
         tmp_path / "topology.json",
         tmp_path / "topology.graphml",
+        tmp_path / "topology.gexf",
         tmp_path / "topology.html",
     }
     assert set(outputs) == expected_files
     assert (tmp_path / "topology.json").exists()
+    assert (tmp_path / "topology.gexf").exists()
 
     data = json.loads((tmp_path / "topology.json").read_text(encoding="utf-8"))
     assert data["nodes"][1]["label"] == "router"
