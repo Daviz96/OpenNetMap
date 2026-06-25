@@ -79,7 +79,8 @@ Ulteriori dettagli sulla roadmap, i piani di milestone, i risultati e il changel
 - `docs/USO.md` — guida d'uso dettagliata
 - `docs/Claude docs/STATO_PROGETTO.md` — stato corrente del progetto
 - `docs/CHANGELOG.md` — changelog
-- `docs/PROJECT_SNAPSHOT.md` — fotografia storica della baseline iniziale (non aggiornata)
+- `docs/prompts/` — prompt sorgente usati per generare/evolvere il progetto
+- `docs/archive/` — documenti storici (snapshot iniziale, milestone, piani superati)
 
 ## Utilizzo
 

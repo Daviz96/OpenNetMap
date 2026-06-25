@@ -195,7 +195,7 @@ python -m pytest -q
 
 1. **Prima di ogni sprint:** presentare il piano all'utente e attendere conferma
 2. **Durante lo sprint:** eseguire i task, verifica con black → ruff → mypy → pytest
-3. **Dopo ogni sprint:** aggiornare `docs/Claude docs/TODO.md` con data, branch e risultati
+3. **Dopo OGNI sprint aggiornare sempre:** `docs/Claude docs/TODO.md` (data, branch, risultati), `STATO_PROGETTO.md`, `docs/CHANGELOG.md`, `HANDOFF.md`; e **ricontrollare/aggiornare se necessario** `README.md`, `docs/USO.md`, `docs/Claude docs/COMANDI.md`
 4. **Commit + push** al termine di ogni sprint verificato
 5. **PR** verso `main` quando l'utente lo richiede
 

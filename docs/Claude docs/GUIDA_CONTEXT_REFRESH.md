@@ -27,19 +27,19 @@ Aggiornare:
 - [ ] **Decisioni nuove** prese durante la sessione
 - [ ] **Comandi utili** — aggiornare se il workflow è cambiato
 
-### 2. `memory/project_sprint_state.md`
+### 2. `memory/roadmap-and-next-sprint.md`
 Aggiornare con:
 - [ ] Sprint appena completato (nome, branch, data)
 - [ ] Prossimo sprint (nome e task principali)
 - [ ] Branch attivo corrente
 
-### 3. `memory/project_decisions.md`
+### 3. `memory/architectural-decisions.md`
 Aggiornare con:
 - [ ] Nuove decisioni architetturali prese nella sessione
 - [ ] Decisioni revocate o modificate
 - [ ] Nuove dipendenze aggiunte/rimosse con motivazione
 
-### 4. `memory/feedback_*.md`
+### 4. `memory/sprint-workflow.md` e `memory/docs-organization.md`
 Creare o aggiornare se durante la sessione l'utente ha:
 - [ ] Corretto un approccio ("no, non così")
 - [ ] Confermato un approccio non ovvio ("sì, esatto, continua così")
@@ -50,18 +50,29 @@ Creare o aggiornare se durante la sessione l'utente ha:
 - [ ] Aggiungere data esecuzione e branch al titolo dello sprint
 - [ ] Aggiungere riepilogo risultati (black/ruff/mypy/pytest/coverage)
 
+### 6. Documenti da aggiornare a OGNI sprint (regola esplicita)
+- [ ] `docs/Claude docs/STATO_PROGETTO.md` — stato corrente, tabella sprint, funzionalità
+- [ ] `docs/CHANGELOG.md` — nuova sezione sprint (Added/Changed/Fixed + test/coverage)
+- [ ] `docs/Claude docs/HANDOFF.md` — vedi punto 1
+- [ ] **Se necessario:** `README.md`, `docs/USO.md`, `docs/Claude docs/COMANDI.md` (nuovi comandi/flag/endpoint)
+
 ---
 
 ## Struttura delle memorie (riferimento rapido)
 
 ```
 memory/
-├── MEMORY.md                    ← indice (max 200 righe — mantenerlo conciso)
-├── feedback_docs_location.md    ← dove mettere i documenti Claude
-├── feedback_workflow.md         ← come gestire gli sprint
-├── project_decisions.md         ← decisioni architetturali consolidate
-└── project_sprint_state.md      ← stato avanzamento sprint
+├── MEMORY.md                    ← indice (una riga per memoria)
+├── user-profile.md              ← chi è l'utente, lingua, identità Git
+├── sprint-workflow.md           ← come gestire gli sprint (feedback)
+├── docs-organization.md         ← dove mettere i documenti Claude (feedback)
+├── architectural-decisions.md   ← decisioni architetturali consolidate
+└── roadmap-and-next-sprint.md   ← stato sprint e prossimo lavoro
 ```
+
+> Nota: la directory delle memorie è gestita dal sistema di auto-memory di Claude Code
+> (fuori dal repo). I nomi sopra sono quelli reali in uso; non usare nomi vecchi tipo
+> `project_sprint_state.md` o `feedback_*.md`.
 
 **Regola:** ogni file di memoria ha frontmatter YAML con `name`, `description`, `metadata.type`.  
 Tipi disponibili: `user`, `feedback`, `project`, `reference`.
@@ -133,9 +144,9 @@ Struttura consigliata:
 ```
 1. Aggiorna docs/Claude docs/TODO.md (sprint completato)
 2. Aggiorna docs/Claude docs/HANDOFF.md (stato completo)
-3. Aggiorna memory/project_sprint_state.md
-4. Aggiorna memory/project_decisions.md (se ci sono nuove decisioni)
-5. Crea/aggiorna memory/feedback_*.md (se ci sono nuovi feedback)
+3. Aggiorna memory/roadmap-and-next-sprint.md
+4. Aggiorna memory/architectural-decisions.md (se ci sono nuove decisioni)
+5. Crea/aggiorna memory/sprint-workflow.md o docs-organization.md (se nuovi feedback)
 6. Aggiorna memory/MEMORY.md (se hai aggiunto nuovi file)
 7. git add + git commit + git push (su branch attivo)
 ```

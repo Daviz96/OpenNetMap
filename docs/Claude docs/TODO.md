@@ -112,7 +112,7 @@ Obiettivo: rendere il progetto deployabile fuori dal proprio laptop.
 
 Obiettivo: trasformare la topologia a stella in un grafo logico arricchito e cablare
 nella pipeline lo scaffolding `topology/` già esistente ma scollegato.
-**Riferimento:** `docs/topology_engine_prompt.md` (Livelli 0-2). Tutto fattibile senza
+**Riferimento:** `docs/prompts/topology_engine_prompt.md` (Livelli 0-2). Tutto fattibile senza
 hardware gestito.
 
 - [ ] **Riconciliare la doppia persistenza topologia** — oggi `database/store.py` e
