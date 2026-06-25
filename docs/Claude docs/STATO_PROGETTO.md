@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `sprint/3-discovery` (PR aperta verso `main`)  
+**Branch attivo:** `sprint/4-persistence` (Sprint 1+2+3 mergiati; Sprint 4 implementato, PR da aprire)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -112,7 +112,7 @@ OpenNetMap/
 | Security assessment (punteggio porte) | ✅ Funzionale |
 | Report JSON / CSV / HTML | ✅ Completo |
 | Export topologia (JSON, GraphML, HTML) | ✅ Completo (topologia a stella) |
-| Persistenza SQLite | ✅ Parziale (tabelle topology/vlans non popolate) |
+| Persistenza SQLite | ✅ Completa (tabelle topology/vlans popolate — Sprint 4) |
 | Engine eventi (confronto snapshot) | ✅ Funzionale |
 | API REST FastAPI (~15 endpoint) | ✅ Con auth X-API-Key opzionale |
 | Dashboard web inline | ✅ Minimale |
@@ -143,7 +143,8 @@ OpenNetMap/
 |---|---|---|
 | Sprint 1 — Pulizia e stabilizzazione | `sprint/1-cleanup` (merged) | 27 test, coverage 50.77% |
 | Sprint 2 — Sicurezza API e test | `sprint/2-api-security-tests` (merged) | 82 test, coverage 64.37% |
-| Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR aperta) | 119 test, coverage 68.07% |
+| Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR #4 merged) | 119 test, coverage 68.07% |
+| Sprint 4 — Persistenza e topologia | `sprint/4-persistence` (PR da aprire) | 127 test, coverage 68.45% |
 
 ---
 
@@ -151,7 +152,6 @@ OpenNetMap/
 
 | Sprint | Obiettivo | Task principali |
 |---|---|---|
-| Sprint 4 | Persistenza e topologia | Popolare tabelle topology/vlans nel DB, endpoint /topology da DB, graceful shutdown |
 | Sprint 5 | Dashboard e UX | Template Jinja2, grafico storico, topologia interattiva vis.js |
 | Sprint 6 | Deployment Docker | Dockerfile, docker-compose.yml, variabili d'ambiente |
 
@@ -166,6 +166,6 @@ OpenNetMap/
 ## Rischi attuali
 
 - **Coverage bassa in aree chiave**: `http_fingerprint.py` 17%, `port_scanner.py` 19%, `snmp_scanner.py` 18%, `utils/network.py` 34%
-- **Tabelle DB non popolate**: `topology` e `vlans` esistono ma non vengono riempite dallo scan
-- **Nessun graceful shutdown**: il monitor non gestisce `SIGINT`/`SIGTERM` correttamente
+- ~~**Tabelle DB non popolate**~~: risolto in Sprint 4 — `topology` e `vlans` ora popolate
+- ~~**Nessun graceful shutdown**~~: risolto in Sprint 4 — handler `SIGINT`/`SIGTERM` nel monitor
 - **Docker assente**: deploy richiede installazione manuale con Python 3.13

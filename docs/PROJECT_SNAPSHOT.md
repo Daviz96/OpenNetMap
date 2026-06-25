@@ -1,5 +1,10 @@
 # OpenNetMap – Project Snapshot
 
+> ⚠️ **DOCUMENTO STORICO (2026-06-23).** Precede gli Sprint 1-3 e NON riflette lo stato
+> corrente: oggi esistono test (119, coverage 68%), CI, mDNS reale, SSDP, auth API e rate
+> limiting. Per lo stato attuale fai riferimento a `docs/Claude docs/STATO_PROGETTO.md`,
+> `TODO.md` e `HANDOFF.md`. Questo file resta come fotografia della baseline iniziale.
+
 **Ultimo aggiornamento**: 2026-06-23 (Python 3.13 compatibility release)
 
 **Cambiamenti recenti**:

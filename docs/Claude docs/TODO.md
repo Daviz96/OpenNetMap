@@ -64,13 +64,19 @@ Obiettivo: migliorare la qualità dei dati raccolti.
 ---
 
 ## Sprint 4 — Persistenza e topologia (M5)
+**Eseguito:** 2026-06-25 | **Branch:** `sprint/4-persistence`
 
 Obiettivo: rendere il database la fonte di verità unica.
 
-- [ ] **Popolare tabella `topology`** nel database durante ogni scan — allineare `database/store.py` con i dati prodotti da `topology/builder.py`
-- [ ] **Popolare tabella `vlans`** — anche se il rilevamento VLAN non è implementato, creare struttura dati placeholder con VLAN 0 (default)
-- [ ] **Endpoint API `/topology`** — restituire dati reali dal DB invece di richiedere file su disco
-- [ ] **Gestire il graceful shutdown del monitor** — aggiungere `threading.Event` e handler per `SIGINT`/`SIGTERM` in `main.py`
+- [x] **Popolare tabella `topology`** — `save_scan()` accetta un parametro `topology` (modello di `build_topology`) e lo salva come JSON legato allo `scan_id`; call site aggiornati in `main.py` (`run_once`) e `api/app.py` (`_run_scan_job`)
+- [x] **Popolare tabella `vlans`** — `_persist_vlans()` scrive sempre la VLAN 0 di default + eventuali VLAN dai nodi topologia; guard `INSERT ... WHERE NOT EXISTS` per evitare duplicati (nessuna migrazione di schema)
+- [x] **Endpoint API `/topology`** — nuova `InventoryStore.load_latest_topology()`; l'endpoint serve i dati dal DB con fallback al file `reports_output/topology.json` per DB pre-esistenti
+- [x] **Graceful shutdown del monitor** — `threading.Event` + handler `SIGINT`/`SIGTERM` (`_install_stop_handlers`) in `main.py`; il loop usa `stop_event.wait(interval)` e termina pulito con `return 0`
+- [x] **Nuovi test** — `test_store.py` (+3: topology, vlans no-duplicati, none-quando-assente), `test_api.py` (+2: `/topology` da DB e vuoto), `test_monitor.py` (nuovo, 3 test)
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (64 file) | pytest 127/127 ✅ | coverage 68.45% ✅
+
+**Nota ambiente:** in questa sessione non esisteva `.venv/` né Python 3.13; verifica eseguita con Python 3.14 di sistema + dev tools pinnati (black 24.3.0, ruff 0.13.0, mypy 2.1.0, pytest 7.4.0).
 
 ---
 

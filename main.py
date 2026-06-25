@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -25,6 +27,7 @@ from network_inventory.reports.csv_report import write_csv
 from network_inventory.reports.html_report import write_html
 from network_inventory.reports.json_report import write_json
 from network_inventory.security.assessment import assess_device
+from network_inventory.topology.builder import build_topology
 from network_inventory.topology.export import write_topology_exports
 from network_inventory.utils.config import (
     DEFAULT_PORTS,
@@ -214,7 +217,8 @@ def run_once(
         store = InventoryStore(args.db)
         previous = store.load_latest_devices()
         events = compare_snapshots(previous, devices)
-        scan_id = store.save_scan(devices, stats, events)
+        topology = build_topology(devices, stats)
+        scan_id = store.save_scan(devices, stats, events, topology=topology)
         CONSOLE.print(
             f"[green]SQLite aggiornato:[/green] {args.db} scan_id={scan_id} eventi={len(events)}"
         )
@@ -223,8 +227,29 @@ def run_once(
     return devices, stats
 
 
+def _install_stop_handlers(stop_event: threading.Event) -> None:
+    """Wire SIGINT/SIGTERM to set ``stop_event`` for a clean monitor shutdown."""
+
+    def _handler(signum: int, _frame: object) -> None:
+        CONSOLE.print(
+            f"\n[yellow]Segnale {signal.Signals(signum).name} ricevuto, "
+            "arresto del monitor in corso...[/yellow]"
+        )
+        stop_event.set()
+
+    for sig_name in ("SIGINT", "SIGTERM"):
+        sig = getattr(signal, sig_name, None)
+        if sig is None:
+            continue
+        try:
+            signal.signal(sig, _handler)
+        except (ValueError, OSError):
+            # Not in the main thread or unsupported on this platform.
+            pass
+
+
 def run_monitor(config: ScanConfig, args: argparse.Namespace) -> int:
-    """Run continuous monitoring scans."""
+    """Run continuous monitoring scans until interrupted."""
     if args.from_json:
         CONSOLE.print(
             "[red]Errore:[/red] --monitor non puo usare --from-json; serve una scansione reale."
@@ -233,15 +258,24 @@ def run_monitor(config: ScanConfig, args: argparse.Namespace) -> int:
     if not args.db:
         args.db = str(Path(config.output_dir) / "enterprise_inventory.db")
         CONSOLE.print(f"[yellow]DB non specificato, uso:[/yellow] {args.db}")
+
+    stop_event = threading.Event()
+    _install_stop_handlers(stop_event)
     CONSOLE.print(
-        f"[green]Monitor attivo[/green] intervallo={args.interval}s db={args.db}"
+        f"[green]Monitor attivo[/green] intervallo={args.interval}s db={args.db} "
+        "(Ctrl+C per fermare)"
     )
-    while True:
+    while not stop_event.is_set():
         started = time.strftime("%Y-%m-%d %H:%M:%S")
         CONSOLE.print(f"[cyan]Nuova scansione:[/cyan] {started}")
         run_once(config, args)
+        if stop_event.is_set():
+            break
         CONSOLE.print(f"[cyan]In attesa:[/cyan] {args.interval}s")
-        time.sleep(max(args.interval, 1))
+        # wait() returns early as soon as the stop signal arrives.
+        stop_event.wait(max(args.interval, 1))
+    CONSOLE.print("[green]Monitor arrestato correttamente.[/green]")
+    return 0
 
 
 def load_inventory(path: str) -> tuple[list[Device], dict[str, object]]:

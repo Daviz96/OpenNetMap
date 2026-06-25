@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from network_inventory.api.app import _filter_devices, _match_clause, create_app
 from network_inventory.database.store import InventoryStore
 from network_inventory.inventory.device import Device
+from network_inventory.topology.builder import build_topology
 
 
 def test_api_devices_route_returns_empty_list_for_empty_db(tmp_path: Path):
@@ -37,6 +38,38 @@ def test_api_scans_route_returns_scans(tmp_path: Path):
     assert len(data["items"]) == 1
     assert data["items"][0]["id"] == scan_id
     assert data["items"][0]["stats"]["subnet"] == "10.0.0.0/24"
+
+
+def test_api_topology_route_served_from_db(tmp_path: Path):
+    db_path = tmp_path / "inventory.db"
+    store = InventoryStore(db_path)
+    device = Device(ip="10.0.0.10", mac="aa:bb:cc:dd:ee:ff", hostname="switch")
+    stats: dict[str, object] = {
+        "started_at": "2026-06-25T00:00:00Z",
+        "subnet": "10.0.0.0/24",
+    }
+    topology = build_topology([device], stats)
+    store.save_scan([device], stats, topology=topology)
+
+    app = create_app(str(db_path))
+    client = TestClient(app)
+
+    response = client.get("/topology")
+    assert response.status_code == 200
+    data = response.json()
+    assert any(node["ip"] == "10.0.0.10" for node in data["nodes"])
+
+
+def test_api_topology_route_empty_without_data(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    db_path = tmp_path / "inventory.db"
+    InventoryStore(db_path)
+    app = create_app(str(db_path))
+    client = TestClient(app)
+
+    response = client.get("/topology")
+    assert response.status_code == 200
+    assert response.json() == {"nodes": [], "edges": []}
 
 
 def test_match_clause_filters_devices_by_field():

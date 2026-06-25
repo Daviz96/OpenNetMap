@@ -9,18 +9,18 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/3-discovery` (PR aperta verso `main`)
+**Branch di lavoro attivo:** `sprint/4-persistence` (implementato e verificato, PR da aprire)
 
 ---
 
 ## Struttura branch Git
 
 ```
-main  (Sprint 1+2+3 già integrati via merge)
-└── sprint/3-discovery  (pushato, PR NON ancora aperta)
+main  (Sprint 1+2+3 integrati — PR #2, #3, #4 chiuse)
+└── sprint/4-persistence  (Sprint 4 implementato e committato; PR NON ancora aperta)
 ```
 
-**Azione immediata suggerita:** aprire PR da `sprint/3-discovery` → `main`.
+**Azione immediata suggerita:** aprire PR da `sprint/4-persistence` → `main`.
 
 ---
 
@@ -40,7 +40,7 @@ Modifiche principali:
 - Package placeholder (`cli/`, `core/`, `dashboard/`, `discovery/`, `monitor/`) **MANTENUTI** (tutti pianificati in roadmap)
 
 ### Sprint 2 — Sicurezza API e test ✅
-**Branch:** `sprint/2-api-security-tests` | **PR non ancora aperta**
+**Branch:** `sprint/2-api-security-tests` | **PR #3 mergiata in `main`**
 
 Modifiche principali:
 - `api/app.py`: middleware `X-API-Key` (401 se `OPENNETMAP_API_KEY` env var impostata e header mancante/errato); `/` e `/dashboard/*` sono pubblici
@@ -52,7 +52,7 @@ Modifiche principali:
 **Risultati Sprint 2:** pytest 82/82 ✅ | coverage 64.37% ✅ | black ✅ | ruff ✅ | mypy ✅
 
 ### Sprint 3 — Discovery e fingerprinting ✅
-**Branch:** `sprint/3-discovery` | **PR non ancora aperta**
+**Branch:** `sprint/3-discovery` | **PR #4 mergiata in `main`**
 
 Modifiche principali:
 - `scanner/mdns_scanner.py`: implementazione reale con `zeroconf.ServiceBrowser` su 10 tipi di servizio; filtra per IP; estrae hostname
@@ -68,15 +68,26 @@ Modifiche principali:
 
 **Risultati Sprint 3:** pytest 119/119 ✅ | coverage 68.07% ✅ | black ✅ | ruff ✅ | mypy ✅
 
+### Sprint 4 — Persistenza e topologia ✅
+**Branch:** `sprint/4-persistence` | **PR NON ancora aperta**
+
+Modifiche principali:
+- `database/store.py`: `save_scan()` accetta `topology=...` e lo scrive nella tabella `topology`; nuova `load_latest_topology()`; helper `_persist_vlans()`/`_upsert_vlan()` popolano `vlans` (VLAN 0 default + VLAN da nodi topologia, guard anti-duplicati)
+- `main.py`: `run_once()` costruisce e passa la topologia al `save_scan()`; `run_monitor()` refactored con `threading.Event` + `_install_stop_handlers()` (SIGINT/SIGTERM), loop con `stop_event.wait()`, uscita pulita
+- `api/app.py`: `_run_scan_job()` passa la topologia; endpoint `/topology` ora legge da `load_latest_topology()` con fallback al file su disco
+- Nuovi test: `test_store.py` (+3), `test_api.py` (+2), `test_monitor.py` (nuovo, 3)
+
+**Risultati Sprint 4:** pytest 127/127 ✅ | coverage 68.45% ✅ | black ✅ | ruff ✅ | mypy ✅
+
 ---
 
 ## Stato test e coverage
 
-| Metrica | Sprint 1 | Sprint 2 | Sprint 3 |
-|---|---|---|---|
-| Test totali | 27 | 82 | 119 |
-| Coverage | 50.77% | 64.37% | 68.07% |
-| Soglia CI | 50% | 50% | 60% |
+| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 |
+|---|---|---|---|---|
+| Test totali | 27 | 82 | 119 | 127 |
+| Coverage | 50.77% | 64.37% | 68.07% | 68.45% |
+| Soglia CI | 50% | 50% | 60% | 60% |
 
 **Coverage bassa nei moduli (opportunità Sprint 2+):**
 - `scanner/arp_scanner.py`: 22%
@@ -147,14 +158,11 @@ Task:
 ## Comandi utili da riprendere
 
 ```bash
-# Checkout branch attivo
-git checkout sprint/3-discovery
+# Sprint 1+2+3 già mergiati. Partire da main aggiornato:
+git checkout main && git pull
 
-# Aprire PR Sprint 3
-gh pr create --title "feat: Sprint 3 — mDNS, SSDP, nbtstat cross-platform, banner signatures" --base main
-
-# Creare branch Sprint 4 (dopo merge Sprint 3)
-git checkout main && git pull && git checkout -b sprint/4-persistence
+# Creare branch Sprint 4
+git checkout -b sprint/4-persistence
 
 # Suite di verifica da eseguire dopo ogni modifica
 python -m black --check .
