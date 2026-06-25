@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import signal
 import sys
 import threading
@@ -81,7 +82,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="LAN scanner and network inventory tool"
     )
-    parser.add_argument("--subnet", help="Subnet da scansionare, es. 192.168.1.0/24")
+    parser.add_argument(
+        "--subnet",
+        default=os.environ.get("OPENNETMAP_SUBNET"),
+        help="Subnet da scansionare, es. 192.168.1.0/24 (env OPENNETMAP_SUBNET)",
+    )
     parser.add_argument(
         "--ports", default="default", help="default, top, full oppure lista: 22,80,443"
     )
@@ -117,7 +122,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Scarica/aggiorna il database locale IEEE OUI oui.txt",
     )
     parser.add_argument(
-        "--db", help="Salva la scansione in un database SQLite, es. inventory.db"
+        "--db",
+        default=os.environ.get("OPENNETMAP_DB"),
+        help="Salva la scansione in un database SQLite, es. inventory.db (env OPENNETMAP_DB)",
     )
     parser.add_argument(
         "--topology",
@@ -127,8 +134,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--dashboard", action="store_true", help="Avvia API/dashboard FastAPI"
     )
-    parser.add_argument("--host", default="127.0.0.1", help="Host dashboard/API")
-    parser.add_argument("--port", type=int, default=8000, help="Porta dashboard/API")
+    parser.add_argument(
+        "--host",
+        default=os.environ.get("OPENNETMAP_HOST", "127.0.0.1"),
+        help="Host dashboard/API (env OPENNETMAP_HOST)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.environ.get("OPENNETMAP_PORT", "8000")),
+        help="Porta dashboard/API (env OPENNETMAP_PORT)",
+    )
     parser.add_argument(
         "--monitor",
         action="store_true",

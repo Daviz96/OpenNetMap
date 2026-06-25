@@ -1,0 +1,31 @@
+# Version control / IDE / Claude
+.git
+.gitignore
+.gitattributes
+.github
+.claude
+.vscode
+.idea
+
+# Ambienti e cache Python
+.venv
+venv
+__pycache__
+*.py[cod]
+.mypy_cache
+.pytest_cache
+.coverage
+htmlcov
+
+# Test e documentazione (non servono a runtime)
+tests
+docs
+
+# Output generati
+reports_output
+data
+
+# File Docker (evita ricorsione del contesto)
+Dockerfile
+.dockerignore
+docker-compose*.yml

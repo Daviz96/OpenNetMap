@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `sprint/5-dashboard` (Sprint 1-4 mergiati; Sprint 5 implementato, PR da aprire)  
+**Branch attivo:** `sprint/6-docker` (Sprint 1-5 mergiati; Sprint 6 implementato, PR da aprire)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -124,7 +124,7 @@ OpenNetMap/
 | VLAN discovery | ❌ Non implementato |
 | LLDP / CDP discovery | ❌ Non implementato |
 | Notifiche (email, Slack, webhook) | ❌ Non implementato |
-| Docker / containerizzazione | ❌ Non implementato |
+| Docker / containerizzazione | ✅ Dockerfile + compose host/bridge (Sprint 6) |
 
 ---
 
@@ -145,7 +145,8 @@ OpenNetMap/
 | Sprint 2 — Sicurezza API e test | `sprint/2-api-security-tests` (merged) | 82 test, coverage 64.37% |
 | Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR #4 merged) | 119 test, coverage 68.07% |
 | Sprint 4 — Persistenza e topologia | `sprint/4-persistence` (PR #5 merged) | 127 test, coverage 68.45% |
-| Sprint 5 — Dashboard e UX | `sprint/5-dashboard` (PR da aprire) | 135 test, coverage 70.24% |
+| Sprint 5 — Dashboard e UX | `sprint/5-dashboard` (PR #7 merged) | 135 test, coverage 70.24% |
+| Sprint 6 — Deployment Docker | `sprint/6-docker` (PR da aprire) | 137 test, coverage 70.24% |
 
 ---
 
@@ -153,7 +154,8 @@ OpenNetMap/
 
 | Sprint | Obiettivo | Task principali |
 |---|---|---|
-| Sprint 6 | Deployment Docker | Dockerfile, docker-compose.yml, variabili d'ambiente |
+| Sprint 7 | Topology Engine (logico) | Builder NetworkX, inferenza ruoli L2, riconciliare persistenza, dashboard topologia avanzata |
+| Sprint 8 | Topology Engine (fisico L3) | SNMP BRIDGE/Q-BRIDGE/LLDP-MIB, CDP, `CONNECTED_ON_PORT` (richiede switch managed) |
 
 ---
 
@@ -168,4 +170,4 @@ OpenNetMap/
 - **Coverage bassa in aree chiave**: `http_fingerprint.py` 17%, `port_scanner.py` 19%, `snmp_scanner.py` 18%, `utils/network.py` 34%
 - ~~**Tabelle DB non popolate**~~: risolto in Sprint 4 — `topology` e `vlans` ora popolate
 - ~~**Nessun graceful shutdown**~~: risolto in Sprint 4 — handler `SIGINT`/`SIGTERM` nel monitor
-- **Docker assente**: deploy richiede installazione manuale con Python 3.13
+- ~~**Docker assente**~~: risolto in Sprint 6 — `Dockerfile` + compose host/bridge, config via env var

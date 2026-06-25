@@ -17,3 +17,6 @@ Thumbs.db
 
 # Claude Code — impostazioni personali locali
 .claude/settings.local.json
+
+# Volume dati del container Docker (DB SQLite, inventari)
+data/

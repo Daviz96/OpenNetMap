@@ -71,6 +71,54 @@ Una pipeline CI è configurata in `.github/workflows/ci.yml` e esegue:
 
 > Nota: se usi WSL, assicurati di attivare l'ambiente virtuale e installare le dipendenze all'interno di WSL prima di eseguire i comandi locali.
 
+## Deploy con Docker
+
+L'immagine è basata su `python:3.13-slim` e include gli strumenti per la discovery
+(ping, net-tools, libpcap, nmblookup). Avvia la dashboard/API su `0.0.0.0:8000` e
+persiste il DB SQLite nel volume `/data`.
+
+### Configurazione (variabili d'ambiente)
+
+| Variabile | Default | Descrizione |
+|---|---|---|
+| `OPENNETMAP_HOST` | `0.0.0.0` (immagine) | Host di bind della dashboard |
+| `OPENNETMAP_PORT` | `8000` | Porta della dashboard |
+| `OPENNETMAP_DB` | `/data/inventory.db` | Percorso del database SQLite |
+| `OPENNETMAP_SUBNET` | — | Subnet di default per gli scan |
+| `OPENNETMAP_API_KEY` | — | Se impostata, protegge le rotte API con header `X-API-Key` |
+
+### Modalità host — server/homelab Linux (scansione completa)
+
+Usa la rete dell'host e i privilegi raw-socket: l'**ARP scan funziona sulla LAN**.
+
+```bash
+docker compose up -d --build
+# dashboard su http://<host>:8000/
+```
+
+### Modalità bridge — portabile (anche Docker Desktop Win/macOS)
+
+Rete bridge con porta pubblicata. Dashboard, report, dry-run e scan via ping
+funzionano ovunque; l'**ARP scan sulla LAN reale è limitato/assente** (il container
+non vede direttamente la rete fisica dell'host).
+
+```bash
+docker compose -f docker-compose.bridge.yml up -d --build
+# dashboard su http://localhost:8000/
+```
+
+### Eseguire una scansione nel container
+
+`--dashboard` non scansiona. Per aggiornare il DB lancia uno scan a parte:
+
+```bash
+docker compose exec opennetmap python main.py --db /data/inventory.db --report json html --topology
+```
+
+> Nota: la modalità host con `network_mode: host` + `cap_add: NET_RAW` è efficace
+> solo su **Docker Linux**. Su Docker Desktop (Windows/macOS) i container girano in
+> una VM e non raggiungono la LAN fisica: usa la modalità bridge per la dashboard.
+
 ## Documentazione
 
 Ulteriori dettagli sulla roadmap, i piani di milestone, i risultati e il changelog sono disponibili nella cartella `docs/`:

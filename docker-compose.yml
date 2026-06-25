@@ -1,0 +1,28 @@
+# OpenNetMap — deploy completo (server/homelab Linux).
+#
+# Usa la rete dell'host e i privilegi raw-socket: l'ARP scan funziona davvero
+# sulla LAN. Con network_mode: host la porta (8000) è esposta direttamente
+# sull'host, quindi NON si usa la sezione "ports".
+#
+# Avvio:  docker compose up -d --build
+# Nota:   host networking + NET_RAW funzionano su Linux; su Docker Desktop
+#         Windows/macOS usa invece docker-compose.bridge.yml.
+
+services:
+  opennetmap:
+    build: .
+    image: opennetmap:latest
+    container_name: opennetmap
+    network_mode: host
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    environment:
+      OPENNETMAP_HOST: 0.0.0.0
+      OPENNETMAP_PORT: "8000"
+      OPENNETMAP_DB: /data/inventory.db
+      # OPENNETMAP_API_KEY: cambia-questa-chiave   # protegge le rotte API
+      # OPENNETMAP_SUBNET: 192.168.1.0/24          # subnet di default per gli scan
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

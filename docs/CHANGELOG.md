@@ -16,6 +16,20 @@ e procede per **sprint** allineati alla `docs/ROADMAP.md`.
 
 ---
 
+## Sprint 6 — Deployment Docker — 2026-06-25
+
+### Added
+- `Dockerfile` (`python:3.13-slim`) con strumenti per la discovery completa (ping, net-tools, libpcap, `nmblookup`), `HEALTHCHECK` su `/` e volume `/data`.
+- `docker-compose.yml` (host network + `NET_RAW`, ARP completo su Linux) e `docker-compose.bridge.yml` (bridge + porte, portabile).
+- `.dockerignore` per immagini snelle.
+- Configurazione runtime via env: `OPENNETMAP_DB`, `OPENNETMAP_HOST`, `OPENNETMAP_PORT`, `OPENNETMAP_SUBNET` (default CLI in `main.py`).
+- Sezione "Deploy con Docker" nel README.
+
+### Tests
+- 137 test, coverage 70.24%.
+
+---
+
 ## Sprint 5 — Dashboard e UX — 2026-06-25
 
 ### Added

@@ -6,7 +6,14 @@ from main import _parse_ports, parse_args, write_reports
 from network_inventory.inventory.device import Device
 
 
-def test_parse_args_defaults():
+def test_parse_args_defaults(monkeypatch):
+    for var in (
+        "OPENNETMAP_SUBNET",
+        "OPENNETMAP_DB",
+        "OPENNETMAP_HOST",
+        "OPENNETMAP_PORT",
+    ):
+        monkeypatch.delenv(var, raising=False)
     args = parse_args([])
 
     assert args.subnet is None
@@ -17,6 +24,31 @@ def test_parse_args_defaults():
     assert args.snmp is False
     assert args.output_dir == "reports_output"
     assert args.dashboard is False
+    assert args.db is None
+    assert args.host == "127.0.0.1"
+    assert args.port == 8000
+
+
+def test_parse_args_reads_env_vars(monkeypatch):
+    monkeypatch.setenv("OPENNETMAP_SUBNET", "10.0.0.0/24")
+    monkeypatch.setenv("OPENNETMAP_DB", "/data/inventory.db")
+    monkeypatch.setenv("OPENNETMAP_HOST", "0.0.0.0")
+    monkeypatch.setenv("OPENNETMAP_PORT", "9000")
+
+    args = parse_args([])
+    assert args.subnet == "10.0.0.0/24"
+    assert args.db == "/data/inventory.db"
+    assert args.host == "0.0.0.0"
+    assert args.port == 9000
+
+
+def test_parse_args_cli_overrides_env(monkeypatch):
+    monkeypatch.setenv("OPENNETMAP_HOST", "0.0.0.0")
+    monkeypatch.setenv("OPENNETMAP_PORT", "9000")
+
+    args = parse_args(["--host", "127.0.0.1", "--port", "8080"])
+    assert args.host == "127.0.0.1"
+    assert args.port == 8080
 
 
 def test_parse_args_custom_values():
