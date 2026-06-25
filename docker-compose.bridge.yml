@@ -1,0 +1,24 @@
+# OpenNetMap — deploy portabile (rete bridge, funziona anche su Docker Desktop).
+#
+# La dashboard, i report, il dry-run e gli scan via ping funzionano ovunque.
+# L'ARP scan sulla LAN reale è limitato o assente: in bridge il container non
+# vede direttamente la rete fisica dell'host (specialmente su Windows/macOS).
+#
+# Avvio:  docker compose -f docker-compose.bridge.yml up -d --build
+
+services:
+  opennetmap:
+    build: .
+    image: opennetmap:latest
+    container_name: opennetmap
+    ports:
+      - "8000:8000"
+    environment:
+      OPENNETMAP_HOST: 0.0.0.0
+      OPENNETMAP_PORT: "8000"
+      OPENNETMAP_DB: /data/inventory.db
+      # OPENNETMAP_API_KEY: cambia-questa-chiave
+      # OPENNETMAP_SUBNET: 192.168.1.0/24
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

@@ -98,13 +98,18 @@ Obiettivo: rendere la dashboard usabile per un utente non tecnico.
 ---
 
 ## Sprint 6 — Deployment (M7)
+**Eseguito:** 2026-06-25 | **Branch:** `sprint/6-docker`
 
 Obiettivo: rendere il progetto deployabile fuori dal proprio laptop.
 
-- [ ] **Creare `Dockerfile`** — immagine basata su `python:3.13-slim`, espone porta 8000
-- [ ] **Creare `docker-compose.yml`** — servizio `opennetmap` con volume per il DB SQLite e `--network host` per ARP
-- [ ] **Documentare deploy Docker** nel README
-- [ ] **Aggiungere variabili d'ambiente** per configurazione runtime (API key, porta, percorso DB, subnet default)
+- [x] **`Dockerfile`** — base `python:3.13-slim` con strumenti discovery completa (ping, net-tools, libpcap, `nmblookup`); bind `0.0.0.0:8000`; `HEALTHCHECK` su `/`; volume `/data`; `CMD` dashboard
+- [x] **`docker-compose.yml`** (host network + `NET_RAW` per ARP completo, Linux) + **`docker-compose.bridge.yml`** (bridge + porte, portabile/Docker Desktop)
+- [x] **Variabili d'ambiente** — `parse_args` legge `OPENNETMAP_DB/HOST/PORT/SUBNET` (oltre a `OPENNETMAP_API_KEY` già esistente)
+- [x] **`.dockerignore`** per immagini snelle
+- [x] **Documentazione Docker** nel README (modalità host vs bridge, env var, scan nel container)
+- [x] **Test** — `test_main.py`: default, lettura env var, override CLI > env (+2)
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (66 file) | pytest 137/137 ✅ | coverage 70.24% ✅ | compose config ✅
 
 ---
 

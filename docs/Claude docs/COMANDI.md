@@ -139,7 +139,21 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 7. Database OUI (vendor MAC)
+## 7. Docker
+
+| Funzione | Comando |
+|---|---|
+| Deploy completo (Linux, ARP scan) | `docker compose up -d --build` |
+| Deploy portabile (Docker Desktop) | `docker compose -f docker-compose.bridge.yml up -d --build` |
+| Log del container | `docker compose logs -f` |
+| Scansione dentro il container | `docker compose exec opennetmap python main.py --db /data/inventory.db --report json html --topology` |
+| Stop | `docker compose down` |
+
+> Config via env: `OPENNETMAP_HOST`, `OPENNETMAP_PORT`, `OPENNETMAP_DB`, `OPENNETMAP_SUBNET`, `OPENNETMAP_API_KEY` (vedi `docker-compose.yml`). Dashboard su `http://<host>:8000/`.
+
+---
+
+## 8. Database OUI (vendor MAC)
 
 | Funzione | Comando |
 |---|---|
@@ -147,7 +161,7 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 8. Setup ambiente (script di installazione)
+## 9. Setup ambiente (script di installazione)
 
 | Funzione | Comando |
 |---|---|
@@ -159,7 +173,7 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 9. Controlli qualità (sviluppo)
+## 10. Controlli qualità (sviluppo)
 
 ```powershell
 python -m black --check .

@@ -9,18 +9,18 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/5-dashboard` (implementato e verificato, PR da aprire)
+**Branch di lavoro attivo:** `sprint/6-docker` (implementato e verificato, PR da aprire)
 
 ---
 
 ## Struttura branch Git
 
 ```
-main  (Sprint 1-4 integrati — PR #2..#5; script installazione PR #6)
-└── sprint/5-dashboard  (Sprint 5 implementato e committato; PR NON ancora aperta)
+main  (Sprint 1-5 integrati — PR #2..#7; script PR #6, pulizia doc PR #8)
+└── sprint/6-docker  (Sprint 6 implementato e committato; PR NON ancora aperta)
 ```
 
-**Azione immediata suggerita:** aprire PR da `sprint/5-dashboard` → `main`.
+**Azione immediata suggerita:** aprire PR da `sprint/6-docker` → `main`.
 
 ---
 
@@ -93,15 +93,28 @@ Modifiche principali:
 
 **Risultati Sprint 5:** pytest 135/135 ✅ | coverage 70.24% ✅ | black ✅ | ruff ✅ | mypy ✅
 
+### Sprint 6 — Deployment Docker ✅
+**Branch:** `sprint/6-docker` | **PR NON ancora aperta**
+
+Modifiche principali:
+- `Dockerfile` (`python:3.13-slim`): strumenti discovery completa (ping, net-tools, libpcap, `nmblookup`), bind `0.0.0.0:8000`, `HEALTHCHECK` su `/`, volume `/data`, `CMD` dashboard
+- `docker-compose.yml` (host network + `NET_RAW`, ARP completo su Linux) + `docker-compose.bridge.yml` (bridge + porte, portabile/Docker Desktop)
+- `.dockerignore` per immagini snelle
+- `main.py`: `parse_args` legge `OPENNETMAP_DB/HOST/PORT/SUBNET` da env (CLI ha precedenza)
+- README: sezione "Deploy con Docker"
+- Test: `test_main.py` (+2: env var, override CLI>env)
+
+**Risultati Sprint 6:** pytest 137/137 ✅ | coverage 70.24% ✅ | black ✅ | ruff ✅ | mypy ✅ | compose config ✅ (build Docker da validare con daemon attivo)
+
 ---
 
 ## Stato test e coverage
 
-| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 |
-|---|---|---|---|---|---|
-| Test totali | 27 | 82 | 119 | 127 | 135 |
-| Coverage | 50.77% | 64.37% | 68.07% | 68.45% | 70.24% |
-| Soglia CI | 50% | 50% | 60% | 60% | 60% |
+| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 | Sprint 6 |
+|---|---|---|---|---|---|---|
+| Test totali | 27 | 82 | 119 | 127 | 135 | 137 |
+| Coverage | 50.77% | 64.37% | 68.07% | 68.45% | 70.24% | 70.24% |
+| Soglia CI | 50% | 50% | 60% | 60% | 60% | 60% |
 
 **Coverage bassa nei moduli (opportunità Sprint 2+):**
 - `scanner/arp_scanner.py`: 22%
@@ -176,11 +189,15 @@ Task:
 .\scripts\install.ps1 -Dev       # Windows
 ./scripts/install.sh --dev       # Linux/macOS
 
-# Sprint 1-5 mergiati (Sprint 5 da mergiare). Partire da main aggiornato:
+# Sprint 1-6 (Sprint 6 da mergiare). Partire da main aggiornato:
 git checkout main && git pull
 
-# Creare branch Sprint 6
-git checkout -b sprint/6-docker
+# Creare branch Sprint 7 (Topology Engine logico)
+git checkout -b sprint/7-topology
+
+# Docker (Sprint 6)
+docker compose up -d --build                          # host network (Linux)
+docker compose -f docker-compose.bridge.yml up -d --build   # bridge (portabile)
 
 # Suite di verifica da eseguire dopo ogni modifica
 python -m black --check .
