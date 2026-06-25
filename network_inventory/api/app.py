@@ -30,6 +30,7 @@ from network_inventory.reports.csv_report import write_csv
 from network_inventory.reports.html_report import write_html
 from network_inventory.reports.json_report import write_json
 from network_inventory.security.assessment import assess_device
+from network_inventory.topology.builder import build_topology
 from network_inventory.topology.export import write_topology_exports
 from network_inventory.utils.config import (
     DEFAULT_PORTS,
@@ -163,6 +164,11 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
 
     @app.get("/topology")
     def topology() -> dict[str, Any]:
+        stored = InventoryStore(db_path).load_latest_topology()
+        if stored is not None:
+            return stored
+        # Fallback to the on-disk export for databases written before the
+        # topology table was populated.
         path = Path("reports_output") / "topology.json"
         if not path.exists():
             return {"nodes": [], "edges": []}
@@ -221,7 +227,8 @@ def _run_scan_job(job_id: str, request: ScanRequest, default_db_path: str) -> No
         store = InventoryStore(db_target)
         previous = store.load_latest_devices()
         events = compare_snapshots(previous, devices)
-        scan_id = store.save_scan(devices, stats, events)
+        topology = build_topology(devices, stats)
+        scan_id = store.save_scan(devices, stats, events, topology=topology)
         _update_job(
             job_id,
             status="completed",

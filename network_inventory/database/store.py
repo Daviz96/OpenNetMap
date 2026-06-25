@@ -88,8 +88,15 @@ class InventoryStore:
         devices: list[Device],
         stats: Mapping[str, object],
         events: list[InventoryEvent] | None = None,
+        topology: Mapping[str, object] | None = None,
     ) -> int:
-        """Persist a scan snapshot and return scan id."""
+        """Persist a scan snapshot and return scan id.
+
+        When ``topology`` (the model produced by ``build_topology``) is given it
+        is stored in the ``topology`` table and any VLAN nodes it contains are
+        registered in the ``vlans`` lookup. A default VLAN 0 row is always
+        ensured so the table is never empty.
+        """
         with sqlite3.connect(self.path) as connection:
             connection.executescript(SCHEMA)
             cursor = connection.execute(
@@ -157,6 +164,12 @@ class InventoryStore:
                         event.timestamp,
                     ),
                 )
+            if topology is not None:
+                connection.execute(
+                    "INSERT INTO topology(scan_id, topology_json) VALUES(?, ?)",
+                    (scan_id, json.dumps(topology, ensure_ascii=False)),
+                )
+            _persist_vlans(connection, topology, stats)
             return scan_id
 
     def load_latest_devices(self) -> list[Device]:
@@ -166,6 +179,18 @@ class InventoryStore:
             rows = connection.execute("SELECT last_json FROM devices").fetchall()
         return [Device.from_dict(json.loads(row[0])) for row in rows]
 
+    def load_latest_topology(self) -> dict[str, object] | None:
+        """Return the topology model of the most recent scan, if any."""
+        with sqlite3.connect(self.path) as connection:
+            connection.executescript(SCHEMA)
+            row = connection.execute(
+                "SELECT topology_json FROM topology ORDER BY scan_id DESC, id DESC LIMIT 1"
+            ).fetchone()
+        if row is None:
+            return None
+        payload = json.loads(row[0])
+        return payload if isinstance(payload, dict) else None
+
     def _init_schema(self) -> None:
         with sqlite3.connect(self.path) as connection:
             connection.executescript(SCHEMA)
@@ -173,3 +198,58 @@ class InventoryStore:
 
 def _device_key(device: Device) -> str:
     return f"{device.mac or 'no-mac'}|{device.ip}"
+
+
+def _persist_vlans(
+    connection: sqlite3.Connection,
+    topology: Mapping[str, object] | None,
+    stats: Mapping[str, object],
+) -> None:
+    """Register VLAN rows from a topology model, ensuring a default VLAN 0.
+
+    The ``vlans`` table is a global lookup without a ``scan_id``; rows are
+    inserted only when a matching ``vlan_id`` is not already present, so
+    repeated scans never create duplicates.
+    """
+    subnet = str(stats.get("subnet") or "") or None
+    _upsert_vlan(connection, "0", "Default VLAN", subnet, "default")
+
+    if not topology:
+        return
+    nodes = topology.get("nodes")
+    if not isinstance(nodes, list):
+        return
+    for node in nodes:
+        if not isinstance(node, dict) or node.get("type") != "vlan":
+            continue
+        metadata = node.get("metadata")
+        vlan_value = (
+            metadata.get("vlan_id") if isinstance(metadata, dict) else None
+        ) or node.get("id")
+        if vlan_value is None:
+            continue
+        label = node.get("label")
+        _upsert_vlan(
+            connection,
+            str(vlan_value),
+            str(label) if label is not None else None,
+            subnet,
+            "snmp",
+        )
+
+
+def _upsert_vlan(
+    connection: sqlite3.Connection,
+    vlan_id: str,
+    vlan_name: str | None,
+    subnet: str | None,
+    source: str,
+) -> None:
+    connection.execute(
+        """
+        INSERT INTO vlans(vlan_id, vlan_name, subnet, source)
+        SELECT ?, ?, ?, ?
+        WHERE NOT EXISTS(SELECT 1 FROM vlans WHERE vlan_id IS ?)
+        """,
+        (vlan_id, vlan_name, subnet, source, vlan_id),
+    )
