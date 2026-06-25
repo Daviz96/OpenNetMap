@@ -1,5 +1,33 @@
 # Consigli — Cosa migliorare e cosa implementare
-**Data:** 2026-06-24
+**Data:** 2026-06-24 · **Stato aggiornato:** 2026-06-25 (dopo Sprint 5)
+
+> ⚠️ **La maggior parte di questi consigli è stata implementata.** Questo documento
+> resta come traccia delle raccomandazioni iniziali; lo stato corrente è qui sotto.
+
+## Stato di avanzamento
+
+| # | Consiglio | Stato |
+|---|---|---|
+| 1 | Rimuovere dipendenze inutilizzate | ✅ Sprint 1 (alcune mantenute per roadmap; `networkx`/`pyvis`/`jinja2` ora usate) |
+| 2 | Eliminare/integrare package placeholder | ⬜ In sospeso (mantenuti per scelta — vedi decisioni architetturali) |
+| 3 | Autenticazione API | ✅ Sprint 2 (`X-API-Key`) |
+| 4 | Validazione TLS (`verify_ssl`) | ✅ Sprint 1 |
+| 5 | Ampliare copertura test | ✅ In corso (Sprint 2-5, coverage 70%) |
+| 6 | mDNS reale | ✅ Sprint 3 |
+| 7 | Spostare CLI in `network_inventory/cli/` | ⬜ Backlog |
+| 8 | Popolare tabelle `topology`/`vlans` | ✅ Sprint 4 |
+| 9 | Template Jinja2 per HTML/dashboard | ✅ Sprint 5 |
+| 10 | Graceful shutdown monitor | ✅ Sprint 4 |
+| 11 | Esternalizzare community SNMP | ✅ Sprint 3 |
+| 12 | SSDP/UPnP discovery | ✅ Sprint 3 |
+| 13 | Topologia avanzata (inferenza relazioni) | 🔜 Pianificato Sprint 7-8 |
+| 14 | Notifiche (email/webhook) | ⬜ Backlog |
+| 15 | Docker | 🔜 Pianificato Sprint 6 |
+| 16 | Dashboard interattiva (grafici, topologia) | ✅ Sprint 5 |
+| 17 | Sfruttare `signatures/` | 🟡 Parziale (banner Sprint 3; favicon/TLS in sospeso) |
+
+Debito tecnico: `python-nmap` rimosso ✅, `nbtstat` cross-platform ✅ (Sprint 3),
+CI su Python 3.13 ✅, `pytest-cov` + soglia ✅.
 
 ---
 
