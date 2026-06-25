@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Dispositivi — OpenNetMap{% endblock %}
+{% block heading %}Dispositivi{% endblock %}
+
+{% block content %}
+  <form class="toolbar" method="get">
+    <input name="q" value="{{ query }}" placeholder="vendor:Brother and port:9100">
+    <select name="sort">
+      {% for value, label in [("ip", "IP"), ("security", "Security"), ("device_type", "Tipo"), ("manufacturer", "Produttore"), ("ports", "Numero porte")] %}
+      <option value="{{ value }}"{% if value == sort %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filtra</button>
+  </form>
+  <p class="hint">Esempi: <code>vendor:Brother</code> <code>type:Stampante and port:9100</code> <code>ip:192.168.100.*</code> <code>security:80</code></p>
+  <table>
+    <thead><tr><th>IP</th><th>MAC</th><th>Hostname</th><th>Tipo</th><th>Produttore</th><th>Modello</th><th>Security</th><th>Porte</th></tr></thead>
+    <tbody>
+      {% for d in devices %}
+      <tr>
+        <td><code>{{ d.get("ip") or "" }}</code></td>
+        <td><code>{{ d.get("mac") or "" }}</code></td>
+        <td>{{ d.get("hostname") or "" }}</td>
+        <td>{{ d.get("device_type") or "" }}</td>
+        <td>{{ d.get("manufacturer") or d.get("vendor") or "" }}</td>
+        <td>{{ d.get("model") or "" }}</td>
+        <td><span class="badge {{ d.get('security_score')|security_class }}">{{ d.get("security_score") }}</span></td>
+        <td><code>{{ d.get("open_ports", [])|join(", ") }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Topologia — OpenNetMap{% endblock %}
+{% block heading %}Topologia di rete{% endblock %}
+
+{% block content %}
+  {% if topology.nodes %}
+  <p class="hint">{{ topology.nodes|length }} nodi · {{ topology.edges|length }} collegamenti. Trascina i nodi, zoom con la rotellina.</p>
+  <div id="topology"></div>
+  {% else %}
+  <p class="hint">Nessuna topologia disponibile. Esegui una scansione con persistenza DB (<code>--db</code>) per popolarla.</p>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if topology.nodes %}
+<script src="/static/vis-network.min.js"></script>
+<script>
+  const model = {{ topology|tojson }};
+  const groupColors = {
+    network: "#1d4ed8", router: "#dc2626", switch: "#d97706", firewall: "#b91c1c",
+    access_point: "#0891b2", host: "#2563eb", vlan: "#7c3aed", unknown: "#475569",
+  };
+  const nodes = (model.nodes || []).map(n => ({
+    id: n.id,
+    label: n.label || n.id,
+    title: (n.ip || "") + (n.vendor ? " · " + n.vendor : ""),
+    color: groupColors[n.type] || groupColors.unknown,
+    shape: n.type === "network" || n.type === "vlan" ? "diamond" : "dot",
+  }));
+  const edges = (model.edges || []).map(e => ({
+    from: e.source, to: e.target, label: e.relationship || "",
+    color: { color: "#3b4a60" }, font: { color: "#9fb3c8", size: 10 },
+    smooth: { type: "continuous" },
+  }));
+  const network = new vis.Network(
+    document.getElementById("topology"),
+    { nodes: nodes, edges: edges },
+    {
+      nodes: { font: { color: "#e5edf6" }, size: 16 },
+      physics: {
+        // Stabilizza una volta sola, poi la fisica viene spenta: il grafo
+        // resta fermo e leggibile invece di muoversi all'infinito.
+        stabilization: { enabled: true, iterations: 300, fit: true },
+        barnesHut: {
+          gravitationalConstant: -12000,
+          springLength: 180,
+          springConstant: 0.04,
+          avoidOverlap: 0.6,
+        },
+      },
+      interaction: { hover: true, tooltipDelay: 120, dragNodes: true },
+    }
+  );
+  // Congela il layout appena stabilizzato: i nodi restano dove sono,
+  // trascinabili manualmente ma senza animazione continua.
+  network.once("stabilizationIterationsDone", () => {
+    network.setOptions({ physics: false });
+  });
+</script>
+{% endif %}
+{% endblock %}

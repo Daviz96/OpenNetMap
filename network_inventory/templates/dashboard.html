@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}OpenNetMap Dashboard{% endblock %}
+{% block heading %}OpenNetMap Dashboard{% endblock %}
+
+{% block content %}
+  <div class="stats">
+    <div class="stat">Dispositivi inventariati<b>{{ counts.devices }}</b></div>
+    <div class="stat">Scansioni salvate<b>{{ counts.scans }}</b></div>
+    <div class="stat">Eventi totali<b>{{ counts.events }}</b></div>
+    <div class="stat">Utilizzo subnet<b>{{ stats.get("utilization_percent", 0) }}%</b></div>
+  </div>
+
+  {% if history %}
+  <section>
+    <h2>Storico dispositivi per scansione</h2>
+    <div class="chart-wrap"><canvas id="historyChart" height="120"></canvas></div>
+  </section>
+  {% endif %}
+
+  <section>
+    <h2>Dispositivi più rischiosi</h2>
+    <table>
+      <thead><tr><th>IP</th><th>Hostname</th><th>Tipo</th><th>Produttore</th><th>Score</th></tr></thead>
+      <tbody>
+        {% for d in risky_devices %}
+        <tr>
+          <td><code>{{ d.get("ip") or "" }}</code></td>
+          <td>{{ d.get("hostname") or "" }}</td>
+          <td>{{ d.get("device_type") or "" }}</td>
+          <td>{{ d.get("manufacturer") or d.get("vendor") or "" }}</td>
+          <td><span class="badge {{ d.get('security_score')|security_class }}">{{ d.get("security_score") }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Scan job recenti</h2>
+    <p class="hint">Avvio API: <code>POST /scan</code> · Stato: <code>GET /scan/jobs</code></p>
+    <table>
+      <thead><tr><th>Job</th><th>Stato</th><th>Dispositivi</th><th>Eventi</th><th>Errore</th></tr></thead>
+      <tbody>
+        {% for j in jobs %}
+        <tr>
+          <td><code>{{ j.get("id") or "" }}</code></td>
+          <td>{{ j.get("status") or "" }}</td>
+          <td>{{ j.get("device_count") }}</td>
+          <td>{{ j.get("event_count") }}</td>
+          <td>{{ j.get("error") or "" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Ultimi eventi</h2>
+    <table>
+      <thead><tr><th>Timestamp</th><th>Tipo</th><th>Messaggio</th></tr></thead>
+      <tbody>
+        {% for e in events %}
+        <tr>
+          <td><code>{{ e.get("timestamp") or "" }}</code></td>
+          <td>{{ e.get("event_type") or "" }}</td>
+          <td>{{ e.get("message") or "" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+{% if history %}
+<script src="/static/chart.min.js"></script>
+<script>
+  const history = {{ history|tojson }};
+  new Chart(document.getElementById("historyChart"), {
+    type: "line",
+    data: {
+      labels: history.map(p => p.label),
+      datasets: [{
+        label: "Dispositivi",
+        data: history.map(p => p.count),
+        borderColor: "#93c5fd",
+        backgroundColor: "rgba(147,197,253,0.15)",
+        tension: 0.25,
+        fill: true,
+      }],
+    },
+    options: {
+      scales: {
+        x: { ticks: { color: "#9fb3c8" }, grid: { color: "#233044" } },
+        y: { beginAtZero: true, ticks: { color: "#9fb3c8" }, grid: { color: "#233044" } },
+      },
+      plugins: { legend: { labels: { color: "#e5edf6" } } },
+    },
+  });
+</script>
+{% endif %}
+{% endblock %}

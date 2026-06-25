@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import fnmatch
-import html
 import json
 import os
 import sqlite3
@@ -16,6 +15,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from network_inventory.database.store import InventoryStore
@@ -30,6 +30,7 @@ from network_inventory.reports.csv_report import write_csv
 from network_inventory.reports.html_report import write_html
 from network_inventory.reports.json_report import write_json
 from network_inventory.security.assessment import assess_device
+from network_inventory.templating import STATIC_DIR, render
 from network_inventory.topology.builder import build_topology
 from network_inventory.topology.export import write_topology_exports
 from network_inventory.utils.config import (
@@ -87,6 +88,7 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
     """Create the REST API and dashboard application."""
     InventoryStore(db_path)
     app = FastAPI(title="Network Inventory API", version="0.2.0")
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
     @app.middleware("http")
     async def _api_key_middleware(request: Request, call_next: Any) -> Any:
@@ -94,7 +96,11 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         expected = os.environ.get("OPENNETMAP_API_KEY")
         if expected:
             path = request.url.path
-            public = path == "/" or path.startswith("/dashboard")
+            public = (
+                path == "/"
+                or path.startswith("/dashboard")
+                or path.startswith("/static")
+            )
             if not public:
                 provided = request.headers.get("x-api-key")
                 if provided != expected:
@@ -115,8 +121,9 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
         with _JOBS_LOCK:
             jobs = [_job_to_dict(job) for job in _JOBS.values()]
         jobs.sort(key=lambda item: item["created_at"], reverse=True)
+        history = _query_scan_history(db_path)
         return _render_dashboard(
-            stats_payload, recent_events, risky_devices, counts, jobs[:5]
+            stats_payload, recent_events, risky_devices, counts, jobs[:5], history
         )
 
     @app.get("/dashboard/devices", response_class=HTMLResponse)
@@ -130,6 +137,10 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
     ) -> str:
         rows = _query_events(db_path, limit, q)
         return _render_events_page(rows, q or "")
+
+    @app.get("/dashboard/topology", response_class=HTMLResponse)
+    def topology_page() -> str:
+        return _render_topology_page(_latest_topology(db_path))
 
     @app.get("/devices")
     def devices(
@@ -164,18 +175,7 @@ def create_app(db_path: str = "inventory.db") -> FastAPI:
 
     @app.get("/topology")
     def topology() -> dict[str, Any]:
-        stored = InventoryStore(db_path).load_latest_topology()
-        if stored is not None:
-            return stored
-        # Fallback to the on-disk export for databases written before the
-        # topology table was populated.
-        path = Path("reports_output") / "topology.json"
-        if not path.exists():
-            return {"nodes": [], "edges": []}
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        if isinstance(payload, dict):
-            return payload
-        return {"nodes": [], "edges": []}
+        return _latest_topology(db_path)
 
     @app.get("/vlans")
     def vlans() -> dict[str, Any]:
@@ -545,161 +545,78 @@ def _render_dashboard(
     risky_devices: list[dict[str, Any]],
     counts: dict[str, int],
     jobs: list[dict[str, Any]],
+    history: list[dict[str, Any]],
 ) -> str:
-    event_rows = "".join(
-        f"<tr><td>{_esc(event['timestamp'])}</td><td>{_esc(event['event_type'])}</td><td>{_esc(event['message'])}</td></tr>"
-        for event in events
-    )
-    risky_rows = "".join(
-        "<tr>"
-        f"<td>{_esc(device.get('ip'))}</td>"
-        f"<td>{_esc(device.get('hostname'))}</td>"
-        f"<td>{_esc(device.get('device_type'))}</td>"
-        f"<td>{_esc(device.get('manufacturer') or device.get('vendor'))}</td>"
-        f"<td>{_esc(device.get('security_score'))}</td>"
-        "</tr>"
-        for device in risky_devices
-    )
-    job_rows = "".join(
-        "<tr>"
-        f"<td><code>{_esc(job.get('id'))}</code></td>"
-        f"<td>{_esc(job.get('status'))}</td>"
-        f"<td>{_esc(job.get('device_count'))}</td>"
-        f"<td>{_esc(job.get('event_count'))}</td>"
-        f"<td>{_esc(job.get('error'))}</td>"
-        "</tr>"
-        for job in jobs
-    )
-    content = f"""
-    <div class="stats">
-      <div class="stat">Dispositivi inventariati<b>{counts["devices"]}</b></div>
-      <div class="stat">Scansioni salvate<b>{counts["scans"]}</b></div>
-      <div class="stat">Eventi totali<b>{counts["events"]}</b></div>
-      <div class="stat">Utilizzo subnet<b>{_esc(stats.get("utilization_percent", 0))}%</b></div>
-    </div>
-    <section>
-      <h2>Dispositivi piu rischiosi</h2>
-      <table><thead><tr><th>IP</th><th>Hostname</th><th>Tipo</th><th>Produttore</th><th>Score</th></tr></thead><tbody>{risky_rows}</tbody></table>
-    </section>
-    <section>
-      <h2>Scan job recenti</h2>
-      <p class="hint">Avvio API: <code>POST /scan</code>. Stato: <code>GET /scan/jobs</code>.</p>
-      <table><thead><tr><th>Job</th><th>Stato</th><th>Dispositivi</th><th>Eventi</th><th>Errore</th></tr></thead><tbody>{job_rows}</tbody></table>
-    </section>
-    <section>
-      <h2>Ultimi eventi</h2>
-      <table><thead><tr><th>Timestamp</th><th>Tipo</th><th>Messaggio</th></tr></thead><tbody>{event_rows}</tbody></table>
-    </section>
-"""
-    return _page_shell(
-        "Network Inventory Dashboard",
-        content,
-        subtitle=f"Subnet {_esc(stats.get('subnet', ''))}",
+    return render(
+        "dashboard.html",
+        subtitle=f"Subnet {stats.get('subnet', '')}",
+        stats=stats,
+        events=events,
+        risky_devices=risky_devices,
+        counts=counts,
+        jobs=jobs,
+        history=history,
     )
 
 
 def _render_devices_page(devices: list[dict[str, Any]], query: str, sort: str) -> str:
-    rows = "".join(
-        "<tr>"
-        f"<td><code>{_esc(device.get('ip'))}</code></td>"
-        f"<td><code>{_esc(device.get('mac'))}</code></td>"
-        f"<td>{_esc(device.get('hostname'))}</td>"
-        f"<td>{_esc(device.get('device_type'))}</td>"
-        f"<td>{_esc(device.get('manufacturer') or device.get('vendor'))}</td>"
-        f"<td>{_esc(device.get('model'))}</td>"
-        f"<td>{_esc(device.get('security_score'))}</td>"
-        f"<td>{_esc(', '.join(str(port) for port in device.get('open_ports', [])))}</td>"
-        "</tr>"
-        for device in devices
+    return render(
+        "devices.html",
+        subtitle=f"{len(devices)} risultati",
+        devices=devices,
+        query=query,
+        sort=sort,
     )
-    content = f"""
-    <form class="toolbar" method="get">
-      <input name="q" value="{_esc(query)}" placeholder="vendor:Brother and port:9100">
-      <select name="sort">
-        {_option("ip", sort, "IP")}
-        {_option("security", sort, "Security")}
-        {_option("device_type", sort, "Tipo")}
-        {_option("manufacturer", sort, "Produttore")}
-        {_option("ports", sort, "Numero porte")}
-      </select>
-      <button type="submit">Filtra</button>
-    </form>
-    <p class="hint">Esempi: <code>vendor:Brother</code> <code>type:Stampante and port:9100</code> <code>ip:192.168.100.*</code> <code>security:80</code></p>
-    <table><thead><tr><th>IP</th><th>MAC</th><th>Hostname</th><th>Tipo</th><th>Produttore</th><th>Modello</th><th>Security</th><th>Porte</th></tr></thead><tbody>{rows}</tbody></table>
-"""
-    return _page_shell("Dispositivi", content, subtitle=f"{len(devices)} risultati")
 
 
 def _render_events_page(events: list[dict[str, Any]], query: str) -> str:
-    rows = "".join(
-        "<tr>"
-        f"<td><code>{_esc(event.get('timestamp'))}</code></td>"
-        f"<td>{_esc(event.get('event_type'))}</td>"
-        f"<td><code>{_esc(event.get('device_key'))}</code></td>"
-        f"<td>{_esc(event.get('message'))}</td>"
-        "</tr>"
-        for event in events
+    return render(
+        "events.html",
+        subtitle=f"{len(events)} eventi",
+        events=events,
+        query=query,
     )
-    content = f"""
-    <form class="toolbar" method="get">
-      <input name="q" value="{_esc(query)}" placeholder="PORT_OPENED, 192.168.100, Brother">
-      <button type="submit">Filtra</button>
-    </form>
-    <table><thead><tr><th>Timestamp</th><th>Tipo</th><th>Dispositivo</th><th>Messaggio</th></tr></thead><tbody>{rows}</tbody></table>
-"""
-    return _page_shell("Eventi", content, subtitle=f"{len(events)} eventi")
 
 
-def _page_shell(title: str, content: str, subtitle: str = "") -> str:
-    return f"""<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{_esc(title)}</title>
-  <style>
-    body {{ margin: 0; font-family: Segoe UI, Arial, sans-serif; background: #0f141b; color: #e5edf6; }}
-    header {{ padding: 22px 30px; background: #17202c; border-bottom: 1px solid #2b3a4f; }}
-    main {{ padding: 24px 30px; }}
-    nav {{ margin-top: 12px; display: flex; gap: 14px; flex-wrap: wrap; }}
-    .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }}
-    .stat {{ background: #17202c; border: 1px solid #2b3a4f; border-radius: 8px; padding: 14px; }}
-    .stat b {{ display: block; font-size: 24px; margin-top: 4px; color: #93c5fd; }}
-    section {{ margin-top: 24px; }}
-    table {{ width: 100%; border-collapse: collapse; background: #111923; border: 1px solid #2b3a4f; }}
-    th, td {{ padding: 9px 11px; border-bottom: 1px solid #233044; text-align: left; vertical-align: top; }}
-    th {{ color: #bfdbfe; background: #17202c; }}
-    code {{ color: #cbd5e1; }}
-    a {{ color: #93c5fd; }}
-    .toolbar {{ display: grid; grid-template-columns: minmax(240px, 1fr) 180px auto; gap: 10px; margin-bottom: 12px; }}
-    input, select, button {{ background: #111923; color: #e5edf6; border: 1px solid #2b3a4f; border-radius: 6px; padding: 9px 10px; }}
-    button {{ cursor: pointer; color: #bfdbfe; }}
-    .hint {{ color: #a8b3c2; }}
-  </style>
-</head>
-<body>
-  <header>
-    <h1>{_esc(title)}</h1>
-    <div>{subtitle}</div>
-    <nav>
-      <a href="/">Dashboard</a>
-      <a href="/dashboard/devices">Dispositivi</a>
-      <a href="/dashboard/events">Eventi</a>
-      <a href="/devices">API dispositivi</a>
-      <a href="/events">API eventi</a>
-      <a href="/topology">API topologia</a>
-      <a href="/scan/jobs">API scan jobs</a>
-    </nav>
-  </header>
-  <main>{content}</main>
-</body>
-</html>"""
+def _render_topology_page(topology: dict[str, Any]) -> str:
+    nodes = topology.get("nodes") if isinstance(topology, dict) else None
+    return render(
+        "topology.html",
+        subtitle=f"{len(nodes or [])} nodi",
+        topology=topology,
+    )
 
 
-def _option(value: str, current: str, label: str) -> str:
-    selected = " selected" if value == current else ""
-    return f'<option value="{_esc(value)}"{selected}>{_esc(label)}</option>'
+def _latest_topology(db_path: str) -> dict[str, Any]:
+    """Return the latest topology from the DB, falling back to the on-disk export."""
+    stored = InventoryStore(db_path).load_latest_topology()
+    if stored is not None:
+        return stored
+    path = Path("reports_output") / "topology.json"
+    if path.exists():
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            return payload
+    return {"nodes": [], "edges": []}
 
 
-def _esc(value: object) -> str:
-    return html.escape("" if value is None else str(value))
+def _query_scan_history(db_path: str, limit: int = 30) -> list[dict[str, Any]]:
+    """Device count per scan, oldest first, for the dashboard history chart."""
+    with _connect(db_path) as connection:
+        rows = connection.execute(
+            "SELECT s.id AS scan_id, s.started_at AS started_at, "
+            "COUNT(sd.device_key) AS count "
+            "FROM scans s LEFT JOIN scan_devices sd ON sd.scan_id = s.id "
+            "GROUP BY s.id ORDER BY s.id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+    history = [
+        {
+            "scan_id": row["scan_id"],
+            "label": str(row["started_at"] or row["scan_id"]),
+            "count": row["count"],
+        }
+        for row in rows
+    ]
+    history.reverse()
+    return history

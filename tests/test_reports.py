@@ -26,10 +26,12 @@ def test_write_html_creates_searchable_report(tmp_path: Path):
     output = write_html(devices, stats, tmp_path)
     assert output.name == "inventory.html"
     html_text = output.read_text(encoding="utf-8")
-    assert "Network Inventory" in html_text
+    assert "OpenNetMap" in html_text
     assert "device6" in html_text
     assert "router" in html_text
     assert str(stats["active_hosts"]) in html_text
+    # Il punteggio di sicurezza è reso con una classe CSS colorata.
+    assert "sec-good" in html_text  # device6 ha score di default 100
 
 
 def test_write_csv_writes_header_and_rows(tmp_path: Path):

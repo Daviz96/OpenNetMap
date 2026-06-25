@@ -72,6 +72,57 @@ def test_api_topology_route_empty_without_data(tmp_path: Path, monkeypatch):
     assert response.json() == {"nodes": [], "edges": []}
 
 
+def test_dashboard_pages_render_html(tmp_path: Path):
+    db_path = tmp_path / "inventory.db"
+    store = InventoryStore(db_path)
+    device = Device(ip="10.0.0.10", mac="aa:bb:cc:dd:ee:ff", hostname="switch")
+    stats: dict[str, object] = {
+        "started_at": "2026-06-25T00:00:00Z",
+        "subnet": "10.0.0.0/24",
+    }
+    store.save_scan([device], stats, topology=build_topology([device], stats))
+
+    client = TestClient(create_app(str(db_path)))
+    for path in ("/", "/dashboard/devices", "/dashboard/events", "/dashboard/topology"):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("text/html")
+        assert "OpenNetMap" in response.text
+
+
+def test_dashboard_topology_page_embeds_node(tmp_path: Path):
+    db_path = tmp_path / "inventory.db"
+    store = InventoryStore(db_path)
+    device = Device(ip="10.0.0.42", mac="aa:bb:cc:dd:ee:01", hostname="nas")
+    stats: dict[str, object] = {
+        "started_at": "2026-06-25T00:00:00Z",
+        "subnet": "10.0.0.0/24",
+    }
+    store.save_scan([device], stats, topology=build_topology([device], stats))
+
+    client = TestClient(create_app(str(db_path)))
+    response = client.get("/dashboard/topology")
+    assert response.status_code == 200
+    assert "vis-network.min.js" in response.text
+    assert "10.0.0.42" in response.text
+
+
+def test_static_assets_served(tmp_path: Path):
+    client = TestClient(create_app(str(tmp_path / "inventory.db")))
+    for asset in ("/static/chart.min.js", "/static/vis-network.min.js"):
+        response = client.get(asset)
+        assert response.status_code == 200
+        assert "javascript" in response.headers["content-type"]
+
+
+def test_static_assets_public_when_api_key_set(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("OPENNETMAP_API_KEY", "secret123")
+    client = TestClient(create_app(str(tmp_path / "inventory.db")))
+    # Le pagine dashboard e gli asset statici restano pubblici.
+    assert client.get("/static/chart.min.js").status_code == 200
+    assert client.get("/").status_code == 200
+
+
 def test_match_clause_filters_devices_by_field():
     device = {"vendor": "Cisco", "ip": "10.0.0.5", "hostname": "office"}
     assert _match_clause(device, "vendor:Cisco")

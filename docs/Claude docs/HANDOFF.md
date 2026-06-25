@@ -9,17 +9,18 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** nessuno — `main` pulito, Sprint 1-4 e script di installazione tutti mergiati
+**Branch di lavoro attivo:** `sprint/5-dashboard` (implementato e verificato, PR da aprire)
 
 ---
 
 ## Struttura branch Git
 
 ```
-main  (Sprint 1+2+3+4 integrati — PR #2..#5; script installazione PR #6)
+main  (Sprint 1-4 integrati — PR #2..#5; script installazione PR #6)
+└── sprint/5-dashboard  (Sprint 5 implementato e committato; PR NON ancora aperta)
 ```
 
-**Azione immediata suggerita:** creare `sprint/5-dashboard` da `main` e avviare Sprint 5.
+**Azione immediata suggerita:** aprire PR da `sprint/5-dashboard` → `main`.
 
 ---
 
@@ -78,15 +79,29 @@ Modifiche principali:
 
 **Risultati Sprint 4:** pytest 127/127 ✅ | coverage 68.45% ✅ | black ✅ | ruff ✅ | mypy ✅
 
+### Sprint 5 — Dashboard e UX ✅
+**Branch:** `sprint/5-dashboard` | **PR NON ancora aperta**
+
+Modifiche principali:
+- `templating.py` (**nuovo**): Environment Jinja2 + filtro `security_class`; `templates/` con `base.html`, `dashboard.html`, `devices.html`, `events.html`, `topology.html`, `report.html`
+- `api/app.py`: rimosse le `_render_*`/`_page_shell`/`_esc`/`_option` f-string → rendering Jinja2; mount `/static`; nuove `_query_scan_history()` e `_latest_topology()`; pagina `/dashboard/topology`
+- `reports/html_report.py`: report HTML ora via template `report.html` (security score colorato)
+- `static/` (**nuovo**): `vis-network.min.js` (9.1.9) + `chart.min.js` (4.4.1) vendorizzate; `.gitattributes` le tratta come binarie
+- Grafico storico (Chart.js) e topologia interattiva (vis-network), offline
+- README aggiornato allo stato corrente
+- Nuovi test: `test_templating.py` (4), `test_api.py` (+4), aggiornato `test_reports.py`
+
+**Risultati Sprint 5:** pytest 135/135 ✅ | coverage 70.24% ✅ | black ✅ | ruff ✅ | mypy ✅
+
 ---
 
 ## Stato test e coverage
 
-| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 |
-|---|---|---|---|---|
-| Test totali | 27 | 82 | 119 | 127 |
-| Coverage | 50.77% | 64.37% | 68.07% | 68.45% |
-| Soglia CI | 50% | 50% | 60% | 60% |
+| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 |
+|---|---|---|---|---|---|
+| Test totali | 27 | 82 | 119 | 127 | 135 |
+| Coverage | 50.77% | 64.37% | 68.07% | 68.45% | 70.24% |
+| Soglia CI | 50% | 50% | 60% | 60% | 60% |
 
 **Coverage bassa nei moduli (opportunità Sprint 2+):**
 - `scanner/arp_scanner.py`: 22%
@@ -161,11 +176,11 @@ Task:
 .\scripts\install.ps1 -Dev       # Windows
 ./scripts/install.sh --dev       # Linux/macOS
 
-# Sprint 1-4 già mergiati. Partire da main aggiornato:
+# Sprint 1-5 mergiati (Sprint 5 da mergiare). Partire da main aggiornato:
 git checkout main && git pull
 
-# Creare branch Sprint 5
-git checkout -b sprint/5-dashboard
+# Creare branch Sprint 6
+git checkout -b sprint/6-docker
 
 # Suite di verifica da eseguire dopo ogni modifica
 python -m black --check .

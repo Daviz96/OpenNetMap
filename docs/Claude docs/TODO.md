@@ -81,13 +81,19 @@ Obiettivo: rendere il database la fonte di verità unica.
 ---
 
 ## Sprint 5 — Dashboard e UX (M6)
+**Eseguito:** 2026-06-25 | **Branch:** `sprint/5-dashboard`
 
 Obiettivo: rendere la dashboard usabile per un utente non tecnico.
 
-- [ ] **Spostare HTML in template Jinja2** — creare `network_inventory/templates/dashboard.html` e `report.html`
-- [ ] **Aggiungere grafico storico dispositivi** alla dashboard (es. linea con numero dispositivi per scan)
-- [ ] **Aggiungere visualizzazione topologia interattiva** — usare vis.js o D3.js con i dati da `/api/topology`
-- [ ] **Migliorare il report HTML** — aggiungere colonna "security score" visiva (colore rosso/giallo/verde)
+- [x] **Template Jinja2** — nuovo modulo `network_inventory/templating.py` (Environment + filtro `security_class`); template `base.html`, `dashboard.html`, `devices.html`, `events.html`, `topology.html`, `report.html`. Rimosse le `_render_*`/`_page_shell`/`_esc`/`_option` f-string da `api/app.py` e la generazione inline in `reports/html_report.py`
+- [x] **Grafico storico dispositivi** — Chart.js (vendorizzato) in dashboard; `_query_scan_history()` conta i dispositivi per scan
+- [x] **Topologia interattiva** — pagina `/dashboard/topology` con vis-network (vendorizzato); consuma `load_latest_topology()` (DB, fallback file); `_latest_topology()` condiviso con l'endpoint `/topology`
+- [x] **Security score colorato** — badge CSS rosso/giallo/verde (`security_class`: ≥80 good, 50-79 warn, <50 bad) in report HTML e tabelle dashboard
+- [x] **Librerie JS offline** — `network_inventory/static/` con `vis-network.min.js` + `chart.min.js`; servite via `app.mount("/static")` (pubbliche anche con API key); `.gitattributes` le tratta come binarie
+- [x] **README aggiornato** — titolo OpenNetMap, funzioni reali, script di installazione, auth API, struttura
+- [x] **Nuovi test** — `test_templating.py` (4), `test_api.py` (+4: pagine dashboard, topology page, static, static pubblici con API key), aggiornato `test_reports.py`
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (66 file) | pytest 135/135 ✅ | coverage 70.24% ✅
 
 ---
 
@@ -102,10 +108,54 @@ Obiettivo: rendere il progetto deployabile fuori dal proprio laptop.
 
 ---
 
+## Sprint 7 — Topology Engine: logica + consolidamento (M6, parte 1)
+
+Obiettivo: trasformare la topologia a stella in un grafo logico arricchito e cablare
+nella pipeline lo scaffolding `topology/` già esistente ma scollegato.
+**Riferimento:** `docs/topology_engine_prompt.md` (Livelli 0-2). Tutto fattibile senza
+hardware gestito.
+
+- [ ] **Riconciliare la doppia persistenza topologia** — oggi `database/store.py` e
+      `topology/repository.py` scrivono tabelle `topology` con schemi diversi e
+      `TopologyEngine`/`TopologyRepository` non sono usati dalla pipeline. Scegliere
+      una sola sorgente (preferibile estendere `store.py` con `recorded_at` +
+      `topology_changes`) ed eliminare/integrare il codice duplicato.
+- [ ] **Builder basato su NetworkX** — sostituire la costruzione manuale con un grafo
+      `networkx` (già in requirements); centralizzare nodi/edge e calcolo gerarchie.
+- [ ] **Inferenza ruoli L2** — identificare router/gateway/switch/firewall/AP da
+      device_type + posizione (gateway) e generare `UPLINK`/`DOWNLINK`/`LAYER3_NEIGHBOR`.
+- [ ] **Correlation engine (parziale, senza SNMP avanzato)** — unire ARP + inventory +
+      mDNS/SSDP per consolidare identità; deduplica nodi.
+- [ ] **Change detection come eventi** — esporre `diff_topology` (già esistente) come
+      eventi `TOPOLOGY_NODE_ADDED/REMOVED`, `TOPOLOGY_LINK_ADDED/REMOVED` nel DB e API.
+- [ ] **Dashboard topologia avanzata** — layout gerarchico opzionale in vis-network,
+      filtri per tipo/VLAN, badge VLAN, evidenziazione uplink/downlink, tooltip ricchi.
+- [ ] **Export GEXF/SVG** (oltre a JSON/GraphML/HTML già presenti).
+
+## Sprint 8 — Topology Engine: topologia fisica L3 (M4 + M6, parte 2)
+
+Obiettivo: ricostruire la topologia **fisica** (porta-switch ↔ device). **Richiede
+hardware gestito**: switch con SNMP abilitato e/o LLDP/CDP. Implementare con
+**degradazione graceful** (se i dati non sono disponibili, il L3 resta vuoto senza errori).
+
+- [ ] **Modello `Interface`** (device_id, name, index, mac, speed, status, vlan).
+- [ ] **SNMP avanzato** — walk di IF-MIB, BRIDGE-MIB, Q-BRIDGE-MIB (MAC/forwarding table,
+      VLAN), LLDP-MIB; recupero interfacce e management IP.
+- [ ] **LLDP / Cisco CDP** — neighbor discovery (local/remote port, remote hostname,
+      management IP, capabilities).
+- [ ] **Correlation engine completo** — Switch Port → MAC → IP → Device; relazione
+      `CONNECTED_ON_PORT` e `LAYER2_NEIGHBOR` con confidence (LLDP=100, SNMP=95, ARP=50).
+- [ ] **Performance** — cache e ricostruzione incrementale (aggiornare solo le parti
+      modificate del grafo); concorrenza sui walk SNMP.
+- [ ] **Nota di realtà** — su LAN domestiche/SOHO con switch non gestiti il L3 sarà
+      vuoto: documentarlo. Testare con mock SNMP/LLDP, non richiedere hardware nei test.
+
+---
+
 ## Backlog (senza sprint assegnato)
 
 - [ ] Notifiche webhook/email quando nuovi dispositivi compaiono o cambiano punteggio di sicurezza
-- [ ] Topologia avanzata con inferenza relazioni router→switch→host
+- [ ] ~~Topologia avanzata con inferenza relazioni router→switch→host~~ → pianificata in **Sprint 7-8** (Topology Engine)
 - [ ] Supporto IPv6 per discovery e port scan
 - [ ] Interfaccia web per avviare scan manualmente dalla dashboard (form HTML → `POST /scan`)
 - [ ] Export topologia in formato Mermaid o draw.io
