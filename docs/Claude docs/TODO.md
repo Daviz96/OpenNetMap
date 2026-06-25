@@ -81,13 +81,19 @@ Obiettivo: rendere il database la fonte di verità unica.
 ---
 
 ## Sprint 5 — Dashboard e UX (M6)
+**Eseguito:** 2026-06-25 | **Branch:** `sprint/5-dashboard`
 
 Obiettivo: rendere la dashboard usabile per un utente non tecnico.
 
-- [ ] **Spostare HTML in template Jinja2** — creare `network_inventory/templates/dashboard.html` e `report.html`
-- [ ] **Aggiungere grafico storico dispositivi** alla dashboard (es. linea con numero dispositivi per scan)
-- [ ] **Aggiungere visualizzazione topologia interattiva** — usare vis.js o D3.js con i dati da `/api/topology`
-- [ ] **Migliorare il report HTML** — aggiungere colonna "security score" visiva (colore rosso/giallo/verde)
+- [x] **Template Jinja2** — nuovo modulo `network_inventory/templating.py` (Environment + filtro `security_class`); template `base.html`, `dashboard.html`, `devices.html`, `events.html`, `topology.html`, `report.html`. Rimosse le `_render_*`/`_page_shell`/`_esc`/`_option` f-string da `api/app.py` e la generazione inline in `reports/html_report.py`
+- [x] **Grafico storico dispositivi** — Chart.js (vendorizzato) in dashboard; `_query_scan_history()` conta i dispositivi per scan
+- [x] **Topologia interattiva** — pagina `/dashboard/topology` con vis-network (vendorizzato); consuma `load_latest_topology()` (DB, fallback file); `_latest_topology()` condiviso con l'endpoint `/topology`
+- [x] **Security score colorato** — badge CSS rosso/giallo/verde (`security_class`: ≥80 good, 50-79 warn, <50 bad) in report HTML e tabelle dashboard
+- [x] **Librerie JS offline** — `network_inventory/static/` con `vis-network.min.js` + `chart.min.js`; servite via `app.mount("/static")` (pubbliche anche con API key); `.gitattributes` le tratta come binarie
+- [x] **README aggiornato** — titolo OpenNetMap, funzioni reali, script di installazione, auth API, struttura
+- [x] **Nuovi test** — `test_templating.py` (4), `test_api.py` (+4: pagine dashboard, topology page, static, static pubblici con API key), aggiornato `test_reports.py`
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ (66 file) | pytest 135/135 ✅ | coverage 70.24% ✅
 
 ---
 

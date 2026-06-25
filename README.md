@@ -1,71 +1,54 @@
-# Network Inventory Tool
+# OpenNetMap
 
-Scanner LAN in Python per inventariare dispositivi di rete, porte e servizi esposti.
+Tool Python per il discovery e l'inventario di una LAN: scopre i dispositivi attivi, ne raccoglie porte e servizi, li classifica, ne valuta la sicurezza e produce report JSON/CSV/HTML. Include un'API REST FastAPI e una dashboard web.
 
 ## Funzioni principali
 
 - Rilevamento automatico di IP locale, netmask, gateway e subnet.
 - Discovery host tramite ARP con fallback ping concorrente.
+- Discovery multi-protocollo: **mDNS** (zeroconf), **SSDP/UPnP**, **NetBIOS** (cross-platform).
 - Recupero MAC, hostname, vendor OUI locale quando disponibile.
 - Scansione porte TCP configurabile.
-- Fingerprint HTTP/HTTPS, banner TCP, SNMP, NetBIOS e punto di estensione mDNS.
-- Classificazione dispositivi con logica a punteggio.
-- Output tabellare e report JSON, CSV, HTML.
+- Fingerprint HTTP/HTTPS, banner TCP con firme, SNMP.
+- Classificazione dispositivi con logica a punteggio e **security assessment**.
+- Report JSON, CSV, HTML + export topologia (JSON/GraphML/HTML).
+- **Persistenza SQLite** con storico scansioni, eventi tra snapshot e topologia/VLAN.
+- **API REST + dashboard** FastAPI (con grafico storico, topologia interattiva, auth opzionale).
+- Modalità **monitor** con scansioni periodiche e shutdown pulito.
+
+## Requisiti
+
+- **Python 3.13** (versione di riferimento del progetto e della CI).
+- Permessi di amministratore se si usa Scapy per l'ARP scan.
 
 ## Installazione
 
-### Windows
+Gli script in `scripts/` verificano Python 3.13, creano `.venv` e installano le dipendenze (idempotenti; non installano Python, ma guidano se manca).
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+### Windows (PowerShell)
+
+```powershell
+.\scripts\install.ps1          # ambiente base
+.\scripts\install.ps1 -Dev     # ambiente di sviluppo (+ requirements/dev.txt)
 ```
 
-### Linux/macOS
+### Linux / macOS / WSL
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+./scripts/install.sh           # ambiente base
+./scripts/install.sh --dev     # ambiente di sviluppo (+ requirements/dev.txt)
 ```
 
-### WSL
+### Installazione manuale
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3.13 -m venv .venv
+source .venv/bin/activate         # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+pip install -r requirements/dev.txt   # solo per sviluppo
 ```
 
 ## Sviluppo
-
-### Windows
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-pip install -r requirements/dev.txt
-```
-
-### Linux/macOS
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -r requirements/dev.txt
-```
-
-### WSL
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -r requirements/dev.txt
-```
 
 Esegui i controlli localmente con:
 
@@ -92,12 +75,11 @@ Una pipeline CI è configurata in `.github/workflows/ci.yml` e esegue:
 
 Ulteriori dettagli sulla roadmap, i piani di milestone, i risultati e il changelog sono disponibili nella cartella `docs/`:
 
-- `docs/ROADMAP.md`
-- `docs/MILESTONE_1_PLAN.md`
-- `docs/MILESTONE_1_RESULTS.md`
-- `docs/PROJECT_SNAPSHOT.md`
-- `docs/CHANGELOG.md`
-- `docs/USO.md`
+- `docs/ROADMAP.md` — roadmap a 16 milestone
+- `docs/USO.md` — guida d'uso dettagliata
+- `docs/Claude docs/STATO_PROGETTO.md` — stato corrente del progetto
+- `docs/CHANGELOG.md` — changelog
+- `docs/PROJECT_SNAPSHOT.md` — fotografia storica della baseline iniziale (non aggiornata)
 
 ## Utilizzo
 
@@ -122,10 +104,13 @@ python main.py --dashboard --db reports_output\enterprise_inventory.db
 Dashboard:
 
 ```text
-http://127.0.0.1:8000/
+http://127.0.0.1:8000/                     # panoramica + grafico storico
 http://127.0.0.1:8000/dashboard/devices
 http://127.0.0.1:8000/dashboard/events
+http://127.0.0.1:8000/dashboard/topology   # topologia interattiva (vis-network)
 ```
+
+> Autenticazione API: se la variabile d'ambiente `OPENNETMAP_API_KEY` è impostata, tutte le rotte tranne la dashboard (`/`, `/dashboard/*`, `/static/*`) richiedono l'header `X-API-Key`. `POST /scan` consente un solo job attivo alla volta (429 altrimenti).
 
 Ricerca avanzata:
 
@@ -187,13 +172,22 @@ python main.py --from-json reports_output\inventory.json --report html csv
 ## Struttura
 
 ```text
+main.py                     # entry point CLI
 network_inventory/
-  main.py
-  scanner/
-  fingerprint/
-  inventory/
-  reports/
-  utils/
+  api/                      # FastAPI: API REST + dashboard
+  scanner/                  # ARP, porte, SNMP, NetBIOS, mDNS, SSDP
+  fingerprint/              # banner, HTTP, classifier
+  inventory/                # Device + InventoryRunner (pipeline)
+  security/                 # security assessment
+  topology/                 # builder + export topologia
+  database/                 # persistenza SQLite
+  events/                   # confronto snapshot -> eventi
+  reports/                  # writer JSON/CSV/HTML
+  templates/                # template Jinja2 (dashboard + report)
+  static/                   # librerie JS vendorizzate (vis-network, Chart.js)
+  signatures/               # firme banner/prodotti
+  utils/                    # config, network, OUI, logger
+scripts/                    # install.sh / install.ps1
+tests/                      # suite pytest
 requirements.txt
-README.md
 ```

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OpenNetMap{% endblock %}</title>
+  <style>
+    body { margin: 0; font-family: Segoe UI, Arial, sans-serif; background: #0f141b; color: #e5edf6; }
+    a { color: #93c5fd; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header { padding: 22px 30px; background: #17202c; border-bottom: 1px solid #2b3a4f; }
+    header h1 { margin: 0; font-size: 22px; }
+    .subtitle { color: #9fb3c8; margin-top: 4px; font-size: 14px; }
+    nav { margin-top: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+    main { padding: 24px 30px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
+    .stat { background: #17202c; border: 1px solid #2b3a4f; border-radius: 8px; padding: 14px; }
+    .stat b { display: block; font-size: 24px; margin-top: 4px; color: #93c5fd; }
+    section { margin-top: 24px; }
+    section h2 { font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; background: #111923; border: 1px solid #2b3a4f; }
+    th, td { padding: 9px 11px; border-bottom: 1px solid #233044; text-align: left; vertical-align: top; }
+    th { color: #bfdbfe; background: #17202c; }
+    code { font-family: Consolas, monospace; color: #cbd5e1; }
+    .hint { color: #9fb3c8; font-size: 13px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .toolbar input { flex: 1; min-width: 220px; padding: 9px 11px; border: 1px solid #2b3a4f; border-radius: 6px; background: #0f141b; color: #e5edf6; }
+    .toolbar select, .toolbar button { padding: 9px 11px; border: 1px solid #2b3a4f; border-radius: 6px; background: #17202c; color: #e5edf6; cursor: pointer; }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .sec-good { background: #064e3b; color: #6ee7b7; }
+    .sec-warn { background: #78350f; color: #fcd34d; }
+    .sec-bad { background: #7f1d1d; color: #fca5a5; }
+    .sec-unknown { background: #1f2937; color: #9ca3af; }
+    .chart-wrap { background: #111923; border: 1px solid #2b3a4f; border-radius: 8px; padding: 16px; max-width: 720px; }
+    #topology { height: 600px; background: #111923; border: 1px solid #2b3a4f; border-radius: 8px; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <h1>{% block heading %}OpenNetMap{% endblock %}</h1>
+    {% if subtitle %}<div class="subtitle">{{ subtitle }}</div>{% endif %}
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/dashboard/devices">Dispositivi</a>
+      <a href="/dashboard/events">Eventi</a>
+      <a href="/dashboard/topology">Topologia</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

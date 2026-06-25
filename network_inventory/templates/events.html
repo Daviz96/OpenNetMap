@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Eventi — OpenNetMap{% endblock %}
+{% block heading %}Eventi{% endblock %}
+
+{% block content %}
+  <form class="toolbar" method="get">
+    <input name="q" value="{{ query }}" placeholder="PORT_OPENED, 192.168.100, Brother">
+    <button type="submit">Filtra</button>
+  </form>
+  <table>
+    <thead><tr><th>Timestamp</th><th>Tipo</th><th>Dispositivo</th><th>Messaggio</th></tr></thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td><code>{{ e.get("timestamp") or "" }}</code></td>
+        <td>{{ e.get("event_type") or "" }}</td>
+        <td><code>{{ e.get("device_key") or "" }}</code></td>
+        <td>{{ e.get("message") or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `main` (pulito — Sprint 1-4 mergiati, PR #2..#5; script installazione PR #6)  
+**Branch attivo:** `sprint/5-dashboard` (Sprint 1-4 mergiati; Sprint 5 implementato, PR da aprire)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -115,7 +115,7 @@ OpenNetMap/
 | Persistenza SQLite | ✅ Completa (tabelle topology/vlans popolate — Sprint 4) |
 | Engine eventi (confronto snapshot) | ✅ Funzionale |
 | API REST FastAPI (~15 endpoint) | ✅ Con auth X-API-Key opzionale |
-| Dashboard web inline | ✅ Minimale |
+| Dashboard web (Jinja2) | ✅ Grafico storico (Chart.js) + topologia interattiva (vis-network), offline |
 | Modalità monitoring (`--monitor`) | ✅ Funzionale |
 | Lookup vendor OUI | ✅ Completo |
 | CLI con argparse | ✅ Completo |
@@ -145,6 +145,7 @@ OpenNetMap/
 | Sprint 2 — Sicurezza API e test | `sprint/2-api-security-tests` (merged) | 82 test, coverage 64.37% |
 | Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR #4 merged) | 119 test, coverage 68.07% |
 | Sprint 4 — Persistenza e topologia | `sprint/4-persistence` (PR #5 merged) | 127 test, coverage 68.45% |
+| Sprint 5 — Dashboard e UX | `sprint/5-dashboard` (PR da aprire) | 135 test, coverage 70.24% |
 
 ---
 
@@ -152,7 +153,6 @@ OpenNetMap/
 
 | Sprint | Obiettivo | Task principali |
 |---|---|---|
-| Sprint 5 | Dashboard e UX | Template Jinja2, grafico storico, topologia interattiva vis.js |
 | Sprint 6 | Deployment Docker | Dockerfile, docker-compose.yml, variabili d'ambiente |
 
 ---
