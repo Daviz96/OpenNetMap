@@ -56,6 +56,30 @@ def test_load_latest_topology_returns_none_when_absent(tmp_path: Path):
     assert store.load_latest_topology() is None
 
 
+def test_save_scan_emits_topology_change_events(tmp_path: Path):
+    db_path = tmp_path / "inventory.db"
+    store = InventoryStore(db_path)
+    stats: dict[str, object] = {
+        "started_at": "2026-06-25T00:00:00Z",
+        "subnet": "10.0.0.0/24",
+    }
+    d1 = Device(ip="10.0.0.10", mac="aa:bb:cc:dd:ee:10")
+    d2 = Device(ip="10.0.0.11", mac="aa:bb:cc:dd:ee:11")
+
+    # Primo scan: nessuna topologia precedente -> nessun evento di cambiamento.
+    store.save_scan([d1], stats, topology=build_topology([d1], stats))
+    # Secondo scan con un nuovo device -> nodo e collegamento aggiunti.
+    store.save_scan([d1, d2], stats, topology=build_topology([d1, d2], stats))
+
+    with sqlite3.connect(db_path) as connection:
+        rows = connection.execute(
+            "SELECT event_type FROM events WHERE event_type LIKE 'TOPOLOGY_%'"
+        ).fetchall()
+    types = {row[0] for row in rows}
+    assert "TOPOLOGY_NODE_ADDED" in types
+    assert "TOPOLOGY_LINK_ADDED" in types
+
+
 def test_save_scan_ensures_default_vlan_without_duplicates(tmp_path: Path):
     db_path = tmp_path / "inventory.db"
     store = InventoryStore(db_path)

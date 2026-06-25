@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 import sqlite3
 from collections.abc import Mapping
@@ -9,6 +10,7 @@ from pathlib import Path
 
 from network_inventory.events.engine import InventoryEvent
 from network_inventory.inventory.device import Device
+from network_inventory.topology.diff import diff_topology
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS scans (
@@ -165,10 +167,19 @@ class InventoryStore:
                     ),
                 )
             if topology is not None:
+                previous_topology = _load_latest_topology(connection)
                 connection.execute(
                     "INSERT INTO topology(scan_id, topology_json) VALUES(?, ?)",
                     (scan_id, json.dumps(topology, ensure_ascii=False)),
                 )
+                if previous_topology is not None:
+                    for change in _topology_change_events(
+                        previous_topology, dict(topology)
+                    ):
+                        connection.execute(
+                            "INSERT INTO events(event_type, device_key, message, timestamp) VALUES(?, ?, ?, ?)",
+                            change,
+                        )
             _persist_vlans(connection, topology, stats)
             return scan_id
 
@@ -198,6 +209,69 @@ class InventoryStore:
 
 def _device_key(device: Device) -> str:
     return f"{device.mac or 'no-mac'}|{device.ip}"
+
+
+def _load_latest_topology(
+    connection: sqlite3.Connection,
+) -> dict[str, object] | None:
+    """Carica l'ultima topologia salvata usando la connessione corrente."""
+    row = connection.execute(
+        "SELECT topology_json FROM topology ORDER BY scan_id DESC, id DESC LIMIT 1"
+    ).fetchone()
+    if row is None:
+        return None
+    payload = json.loads(row[0])
+    return payload if isinstance(payload, dict) else None
+
+
+def _topology_change_events(
+    previous: dict[str, object], current: dict[str, object]
+) -> list[tuple[str, str, str, str]]:
+    """Trasforma il diff di topologia in righe-evento (event_type, key, msg, ts)."""
+    changes = diff_topology(previous, current)
+    timestamp = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
+    events: list[tuple[str, str, str, str]] = []
+    for node in changes.get("nodes_added", []):
+        label = node.get("label") or node.get("id")
+        events.append(
+            (
+                "TOPOLOGY_NODE_ADDED",
+                str(node.get("id") or ""),
+                f"Nuovo nodo topologia: {label}",
+                timestamp,
+            )
+        )
+    for node in changes.get("nodes_removed", []):
+        label = node.get("label") or node.get("id")
+        events.append(
+            (
+                "TOPOLOGY_NODE_REMOVED",
+                str(node.get("id") or ""),
+                f"Nodo topologia rimosso: {label}",
+                timestamp,
+            )
+        )
+    for edge in changes.get("edges_added", []):
+        key = f"{edge.get('source')}->{edge.get('target')}"
+        events.append(
+            (
+                "TOPOLOGY_LINK_ADDED",
+                key,
+                f"Nuovo collegamento {edge.get('relationship')}: {key}",
+                timestamp,
+            )
+        )
+    for edge in changes.get("edges_removed", []):
+        key = f"{edge.get('source')}->{edge.get('target')}"
+        events.append(
+            (
+                "TOPOLOGY_LINK_REMOVED",
+                key,
+                f"Collegamento rimosso {edge.get('relationship')}: {key}",
+                timestamp,
+            )
+        )
+    return events
 
 
 def _persist_vlans(

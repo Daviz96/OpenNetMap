@@ -8,23 +8,53 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
 
+import networkx as nx
+
 from network_inventory.inventory.device import Device
-from network_inventory.topology.builder import build_topology
+from network_inventory.topology.builder import build_graph
 
 
 def write_topology_exports(
     devices: list[Device], stats: Mapping[str, object], output_dir: str | Path
 ) -> list[Path]:
-    """Write topology JSON, GraphML and HTML files."""
+    """Write topology JSON, GraphML, GEXF and HTML files."""
     path = Path(output_dir)
     path.mkdir(parents=True, exist_ok=True)
-    topology = build_topology(devices, dict(stats))
+    graph = build_graph(devices, dict(stats))
+    topology: dict[str, object] = {
+        "nodes": [dict(data) for _, data in graph.nodes(data=True)],
+        "edges": [dict(data) for _, _, data in graph.edges(data=True)],
+        "metadata": graph.graph["metadata"],
+    }
     outputs = [
         _write_json(topology, path / "topology.json"),
         _write_graphml(topology, path / "topology.graphml"),
+        _write_gexf(graph, path / "topology.gexf"),
         _write_html(topology, path / "topology.html"),
     ]
     return outputs
+
+
+def _write_gexf(graph: nx.DiGraph, path: Path) -> Path:
+    """Esporta in GEXF, ripulendo gli attributi non scalari (no nested dict)."""
+    clean: nx.DiGraph = nx.DiGraph()
+    for node_id, data in graph.nodes(data=True):
+        clean.add_node(
+            node_id,
+            label=str(data.get("label") or node_id),
+            type=str(data.get("type") or ""),
+            ip=str(data.get("ip") or ""),
+            level=int(data.get("level") or 0),
+        )
+    for source, target, data in graph.edges(data=True):
+        clean.add_edge(
+            source,
+            target,
+            relationship=str(data.get("relationship") or ""),
+            confidence=int(data.get("confidence") or 0),
+        )
+    nx.write_gexf(clean, str(path))
+    return path
 
 
 def _write_json(topology: dict[str, object], path: Path) -> Path:

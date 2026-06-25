@@ -9,18 +9,18 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/6-docker` (implementato e verificato, PR da aprire)
+**Branch di lavoro attivo:** `sprint/7-topology` (implementato e verificato, PR da aprire)
 
 ---
 
 ## Struttura branch Git
 
 ```
-main  (Sprint 1-5 integrati — PR #2..#7; script PR #6, pulizia doc PR #8)
-└── sprint/6-docker  (Sprint 6 implementato e committato; PR NON ancora aperta)
+main  (Sprint 1-6 integrati — PR #2..#9)
+└── sprint/7-topology  (Sprint 7 implementato e committato; PR NON ancora aperta)
 ```
 
-**Azione immediata suggerita:** aprire PR da `sprint/6-docker` → `main`.
+**Azione immediata suggerita:** aprire PR da `sprint/7-topology` → `main`.
 
 ---
 
@@ -104,17 +104,30 @@ Modifiche principali:
 - README: sezione "Deploy con Docker"
 - Test: `test_main.py` (+2: env var, override CLI>env)
 
-**Risultati Sprint 6:** pytest 137/137 ✅ | coverage 70.24% ✅ | black ✅ | ruff ✅ | mypy ✅ | compose config ✅ (build Docker da validare con daemon attivo)
+**Risultati Sprint 6:** pytest 137/137 ✅ | coverage 70.24% ✅ | black ✅ | ruff ✅ | mypy ✅ | build Docker OK (container healthy, dashboard 200)
+
+### Sprint 7 — Topology Engine (logico) ✅
+**Branch:** `sprint/7-topology` | **PR NON ancora aperta**
+
+Modifiche principali:
+- **Riconciliata persistenza**: eliminati `topology/engine.py` e `topology/repository.py` (codice morto/duplicato); `database/store.py` è l'unica sorgente
+- `topology/builder.py`: nuova `build_graph()` su `nx.DiGraph` (livelli gerarchici, correlation/dedup, inferenza `UPLINK`/`LAYER3_NEIGHBOR`); `build_topology()` serializza preservando il contratto
+- `store.py`: change detection topologia → eventi `TOPOLOGY_NODE/LINK_ADDED/REMOVED` nella tabella `events`
+- `topology/export.py`: aggiunto export **GEXF**
+- `templates/topology.html`: filtri tipo/VLAN, legenda, archi stilizzati per relazione, toggle layout fisico↔gerarchico
+- Test: `test_topology.py` (+2), `test_store.py` (+1)
+
+**Risultati Sprint 7:** pytest 140/140 ✅ | coverage 72.12% ✅ | black ✅ | ruff ✅ | mypy ✅
 
 ---
 
 ## Stato test e coverage
 
-| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 | Sprint 6 |
-|---|---|---|---|---|---|---|
-| Test totali | 27 | 82 | 119 | 127 | 135 | 137 |
-| Coverage | 50.77% | 64.37% | 68.07% | 68.45% | 70.24% | 70.24% |
-| Soglia CI | 50% | 50% | 60% | 60% | 60% | 60% |
+| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 | Sprint 6 | Sprint 7 |
+|---|---|---|---|---|---|---|---|
+| Test totali | 27 | 82 | 119 | 127 | 135 | 137 | 140 |
+| Coverage | 50.77% | 64.37% | 68.07% | 68.45% | 70.24% | 70.24% | 72.12% |
+| Soglia CI | 50% | 50% | 60% | 60% | 60% | 60% | 60% |
 
 **Coverage bassa nei moduli (opportunità Sprint 2+):**
 - `scanner/arp_scanner.py`: 22%
@@ -189,11 +202,11 @@ Task:
 .\scripts\install.ps1 -Dev       # Windows
 ./scripts/install.sh --dev       # Linux/macOS
 
-# Sprint 1-6 (Sprint 6 da mergiare). Partire da main aggiornato:
+# Sprint 1-7 (Sprint 7 da mergiare). Partire da main aggiornato:
 git checkout main && git pull
 
-# Creare branch Sprint 7 (Topology Engine logico)
-git checkout -b sprint/7-topology
+# Creare branch Sprint 8 (Topology Engine fisico L3)
+git checkout -b sprint/8-topology-physical
 
 # Docker (Sprint 6)
 docker compose up -d --build                          # host network (Linux)
