@@ -30,16 +30,32 @@
   const edges = (model.edges || []).map(e => ({
     from: e.source, to: e.target, label: e.relationship || "",
     color: { color: "#3b4a60" }, font: { color: "#9fb3c8", size: 10 },
+    smooth: { type: "continuous" },
   }));
-  new vis.Network(
+  const network = new vis.Network(
     document.getElementById("topology"),
     { nodes: nodes, edges: edges },
     {
       nodes: { font: { color: "#e5edf6" }, size: 16 },
-      physics: { stabilization: true, barnesHut: { springLength: 140 } },
-      interaction: { hover: true, tooltipDelay: 120 },
+      physics: {
+        // Stabilizza una volta sola, poi la fisica viene spenta: il grafo
+        // resta fermo e leggibile invece di muoversi all'infinito.
+        stabilization: { enabled: true, iterations: 300, fit: true },
+        barnesHut: {
+          gravitationalConstant: -12000,
+          springLength: 180,
+          springConstant: 0.04,
+          avoidOverlap: 0.6,
+        },
+      },
+      interaction: { hover: true, tooltipDelay: 120, dragNodes: true },
     }
   );
+  // Congela il layout appena stabilizzato: i nodi restano dove sono,
+  // trascinabili manualmente ma senza animazione continua.
+  network.once("stabilizationIterationsDone", () => {
+    network.setOptions({ physics: false });
+  });
 </script>
 {% endif %}
 {% endblock %}
