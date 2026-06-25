@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `sprint/4-persistence` (Sprint 1+2+3 mergiati; Sprint 4 implementato, PR da aprire)  
+**Branch attivo:** `main` (pulito — Sprint 1-4 mergiati, PR #2..#5; script installazione PR #6)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -144,7 +144,7 @@ OpenNetMap/
 | Sprint 1 — Pulizia e stabilizzazione | `sprint/1-cleanup` (merged) | 27 test, coverage 50.77% |
 | Sprint 2 — Sicurezza API e test | `sprint/2-api-security-tests` (merged) | 82 test, coverage 64.37% |
 | Sprint 3 — Discovery e fingerprinting | `sprint/3-discovery` (PR #4 merged) | 119 test, coverage 68.07% |
-| Sprint 4 — Persistenza e topologia | `sprint/4-persistence` (PR da aprire) | 127 test, coverage 68.45% |
+| Sprint 4 — Persistenza e topologia | `sprint/4-persistence` (PR #5 merged) | 127 test, coverage 68.45% |
 
 ---
 

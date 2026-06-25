@@ -9,18 +9,17 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/4-persistence` (implementato e verificato, PR da aprire)
+**Branch di lavoro attivo:** nessuno — `main` pulito, Sprint 1-4 e script di installazione tutti mergiati
 
 ---
 
 ## Struttura branch Git
 
 ```
-main  (Sprint 1+2+3 integrati — PR #2, #3, #4 chiuse)
-└── sprint/4-persistence  (Sprint 4 implementato e committato; PR NON ancora aperta)
+main  (Sprint 1+2+3+4 integrati — PR #2..#5; script installazione PR #6)
 ```
 
-**Azione immediata suggerita:** aprire PR da `sprint/4-persistence` → `main`.
+**Azione immediata suggerita:** creare `sprint/5-dashboard` da `main` e avviare Sprint 5.
 
 ---
 
@@ -69,7 +68,7 @@ Modifiche principali:
 **Risultati Sprint 3:** pytest 119/119 ✅ | coverage 68.07% ✅ | black ✅ | ruff ✅ | mypy ✅
 
 ### Sprint 4 — Persistenza e topologia ✅
-**Branch:** `sprint/4-persistence` | **PR NON ancora aperta**
+**Branch:** `sprint/4-persistence` | **PR #5 mergiata in `main`**
 
 Modifiche principali:
 - `database/store.py`: `save_scan()` accetta `topology=...` e lo scrive nella tabella `topology`; nuova `load_latest_topology()`; helper `_persist_vlans()`/`_upsert_vlan()` popolano `vlans` (VLAN 0 default + VLAN da nodi topologia, guard anti-duplicati)
@@ -158,11 +157,15 @@ Task:
 ## Comandi utili da riprendere
 
 ```bash
-# Sprint 1+2+3 già mergiati. Partire da main aggiornato:
+# Setup ambiente (Windows / Linux-macOS) — verifica Python 3.13, crea .venv, installa deps
+.\scripts\install.ps1 -Dev       # Windows
+./scripts/install.sh --dev       # Linux/macOS
+
+# Sprint 1-4 già mergiati. Partire da main aggiornato:
 git checkout main && git pull
 
-# Creare branch Sprint 4
-git checkout -b sprint/4-persistence
+# Creare branch Sprint 5
+git checkout -b sprint/5-dashboard
 
 # Suite di verifica da eseguire dopo ogni modifica
 python -m black --check .
