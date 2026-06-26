@@ -139,7 +139,31 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 7. Docker
+## 7. Topologia fisica cablata (SNMP — Sprint 8)
+
+Mappa **endpoint → switch/porta** interrogando switch/router via SNMP (richiede SNMP
+abilitato sugli apparati; quelli muti vengono saltati).
+
+| Funzione | Comando |
+|---|---|
+| Scan con mappa fisica (auto-detect switch/router/AP per vendor) | `python main.py --subnet <cidr> --db <db> --topology --snmp-topology` |
+| Aggiungere apparati espliciti | `... --snmp-topology --snmp-topology-hosts 192.168.1.11,192.168.1.12` |
+| Via env (lista lunga) | `$env:OPENNETMAP_SNMP_TOPOLOGY_HOSTS="ip1,ip2,..."` poi `--snmp-topology` |
+
+Diagnostica (script `scripts/`):
+
+| Funzione | Comando |
+|---|---|
+| Fattibilità SNMP su un apparato | `python scripts\topology_probe.py --host <ip> -c public` |
+| Dump FDB switch (MAC→porta) | `python scripts\snmp_topology_dump.py --host <ip_switch> -c public` |
+| Dump ARP router | `python scripts\snmp_topology_dump.py --host <ip_router> -c public --arp` |
+| Mappa endpoint→porta (+ inventario) | `python scripts\physical_map.py -s <ip_switch> -c public --inventory reports_output\inventory.json` |
+
+> Nella dashboard topologia, selettore **Vista: Fisica** per vedere l'albero switch→porta→endpoint.
+
+---
+
+## 8. Docker
 
 | Funzione | Comando |
 |---|---|
@@ -153,7 +177,7 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 8. Database OUI (vendor MAC)
+## 9. Database OUI (vendor MAC)
 
 | Funzione | Comando |
 |---|---|
@@ -161,7 +185,7 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 9. Setup ambiente (script di installazione)
+## 10. Setup ambiente (script di installazione)
 
 | Funzione | Comando |
 |---|---|
@@ -173,7 +197,7 @@ curl http://127.0.0.1:8000/devices -H "x-api-key: la-tua-chiave"
 
 ---
 
-## 10. Controlli qualità (sviluppo)
+## 11. Controlli qualità (sviluppo)
 
 ```powershell
 python -m black --check .

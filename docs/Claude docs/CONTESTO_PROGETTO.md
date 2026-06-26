@@ -63,17 +63,18 @@ Lavoro a **sprint** numerati allineati alla `docs/ROADMAP.md`, ognuno su branch 
 | 5 | Dashboard Jinja2 + grafici/topologia offline | 135 test, 70.24% |
 | 6 | Deployment Docker (host/bridge) + env var | 137 test, 70.24% |
 | 7 | Topology Engine logico (NetworkX, change events) | 140 test, 72.12% |
+| 8 | Topology Engine fisico L3 cablato (SNMP) | 151 test, ~69.5% |
 
-PR aperte/mergiate: #2..#10 (#6 script installazione, #8 pulizia doc). **`gh` operativo** (utente Daviz96).
+PR mergiate #2..#10; Sprint 8 su branch `sprint/8-topology-physical` (PR da aprire). **`gh` operativo** (utente Daviz96).
 
-## 7. Prossimo: Sprint 8 — Topology Engine fisico L3
+## 7. Sprint 8 — Topology Engine fisico L3 cablato (fatto) + follow-up
 
-Obiettivo: mappa fisica **endpoint → switch/porta** e **client → AP**. Da `docs/prompts/topology_engine_prompt.md`.
+Mappa fisica **endpoint → switch/porta** ricostruita e **validata su rete reale DrayTek** (281 attacchi, 3 switch SNMP).
 
-- **Ambiente reale dell'utente:** rete aziendale, apparati **DrayTek** (switch/AP/router VigorSwitch/VigorAP/Vigor), un po' di TP-Link. Endpoint: PC, stampanti, server, NAS, telecamere IP/registratori, IoT, telefoni (SSID ospiti/dipendenti).
-- **Metodo:** SNMP `BRIDGE-MIB`/`Q-BRIDGE-MIB` (MAC→porta), `LLDP-MIB`/CDP (gerarchia), `IF-MIB`; correlation `Porta→MAC→IP→Device`; per il wireless **API VigorACS** o **Central AP Management** del router Vigor. Richiede SNMP/API abilitati sugli apparati (non sugli endpoint).
-- **Decisione in corso:** prima una **sonda di fattibilità** — `scripts/topology_probe.py` (SNMP read-only) da lanciare sui DrayTek per vedere quali dati escono. VigorACS: da verificare se presente.
-- ⚠️ **BUG da fixare in Sprint 8:** `scanner/snmp_scanner.py` usa l'API **sync** di pysnmp ma l'ambiente ha **pysnmp 7.x** (solo asyncio) → `scan_snmp()` ritorna sempre `{}` a runtime (test verdi solo perché mockano). Riferimento API 7.x corretta: `scripts/topology_probe.py` (`pysnmp.hlapi.asyncio`, `get_cmd`/`walk_cmd`, `UdpTransportTarget.create(...)`, `mpModel=1`).
+- **Ambiente utente:** rete aziendale **DrayTek** — switch VigorSwitch (FX2120 `192.168.101.11`, G2540xs `.12`/`.13`, ecc.), AP VigorAP912C (`.21`–`.56`), router Vigor2962 (`192.168.101.1`). SNMP **v2c** community `public`. Sul **router** serve la *Manager Host IP* whitelist (sul VigorSwitch no: usa View→Group→Community). I DrayTek si classificano come "Server" → auto-detect per **vendor**.
+- **Come funziona:** SNMP `dot1qTpFdbPort` (MAC→porta, lo switch usa la **Q-BRIDGE**, non la dot1d) + `ipNetToMediaPhysAddress` (ARP); correlation `Porta→MAC→IP→Device` ("fewest companions" = porta di accesso); archi `CONNECTED_ON_PORT`. Codice: `scanner/snmp_topology.py`, `topology/correlation.py`. Comando: `--snmp-topology`.
+- ✅ **SNMP fix:** `scanner/snmp_scanner.py` portato a **pysnmp 7.x asyncio** (prima ritornava sempre `{}`).
+- **Follow-up:** wireless **client→AP** dal **Central Management** del router (Switch/AP Status con STA list) o **VigorACS** (Northbound API) — SNMP standard non lo dà; **LLDP/CDP** per gerarchia switch↔AP (sui DrayTek era assente); **rifinitura visualizzazione** topologia fisica.
 
 ## 8. Riprendere da una NUOVA postazione
 

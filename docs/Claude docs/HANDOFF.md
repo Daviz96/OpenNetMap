@@ -9,7 +9,7 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** nessuno — `main` pulito, Sprint 1-7 tutti mergiati (ultima PR #10)
+**Branch di lavoro attivo:** `sprint/8-topology-physical` (implementato e validato su rete reale, PR da aprire)
 
 ---
 
@@ -17,9 +17,10 @@
 
 ```
 main  (Sprint 1-7 integrati — PR #2..#10)
+└── sprint/8-topology-physical  (Sprint 8 implementato e committato; PR NON ancora aperta)
 ```
 
-**Azione immediata suggerita:** sonda di fattibilità Sprint 8 (`scripts/topology_probe.py` sui DrayTek), poi creare `sprint/8-topology-physical`.
+**Azione immediata suggerita:** aprire PR da `sprint/8-topology-physical` → `main`.
 
 > ⚠️ **Per riprendere da un'altra postazione:** leggi `docs/Claude docs/CONTESTO_PROGETTO.md` — contiene il contesto completo (memorie + stato) che NON è nel repo (le memorie auto sono locali alla macchina).
 
@@ -120,15 +121,31 @@ Modifiche principali:
 
 **Risultati Sprint 7:** pytest 140/140 ✅ | coverage 72.12% ✅ | black ✅ | ruff ✅ | mypy ✅
 
+### Sprint 8 — Topology Engine fisico L3 (cablato) ✅
+**Branch:** `sprint/8-topology-physical` | **PR NON ancora aperta** | validato su rete reale DrayTek
+
+Modifiche principali:
+- **Fix `scanner/snmp_scanner.py`** → pysnmp 7.x asyncio (prima `scan_snmp` ritornava sempre `{}`; bug latente risolto)
+- **`scanner/snmp_topology.py`**: collector SNMP `dot1qTpFdbPort` (MAC→porta + nomi via `dot1dBasePortIfIndex`/`ifName`) + ARP; **poll parallelo** (`asyncio.gather`)
+- **`topology/correlation.py`**: `correlate_physical()` (euristica "fewest companions"), `select_snmp_targets()` (auto-detect tipo + **vendor** DrayTek/Cisco/... + espliciti), `_reclassify_from_snmp()` (device_type da sysDescr)
+- **`build_graph`**: archi `CONNECTED_ON_PORT` (endpoint→switch, metadata porta/VLAN)
+- **CLI**: `--snmp-topology` / `--snmp-topology-hosts` (+ env `OPENNETMAP_SNMP_TOPOLOGY_HOSTS`)
+- **Dashboard**: viste Logica/Fisica separate (fisica = albero gerarchico), etichette in tooltip
+- **Script**: `topology_probe.py`, `snmp_topology_dump.py`, `physical_map.py`
+
+**Risultati Sprint 8:** pytest 151/151 ✅ | coverage ~69.5% ✅ | black ✅ | ruff ✅ | mypy ✅ | **281 attacchi fisici** su rete reale (3 switch SNMP)
+
+**Follow-up:** wireless client→AP (Central Management/VigorACS), LLDP/CDP, rifinitura visualizzazione.
+
 ---
 
 ## Stato test e coverage
 
-| Metrica | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 | Sprint 6 | Sprint 7 |
-|---|---|---|---|---|---|---|---|
-| Test totali | 27 | 82 | 119 | 127 | 135 | 137 | 140 |
-| Coverage | 50.77% | 64.37% | 68.07% | 68.45% | 70.24% | 70.24% | 72.12% |
-| Soglia CI | 50% | 50% | 60% | 60% | 60% | 60% | 60% |
+| Metrica | Sprint 4 | Sprint 5 | Sprint 6 | Sprint 7 | Sprint 8 |
+|---|---|---|---|---|---|
+| Test totali | 127 | 135 | 137 | 140 | 151 |
+| Coverage | 68.45% | 70.24% | 70.24% | 72.12% | ~69.5% |
+| Soglia CI | 60% | 60% | 60% | 60% | 60% |
 
 **Coverage bassa nei moduli (opportunità Sprint 2+):**
 - `scanner/arp_scanner.py`: 22%
@@ -203,11 +220,17 @@ Task:
 .\scripts\install.ps1 -Dev       # Windows
 ./scripts/install.sh --dev       # Linux/macOS
 
-# Sprint 1-7 (Sprint 7 da mergiare). Partire da main aggiornato:
+# Sprint 1-8 (Sprint 8 da mergiare). Partire da main aggiornato:
 git checkout main && git pull
 
-# Creare branch Sprint 8 (Topology Engine fisico L3)
-git checkout -b sprint/8-topology-physical
+# Scan con topologia fisica cablata (SNMP su switch/router/AP)
+python main.py --subnet <cidr> --db <db> --topology --snmp-topology
+#   auto-detect per vendor (DrayTek/Cisco/...); host extra: --snmp-topology-hosts a,b,c
+
+# Diagnostica SNMP (Sprint 8)
+python scripts/topology_probe.py --host <ip> -c public          # fattibilità
+python scripts/snmp_topology_dump.py --host <ip_switch> -c public # FDB MAC->porta
+python scripts/physical_map.py -s <ip_switch> --inventory <json>  # mappa endpoint->porta
 
 # Docker (Sprint 6)
 docker compose up -d --build                          # host network (Linux)
