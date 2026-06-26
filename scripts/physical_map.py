@@ -86,13 +86,17 @@ def main() -> None:
     )
     mapped = 0
     for link in direct:
-        who = link.device_label or "(sconosciuto)"
-        ip = f" {link.device_ip}" if link.device_ip else ""
+        switch = f"{link.switch_name or '?'}@{link.switch_host}"
         if link.device_label:
             mapped += 1
+            # Evita di ripetere l'IP quando manca l'hostname (label == IP).
+            who = link.device_label
+            if link.device_ip and link.device_ip != link.device_label:
+                who = f"{link.device_label} ({link.device_ip})"
+        else:
+            who = "(sconosciuto)"
         print(
-            f"  {link.switch_name or link.switch_host} / {link.port:<20} "
-            f"VLAN {link.vlan:<4} → {who}{ip}  [{link.mac}]"
+            f"  {switch:<26} {link.port:<20} VLAN {link.vlan:<4} → {who}  [{link.mac}]"
         )
     print(
         f"\n{mapped}/{len(direct)} attacchi diretti corrispondono a un dispositivo "

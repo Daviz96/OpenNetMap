@@ -182,9 +182,11 @@ async def _collect_switch(
         # suffix = (vlan/fdbId, mac0..mac5)
         if len(suffix) < 7:
             continue
+        bridge_port = int(value)
+        if bridge_port <= 0:
+            continue  # porta interna/CPU (non è un attacco fisico reale)
         vlan = suffix[0]
         mac = _format_mac(bytes(suffix[1:7]))
-        bridge_port = int(value)
         if_name = if_names.get(base_to_ifindex.get(bridge_port, -1))
         fdb.append(
             FdbEntry(mac=mac, vlan=vlan, bridge_port=bridge_port, if_name=if_name)
