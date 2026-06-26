@@ -13,7 +13,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from network_inventory.inventory.device import Device
-from network_inventory.scanner.snmp_topology import SwitchTopology
+from network_inventory.scanner.snmp_topology import (
+    SwitchTopology,
+    collect_switch_topology,
+)
+
+_INFRA_KEYWORDS = ("switch", "router", "firewall", "gateway")
 
 
 @dataclass(slots=True)
@@ -79,3 +84,48 @@ def access_links(
 ) -> list[PhysicalLink]:
     """Filtra i soli attacchi diretti (porta di accesso, <= max_companions MAC)."""
     return [link for link in links if link.companions <= max_companions]
+
+
+def select_snmp_targets(devices: list[Device], explicit_hosts: list[str]) -> list[str]:
+    """Switch/router da interrogare: host espliciti + auto-detect (161 + tipo rete)."""
+    targets: list[str] = list(explicit_hosts)
+    for device in devices:
+        device_type = (device.device_type or "").lower()
+        if 161 in device.open_ports and any(k in device_type for k in _INFRA_KEYWORDS):
+            targets.append(device.ip)
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for host in targets:
+        if host and host not in seen:
+            seen.add(host)
+            ordered.append(host)
+    return ordered
+
+
+def collect_physical_links(
+    devices: list[Device],
+    communities: list[str],
+    explicit_hosts: list[str] | None = None,
+    timeout: float = 2.0,
+) -> list[PhysicalLink]:
+    """Interroga gli switch (auto+espliciti) e correla in attacchi fisici."""
+    targets = select_snmp_targets(devices, explicit_hosts or [])
+    switches: list[SwitchTopology] = []
+    for host in targets:
+        topo = collect_switch_topology(host, communities, timeout)
+        if topo is not None and topo.fdb:
+            switches.append(topo)
+    return correlate_physical(switches, devices)
+
+
+def link_to_dict(link: PhysicalLink) -> dict[str, object]:
+    """Serializza un PhysicalLink (per stats/persistenza)."""
+    return {
+        "mac": link.mac,
+        "switch_host": link.switch_host,
+        "switch_name": link.switch_name,
+        "port": link.port,
+        "vlan": link.vlan,
+        "companions": link.companions,
+        "device_ip": link.device_ip,
+    }

@@ -1,6 +1,10 @@
 from network_inventory.inventory.device import Device
 from network_inventory.scanner.snmp_topology import FdbEntry, SwitchTopology
-from network_inventory.topology.correlation import access_links, correlate_physical
+from network_inventory.topology.correlation import (
+    access_links,
+    correlate_physical,
+    select_snmp_targets,
+)
 
 MAC = "00:07:4d:b2:92:a9"
 
@@ -53,3 +57,24 @@ def test_access_links_filter():
     direct = access_links(links, max_companions=1)
     ports = {link.port for link in direct}
     assert ports == {"Gi5"}  # solo la porta con 1 MAC
+
+
+def test_select_snmp_targets_auto_and_explicit():
+    switch = Device(
+        ip="10.0.0.1", mac="aa:bb:cc:00:00:01", device_type="Switch", open_ports=[161]
+    )
+    pc = Device(
+        ip="10.0.0.50", mac="aa:bb:cc:00:00:50", device_type="host", open_ports=[445]
+    )
+    printer = Device(
+        ip="10.0.0.60",
+        mac="aa:bb:cc:00:00:60",
+        device_type="Stampante",
+        open_ports=[161],
+    )
+    targets = select_snmp_targets([switch, pc, printer], ["10.0.0.99"])
+
+    assert "10.0.0.99" in targets  # esplicito
+    assert "10.0.0.1" in targets  # auto: switch con 161
+    assert "10.0.0.50" not in targets  # host senza 161
+    assert "10.0.0.60" not in targets  # stampante con 161 ma non apparato di rete
