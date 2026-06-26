@@ -1,5 +1,11 @@
 # OpenNetMap Roadmap
 
+> **Stato avanzamento (2026-06-26):** completati gli Sprint 1-8 — pulizia/CI, sicurezza
+> API, discovery multi-protocollo, persistenza+eventi, dashboard Jinja2, Docker, topology
+> engine logico (NetworkX) e **fisico L3 cablato** (SNMP endpoint→switch/porta). Per lo
+> stato puntuale vedi `docs/Claude docs/STATO_PROGETTO.md` e `docs/CHANGELOG.md`. Questo
+> file resta la **proposta** a 16 milestone di riferimento.
+
 Questo documento descrive la roadmap proposta per trasformare OpenNetMap in una piattaforma enterprise per Network Discovery, Asset Inventory, Topology Mapping, Continuous Monitoring, Security Assessment e Dashboard/API.
 
 Per ogni milestone sono elencati: obiettivi, dipendenze, priorità, complessità, rischi e stima del lavoro.

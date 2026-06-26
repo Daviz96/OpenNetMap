@@ -154,6 +154,25 @@ python main.py --monitor --interval 300 --db reports_output\enterprise_inventory
 python main.py --dashboard --db reports_output\enterprise_inventory.db
 ```
 
+### Topologia fisica cablata (SNMP)
+
+Ricostruisce la mappa **endpoint → switch/porta** interrogando gli switch/router
+managed via SNMP (forwarding table Q-BRIDGE). Richiede SNMP abilitato sugli
+apparati; quelli muti vengono saltati. Nella dashboard topologia usa *Vista: Fisica*.
+
+```bash
+# auto-detect degli apparati di rete per vendor (DrayTek, Cisco, ...)
+python main.py --subnet 192.168.1.0/24 --db inv.db --topology --snmp-topology
+
+# aggiungere IP espliciti di switch/router
+python main.py --subnet 192.168.1.0/24 --db inv.db --topology --snmp-topology --snmp-topology-hosts 192.168.1.11,192.168.1.12
+
+# diagnostica (sola lettura)
+python scripts/topology_probe.py --host 192.168.1.11 -c public          # fattibilità SNMP
+python scripts/snmp_topology_dump.py --host 192.168.1.11 -c public      # FDB MAC->porta
+python scripts/physical_map.py -s 192.168.1.11 -c public --inventory reports_output/inventory.json
+```
+
 ## Dashboard e API
 
 Dopo l'avvio della dashboard, apri in browser:

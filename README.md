@@ -1,6 +1,6 @@
 # OpenNetMap
 
-Tool Python per il discovery e l'inventario di una LAN: scopre i dispositivi attivi, ne raccoglie porte e servizi, li classifica, ne valuta la sicurezza e produce report JSON/CSV/HTML. Include un'API REST FastAPI e una dashboard web.
+Tool Python per il discovery e l'inventario di una LAN: scopre i dispositivi attivi, ne raccoglie porte e servizi, li classifica, ne valuta la sicurezza, ne **ricostruisce la topologia** (logica e fisica) e produce report JSON/CSV/HTML. Include un'API REST FastAPI, una dashboard web e il deploy Docker.
 
 ## Funzioni principali
 
@@ -11,10 +11,13 @@ Tool Python per il discovery e l'inventario di una LAN: scopre i dispositivi att
 - Scansione porte TCP configurabile.
 - Fingerprint HTTP/HTTPS, banner TCP con firme, SNMP.
 - Classificazione dispositivi con logica a punteggio e **security assessment**.
-- Report JSON, CSV, HTML + export topologia (JSON/GraphML/HTML).
+- Report JSON, CSV, HTML + export topologia (JSON/GraphML/**GEXF**/HTML).
+- **Topologia logica** (grafo NetworkX: gateway, VLAN, ruoli L2) con change-detection come eventi.
+- **Topologia fisica cablata** (`--snmp-topology`): mappa **endpoint → switch/porta** via SNMP (Q-BRIDGE FDB) su switch managed.
 - **Persistenza SQLite** con storico scansioni, eventi tra snapshot e topologia/VLAN.
-- **API REST + dashboard** FastAPI (con grafico storico, topologia interattiva, auth opzionale).
+- **API REST + dashboard** FastAPI (grafico storico, topologia interattiva Logica/Fisica, auth opzionale).
 - Modalità **monitor** con scansioni periodiche e shutdown pulito.
+- **Deploy Docker** (host/bridge) con configurazione via variabili d'ambiente.
 
 ## Requisiti
 
@@ -148,7 +151,20 @@ python main.py --from-json reports_output\inventory.json --report html
 python main.py --from-json reports_output\inventory.json --report json html --topology --db reports_output\enterprise_inventory.db
 python main.py --monitor --interval 300 --db reports_output\enterprise_inventory.db --report json html --topology
 python main.py --dashboard --db reports_output\enterprise_inventory.db
+# Topologia fisica cablata (endpoint -> switch/porta) via SNMP su switch managed:
+python main.py --subnet 192.168.1.0/24 --db inv.db --topology --snmp-topology
+python main.py ... --snmp-topology --snmp-topology-hosts 192.168.1.11,192.168.1.12
 ```
+
+### Topologia fisica (SNMP)
+
+Con `--snmp-topology` OpenNetMap interroga gli switch/router managed via SNMP
+(forwarding table Q-BRIDGE) e ricostruisce la mappa **endpoint → switch/porta**,
+visibile nella dashboard alla voce *Vista: Fisica*. Gli apparati di rete
+(DrayTek, Cisco, ...) sono auto-rilevati per vendor; con `--snmp-topology-hosts`
+si aggiungono IP espliciti. Richiede **SNMP abilitato** sugli apparati; quelli
+muti vengono saltati. Script diagnostici in `scripts/`: `topology_probe.py`,
+`snmp_topology_dump.py`, `physical_map.py`.
 
 Dashboard:
 
@@ -224,11 +240,11 @@ python main.py --from-json reports_output\inventory.json --report html csv
 main.py                     # entry point CLI
 network_inventory/
   api/                      # FastAPI: API REST + dashboard
-  scanner/                  # ARP, porte, SNMP, NetBIOS, mDNS, SSDP
+  scanner/                  # ARP, porte, SNMP, snmp_topology, NetBIOS, mDNS, SSDP
   fingerprint/              # banner, HTTP, classifier
   inventory/                # Device + InventoryRunner (pipeline)
   security/                 # security assessment
-  topology/                 # builder + export topologia
+  topology/                 # builder (NetworkX), correlation (fisica), diff, export
   database/                 # persistenza SQLite
   events/                   # confronto snapshot -> eventi
   reports/                  # writer JSON/CSV/HTML
@@ -236,7 +252,8 @@ network_inventory/
   static/                   # librerie JS vendorizzate (vis-network, Chart.js)
   signatures/               # firme banner/prodotti
   utils/                    # config, network, OUI, logger
-scripts/                    # install.sh / install.ps1
+scripts/                    # install.*, topology_probe, snmp_topology_dump, physical_map
+Dockerfile, docker-compose*.yml
 tests/                      # suite pytest
 requirements.txt
 ```
