@@ -6,6 +6,11 @@ e procede per **sprint** allineati alla `docs/ROADMAP.md`.
 
 ## [Unreleased]
 
+### Fixed
+- mDNS: una sola browse per scansione invece di una per device — evita il crash
+  `zeroconf` `close()` `TimeoutError` su reti con molti host (`scan_mdns_network`,
+  `close()` best-effort). PR #11.
+
 ### Changed
 - Pulizia documentazione: spostati in `docs/archive/` i documenti storici di
   Milestone 1 ed enterprise (incluso `PROJECT_SNAPSHOT.md`); prompt sorgente
