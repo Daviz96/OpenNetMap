@@ -19,7 +19,7 @@ from network_inventory.fingerprint.classifier import classify_with_details
 from network_inventory.fingerprint.services import fingerprint_services
 from network_inventory.inventory.device import Device
 from network_inventory.scanner.arp_scanner import scan_subnet
-from network_inventory.scanner.mdns_scanner import scan_mdns
+from network_inventory.scanner.mdns_scanner import scan_mdns_network
 from network_inventory.scanner.netbios_scanner import scan_netbios
 from network_inventory.scanner.port_scanner import scan_ports
 from network_inventory.scanner.snmp_scanner import scan_snmp
@@ -39,6 +39,7 @@ class InventoryRunner:
     def __init__(self, config: ScanConfig) -> None:
         self.config = config
         self.oui = OuiDatabase()
+        self._mdns: dict[str, dict[str, object]] = {}
 
     def run(self) -> tuple[list[Device], dict[str, object]]:
         """Discover and fingerprint devices."""
@@ -69,6 +70,10 @@ class InventoryRunner:
         for device in devices:
             _mark_discovery(device)
         LOGGER.info("Discovered %d active host(s)", len(devices))
+
+        # Una sola browse mDNS per l'intera scansione (broadcast), distribuita
+        # poi per IP: evita di creare un'istanza Zeroconf per ogni host.
+        self._mdns = scan_mdns_network(max(self.config.timeout, 2.0))
 
         with Progress(
             SpinnerColumn(),
@@ -111,8 +116,8 @@ class InventoryRunner:
                 timeout=self.config.timeout,
                 communities=self.config.snmp_communities,
             )
-        if {5353, 80, 443} & set(device.open_ports):
-            device.mdns_info = scan_mdns(device.ip, timeout=self.config.timeout)
+        if device.ip in self._mdns:
+            device.mdns_info = self._mdns[device.ip]
         if {137, 139, 445} & set(device.open_ports):
             device.netbios_info = scan_netbios(
                 device.ip, timeout=max(self.config.timeout, 2.0)
