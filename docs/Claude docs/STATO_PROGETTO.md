@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `main` (pulito — Sprint 1-7 tutti mergiati, PR #2..#10)  
+**Branch attivo:** `sprint/8-topology-physical` (Sprint 1-7 mergiati; Sprint 8 implementato, PR da aprire)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -121,7 +121,8 @@ OpenNetMap/
 | CLI con argparse | ✅ Completo |
 | Rate limiting POST /scan | ✅ (1 job globale) |
 | Topologia logica avanzata (inferenza ruoli L2, change events) | ✅ Sprint 7 |
-| Topologia fisica L3 (porta-switch, LLDP/CDP) | ❌ Pianificato Sprint 8 (richiede switch managed) |
+| Topologia fisica L3 cablata (endpoint→switch/porta via SNMP) | ✅ Sprint 8 (Q-BRIDGE FDB + correlation `CONNECTED_ON_PORT`) |
+| Topologia wireless (client→AP) | ❌ Follow-up (Central Management/VigorACS) |
 | VLAN discovery | ❌ Non implementato |
 | LLDP / CDP discovery | ❌ Non implementato |
 | Notifiche (email, Slack, webhook) | ❌ Non implementato |
@@ -149,14 +150,17 @@ OpenNetMap/
 | Sprint 5 — Dashboard e UX | `sprint/5-dashboard` (PR #7 merged) | 135 test, coverage 70.24% |
 | Sprint 6 — Deployment Docker | `sprint/6-docker` (PR #9 merged) | 137 test, coverage 70.24% |
 | Sprint 7 — Topology Engine (logico) | `sprint/7-topology` (PR #10 merged) | 140 test, coverage 72.12% |
+| Sprint 8 — Topology Engine fisico L3 | `sprint/8-topology-physical` (PR da aprire) | 151 test, coverage ~69.5% |
 
 ---
 
-## Prossimi sprint
+## Prossimi sprint / follow-up
 
-| Sprint | Obiettivo | Task principali |
-|---|---|---|
-| Sprint 8 | Topology Engine (fisico L3) | SNMP BRIDGE/Q-BRIDGE/LLDP-MIB, CDP, `CONNECTED_ON_PORT` (richiede switch managed) |
+| Tema | Task principali |
+|---|---|
+| Wireless client→AP | Central Management del router DrayTek / VigorACS (SNMP non basta) |
+| Gerarchia switch↔AP | LLDP/CDP (sui DrayTek era assente nei test) |
+| Rifinitura visualizzazione | Topologia fisica: raggruppamento per switch, spaziatura |
 
 ---
 

@@ -130,23 +130,29 @@ nella pipeline lo scaffolding `topology/`. **Riferimento:** `docs/prompts/topolo
 
 **Risultati:** black ✅ | ruff ✅ | mypy ✅ (64 file) | pytest 140/140 ✅ | coverage 72.12% ✅
 
-## Sprint 8 — Topology Engine: topologia fisica L3 (M4 + M6, parte 2)
+## Sprint 8 — Topology Engine: topologia fisica L3 cablata (M4 + M6, parte 2)
+**Eseguito:** 2026-06-26 | **Branch:** `sprint/8-topology-physical` | Validato su rete reale DrayTek.
 
-Obiettivo: ricostruire la topologia **fisica** (porta-switch ↔ device). **Richiede
-hardware gestito**: switch con SNMP abilitato e/o LLDP/CDP. Implementare con
-**degradazione graceful** (se i dati non sono disponibili, il L3 resta vuoto senza errori).
+Obiettivo: ricostruire la topologia **fisica cablata** (endpoint → switch/porta). Degradazione
+graceful (apparati muti saltati senza errori).
 
-- [ ] **Modello `Interface`** (device_id, name, index, mac, speed, status, vlan).
-- [ ] **SNMP avanzato** — walk di IF-MIB, BRIDGE-MIB, Q-BRIDGE-MIB (MAC/forwarding table,
-      VLAN), LLDP-MIB; recupero interfacce e management IP.
-- [ ] **LLDP / Cisco CDP** — neighbor discovery (local/remote port, remote hostname,
-      management IP, capabilities).
-- [ ] **Correlation engine completo** — Switch Port → MAC → IP → Device; relazione
-      `CONNECTED_ON_PORT` e `LAYER2_NEIGHBOR` con confidence (LLDP=100, SNMP=95, ARP=50).
-- [ ] **Performance** — cache e ricostruzione incrementale (aggiornare solo le parti
-      modificate del grafo); concorrenza sui walk SNMP.
-- [ ] **Nota di realtà** — su LAN domestiche/SOHO con switch non gestiti il L3 sarà
-      vuoto: documentarlo. Testare con mock SNMP/LLDP, non richiedere hardware nei test.
+- [x] **Fix `snmp_scanner.py`** — portato a pysnmp 7.x (API asyncio); prima `scan_snmp` ritornava sempre `{}`.
+- [x] **`scanner/snmp_topology.py`** — collector SNMP: `dot1qTpFdbPort` (MAC→porta) tradotto in nomi porta (`dot1dBasePortIfIndex`→`ifName`), `ipNetToMediaPhysAddress` (ARP); poll **parallelo** (`asyncio.gather`).
+- [x] **`topology/correlation.py`** — `correlate_physical()` (euristica "fewest companions" = porta di accesso); `select_snmp_targets()` (auto-detect per tipo/**vendor** DrayTek/Cisco/... + espliciti); `_reclassify_from_snmp()` (device_type da sysDescr).
+- [x] **`build_graph`** — archi **`CONNECTED_ON_PORT`** (endpoint→switch, metadata porta/VLAN, confidence 95).
+- [x] **Pipeline + CLI** — `--snmp-topology` / `--snmp-topology-hosts` (+ env); `ScanConfig.snmp_topology*`.
+- [x] **Dashboard** — viste **Logica/Fisica** separate, layout gerarchico, etichette in tooltip.
+- [x] **Script** — `topology_probe.py`, `snmp_topology_dump.py`, `physical_map.py` (diagnostica su rete reale).
+- [x] **Test** — `test_snmp_topology.py`, `test_correlation.py` (correlation, target, reclassify), `CONNECTED_ON_PORT`.
+
+**Risultati:** black ✅ | ruff ✅ | mypy ✅ | pytest 151/151 ✅ | coverage ~69.5% ✅
+**Validazione reale:** 281 attacchi fisici su rete DrayTek (3 switch SNMP).
+
+### Follow-up (backlog)
+- [ ] **Wireless client→AP** dal Central Management del router / VigorACS (SNMP non basta).
+- [ ] **LLDP/CDP** per gerarchia switch↔switch↔AP (sui DrayTek LLDP era assente nei test).
+- [ ] **Rifinitura visualizzazione** topologia fisica (raggruppamento per switch, spaziatura).
+- [ ] Modello `Interface` dedicato; cache/ricostruzione incrementale.
 
 ---
 

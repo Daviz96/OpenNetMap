@@ -101,6 +101,30 @@ def test_build_topology_includes_gateway_and_vlan():
     assert any(edge["relationship"] == "MEMBER_OF_VLAN" for edge in edges)
 
 
+def test_build_topology_adds_connected_on_port():
+    switch = Device(ip="10.0.0.1", mac="aa:bb:cc:dd:ee:01", device_type="switch")
+    endpoint = Device(ip="10.0.0.50", mac="aa:bb:cc:dd:ee:50", hostname="pc")
+    stats: dict[str, object] = {
+        "subnet": "10.0.0.0/24",
+        "physical_links": [
+            {
+                "mac": "aa:bb:cc:dd:ee:50",
+                "switch_host": "10.0.0.1",
+                "port": "Gi5",
+                "vlan": 1,
+            }
+        ],
+    }
+    topology = build_topology([switch, endpoint], stats)
+    edges = topology["edges"]
+    assert isinstance(edges, list)
+    port_edges = [e for e in edges if e["relationship"] == "CONNECTED_ON_PORT"]
+    assert len(port_edges) == 1
+    assert port_edges[0]["source"] == "aa:bb:cc:dd:ee:50|10.0.0.50"
+    assert port_edges[0]["target"] == "aa:bb:cc:dd:ee:01|10.0.0.1"
+    assert port_edges[0]["metadata"]["port"] == "Gi5"
+
+
 def test_diff_topology_detects_added_and_removed():
     previous: dict[str, object] = {
         "nodes": [{"id": "network", "label": "network", "type": "network"}],

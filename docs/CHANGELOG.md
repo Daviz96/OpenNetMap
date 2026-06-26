@@ -21,6 +21,23 @@ e procede per **sprint** allineati alla `docs/ROADMAP.md`.
 
 ---
 
+## Sprint 8 — Topology Engine fisico L3 (cablato) — 2026-06-26
+
+### Added
+- `scanner/snmp_topology.py`: collector SNMP (pysnmp 7.x asyncio) della forwarding table `dot1qTpFdbPort` (MAC→porta, con nomi porta) e della tabella ARP; poll parallelo di più switch.
+- `topology/correlation.py`: correlazione endpoint→switch/porta ("fewest companions"), selezione target auto (tipo + vendor di rete) + espliciti, riclassificazione via sysDescr SNMP.
+- Archi `CONNECTED_ON_PORT` nella topologia (metadata porta/VLAN); CLI `--snmp-topology` / `--snmp-topology-hosts` (+ env).
+- Dashboard topologia: viste **Logica/Fisica** separate (fisica = albero gerarchico switch→porta→endpoint), etichette archi nel tooltip.
+- Script diagnostici: `topology_probe.py`, `snmp_topology_dump.py`, `physical_map.py`.
+
+### Fixed
+- `scanner/snmp_scanner.py` portato a pysnmp 7.x (asyncio): prima `scan_snmp` ritornava sempre `{}`.
+
+### Tests
+- 151 test, coverage ~69.5%. Validato su rete reale DrayTek (281 attacchi fisici).
+
+---
+
 ## Sprint 7 — Topology Engine (logico) — 2026-06-25
 
 ### Added

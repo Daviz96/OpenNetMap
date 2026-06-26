@@ -25,6 +25,7 @@ from network_inventory.scanner.port_scanner import scan_ports
 from network_inventory.scanner.snmp_scanner import scan_snmp
 from network_inventory.scanner.ssdp_scanner import scan_ssdp
 from network_inventory.security.assessment import assess_device
+from network_inventory.topology.correlation import collect_physical_links, link_to_dict
 from network_inventory.utils.config import ScanConfig
 from network_inventory.utils.logger import get_logger
 from network_inventory.utils.network import detect_local_network, subnet_stats
@@ -95,6 +96,18 @@ class InventoryRunner:
 
         stats = subnet_stats(subnet, len(devices))
         stats["started_at"] = datetime.now(UTC).replace(microsecond=0).isoformat()
+
+        if self.config.snmp_topology:
+            LOGGER.info("Raccolta topologia fisica via SNMP (switch/router)...")
+            links = collect_physical_links(
+                devices,
+                self.config.snmp_communities,
+                self.config.snmp_topology_hosts,
+                max(self.config.timeout, 2.0),
+            )
+            stats["physical_links"] = [link_to_dict(link) for link in links]
+            LOGGER.info("Attacchi fisici rilevati: %d", len(links))
+
         return devices, stats
 
     def _fingerprint_device(self, device: Device) -> Device:

@@ -43,3 +43,8 @@ class ScanConfig:
     verbose: bool = False
     report_formats: list[str] = field(default_factory=lambda: ["json"])
     output_dir: str = "reports_output"
+    # Topologia fisica (Sprint 8): interroga switch/router via SNMP per la
+    # mappa MAC→porta. snmp_topology_hosts aggiunge target espliciti a quelli
+    # auto-rilevati (switch/router con porta 161 aperta).
+    snmp_topology: bool = False
+    snmp_topology_hosts: list[str] = field(default_factory=list)

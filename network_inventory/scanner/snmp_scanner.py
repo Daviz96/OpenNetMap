@@ -1,6 +1,8 @@
-"""SNMP scanner."""
+"""SNMP scanner (pysnmp 7.x, asyncio API)."""
 
 from __future__ import annotations
+
+import asyncio
 
 from network_inventory.utils.config import SNMP_COMMUNITIES
 
@@ -17,33 +19,45 @@ def scan_snmp(
     """Try SNMP community strings and return basic system info.
 
     *communities* overrides the module-level default list when provided.
+    Best-effort: restituisce ``{}`` su qualsiasi errore (SNMP assente/timeout).
     """
+    comms = communities if communities is not None else SNMP_COMMUNITIES
     try:
-        from pysnmp.hlapi import (
+        return asyncio.run(_scan(ip, timeout, comms))
+    except Exception:
+        return {}
+
+
+async def _scan(ip: str, timeout: float, communities: list[str]) -> dict[str, object]:
+    try:
+        from pysnmp.hlapi.asyncio import (
             CommunityData,
             ContextData,
             ObjectIdentity,
             ObjectType,
             SnmpEngine,
             UdpTransportTarget,
-            getCmd,
+            get_cmd,
         )
     except ImportError:
         return {}
 
-    for community in communities if communities is not None else SNMP_COMMUNITIES:
+    engine = SnmpEngine()
+    for community in communities:
         result: dict[str, object] = {"community": community}
         success = False
         for key, oid in OIDS.items():
-            iterator = getCmd(
-                SnmpEngine(),
-                CommunityData(community, mpModel=0),
-                UdpTransportTarget((ip, 161), timeout=timeout, retries=0),
+            target = await UdpTransportTarget.create(
+                (ip, 161), timeout=timeout, retries=0
+            )
+            err_ind, err_stat, _, var_binds = await get_cmd(
+                engine,
+                CommunityData(community, mpModel=1),  # SNMPv2c
+                target,
                 ContextData(),
                 ObjectType(ObjectIdentity(oid)),
             )
-            error_indication, error_status, _, var_binds = next(iterator)
-            if error_indication or error_status:
+            if err_ind or err_stat:
                 continue
             for _, value in var_binds:
                 result[key] = str(value)

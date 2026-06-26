@@ -142,6 +142,7 @@ def build_graph(
             )
 
     _add_vlan_topology(graph, devices)
+    _add_physical_links(graph, devices, stats)
     return graph
 
 
@@ -202,6 +203,40 @@ def _add_vlan_topology(graph: nx.DiGraph, devices: list[Device]) -> None:
                         discovery_method=_edge_discovery_method(device),
                     ),
                 )
+
+
+def _add_physical_links(
+    graph: nx.DiGraph, devices: list[Device], stats: dict[str, object]
+) -> None:
+    """Aggiunge gli archi CONNECTED_ON_PORT (endpoint → switch:porta) da SNMP."""
+    physical = stats.get("physical_links")
+    if not isinstance(physical, list):
+        return
+    by_mac = {
+        (device.mac or "").replace("-", ":").lower(): _build_device_id(device)
+        for device in devices
+        if device.mac
+    }
+    by_ip = {device.ip: _build_device_id(device) for device in devices if device.ip}
+    for item in physical:
+        if not isinstance(item, dict):
+            continue
+        mac = str(item.get("mac") or "").replace("-", ":").lower()
+        endpoint = by_mac.get(mac)
+        switch_node = by_ip.get(str(item.get("switch_host") or ""))
+        if not endpoint or not switch_node or endpoint == switch_node:
+            continue
+        _add_link(
+            graph,
+            TopologyLink(
+                source=endpoint,
+                target=switch_node,
+                relationship="CONNECTED_ON_PORT",
+                confidence=95,
+                discovery_method="snmp",
+                metadata={"port": item.get("port"), "vlan": item.get("vlan")},
+            ),
+        )
 
 
 def _build_device_node(device: Device) -> TopologyNode:

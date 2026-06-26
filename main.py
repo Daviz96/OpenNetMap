@@ -60,6 +60,10 @@ def main(argv: list[str] | None = None) -> int:
         verbose=args.verbose,
         report_formats=args.report,
         output_dir=args.output_dir,
+        snmp_topology=args.snmp_topology,
+        snmp_topology_hosts=[
+            h.strip() for h in args.snmp_topology_hosts.split(",") if h.strip()
+        ],
     )
 
     try:
@@ -107,6 +111,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--snmp",
         action="store_true",
         help="Forza scansione SNMP anche se la porta 161 non risulta aperta",
+    )
+    parser.add_argument(
+        "--snmp-topology",
+        action="store_true",
+        help="Mappa fisica: interroga switch/router via SNMP (MAC->porta)",
+    )
+    parser.add_argument(
+        "--snmp-topology-hosts",
+        default=os.environ.get("OPENNETMAP_SNMP_TOPOLOGY_HOSTS", ""),
+        help="IP switch/router extra da interrogare, separati da virgola (env OPENNETMAP_SNMP_TOPOLOGY_HOSTS)",
     )
     parser.add_argument("--verbose", action="store_true", help="Logging dettagliato")
     parser.add_argument(
