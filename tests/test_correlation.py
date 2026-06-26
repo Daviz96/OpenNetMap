@@ -1,6 +1,7 @@
 from network_inventory.inventory.device import Device
 from network_inventory.scanner.snmp_topology import FdbEntry, SwitchTopology
 from network_inventory.topology.correlation import (
+    _reclassify_from_snmp,
     access_links,
     correlate_physical,
     select_snmp_targets,
@@ -78,3 +79,34 @@ def test_select_snmp_targets_auto_and_explicit():
     assert "10.0.0.1" in targets  # auto: switch con 161
     assert "10.0.0.50" not in targets  # host senza 161
     assert "10.0.0.60" not in targets  # stampante con 161 ma non apparato di rete
+
+
+def test_select_snmp_targets_by_vendor_draytek():
+    # DrayTek classificato come "Server" ma vendor di rete → incluso.
+    draytek = Device(
+        ip="10.0.0.5",
+        mac="14:49:bc:00:00:01",
+        device_type="Server",
+        vendor="DrayTek Corp.",
+    )
+    camera = Device(
+        ip="10.0.0.6",
+        mac="aa:00:00:00:00:06",
+        device_type="Telecamera IP",
+        vendor="Hikvision",
+    )
+    targets = select_snmp_targets([draytek, camera], [])
+    assert "10.0.0.5" in targets
+    assert "10.0.0.6" not in targets
+
+
+def test_reclassify_from_snmp_uses_sysdescr():
+    switch = Device(ip="10.0.0.1", mac="aa:00:00:00:00:01", device_type="Server")
+    router = Device(ip="10.0.0.2", mac="aa:00:00:00:00:02", device_type="Server")
+    topos = [
+        SwitchTopology(host="10.0.0.1", sys_descr="DrayTek 12-Port L2+ Switch"),
+        SwitchTopology(host="10.0.0.2", sys_descr="Router Model: Vigor2962"),
+    ]
+    _reclassify_from_snmp([switch, router], topos)
+    assert switch.device_type == "Switch"
+    assert router.device_type == "Router"

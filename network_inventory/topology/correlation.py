@@ -15,10 +15,40 @@ from dataclasses import dataclass
 from network_inventory.inventory.device import Device
 from network_inventory.scanner.snmp_topology import (
     SwitchTopology,
-    collect_switch_topology,
+    collect_switch_topologies,
 )
 
-_INFRA_KEYWORDS = ("switch", "router", "firewall", "gateway")
+# Tipi/vendor indicativi di apparati di rete (switch/router/AP) da interrogare.
+_INFRA_KEYWORDS = ("switch", "router", "firewall", "gateway", "access point")
+_INFRA_VENDORS = (
+    "draytek",
+    "cisco",
+    "aruba",
+    "hpe",
+    "netgear",
+    "mikrotik",
+    "ubiquiti",
+    "tp-link",
+    "tplink",
+    "zyxel",
+    "juniper",
+)
+# Tipi chiaramente "endpoint": esclusi dall'auto-detect anche se il vendor combacia.
+_ENDPOINT_KEYWORDS = (
+    "stampante",
+    "printer",
+    "telecamera",
+    "camera",
+    "pc ",
+    "windows",
+    "linux",
+    "mac",
+    "nas",
+    "iot",
+    "smartphone",
+    "tablet",
+    "tv",
+)
 
 
 @dataclass(slots=True)
@@ -87,11 +117,24 @@ def access_links(
 
 
 def select_snmp_targets(devices: list[Device], explicit_hosts: list[str]) -> list[str]:
-    """Switch/router da interrogare: host espliciti + auto-detect (161 + tipo rete)."""
+    """Switch/router/AP da interrogare: host espliciti + auto-detect.
+
+    Auto-detect: apparati con tipo di rete (switch/router/...) e porta 161 aperta,
+    **oppure** con vendor di apparati di rete (DrayTek, Cisco, ...), esclusi i tipi
+    chiaramente endpoint (stampanti, telecamere, PC...).
+    """
     targets: list[str] = list(explicit_hosts)
     for device in devices:
         device_type = (device.device_type or "").lower()
-        if 161 in device.open_ports and any(k in device_type for k in _INFRA_KEYWORDS):
+        vendor = (device.vendor or device.manufacturer or "").lower()
+        is_endpoint = any(k in device_type for k in _ENDPOINT_KEYWORDS)
+        if is_endpoint:
+            continue
+        by_type = 161 in device.open_ports and any(
+            k in device_type for k in _INFRA_KEYWORDS
+        )
+        by_vendor = any(v in vendor for v in _INFRA_VENDORS)
+        if by_type or by_vendor:
             targets.append(device.ip)
     seen: set[str] = set()
     ordered: list[str] = []
@@ -110,12 +153,28 @@ def collect_physical_links(
 ) -> list[PhysicalLink]:
     """Interroga gli switch (auto+espliciti) e correla in attacchi fisici."""
     targets = select_snmp_targets(devices, explicit_hosts or [])
-    switches: list[SwitchTopology] = []
-    for host in targets:
-        topo = collect_switch_topology(host, communities, timeout)
-        if topo is not None and topo.fdb:
-            switches.append(topo)
+    topologies = collect_switch_topologies(targets, communities, timeout)
+    _reclassify_from_snmp(devices, topologies)
+    switches = [topo for topo in topologies if topo.fdb]
     return correlate_physical(switches, devices)
+
+
+def _reclassify_from_snmp(
+    devices: list[Device], topologies: list[SwitchTopology]
+) -> None:
+    """Corregge device_type degli apparati interrogati usando la sysDescr SNMP."""
+    by_ip = {topo.host: topo for topo in topologies if topo.sys_descr}
+    for device in devices:
+        topo = by_ip.get(device.ip)
+        if topo is None or not topo.sys_descr:
+            continue
+        descr = topo.sys_descr.lower()
+        if "switch" in descr:
+            device.device_type = "Switch"
+        elif "access point" in descr or "vigorap" in descr:
+            device.device_type = "Access Point"
+        elif "router" in descr or "vigor2" in descr or "vigor3" in descr:
+            device.device_type = "Router"
 
 
 def link_to_dict(link: PhysicalLink) -> dict[str, object]:

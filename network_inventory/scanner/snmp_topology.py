@@ -78,6 +78,28 @@ def collect_arp(
         return {}
 
 
+def collect_switch_topologies(
+    hosts: list[str], communities: list[str], timeout: float = 2.0
+) -> list[SwitchTopology]:
+    """Interroga più switch **in parallelo** (un solo event loop). Salta i muti."""
+    if not hosts:
+        return []
+    try:
+        return asyncio.run(_collect_switches(hosts, communities, timeout))
+    except Exception:
+        return []
+
+
+async def _collect_switches(
+    hosts: list[str], communities: list[str], timeout: float
+) -> list[SwitchTopology]:
+    results = await asyncio.gather(
+        *[_collect_switch(host, communities, timeout) for host in hosts],
+        return_exceptions=True,
+    )
+    return [r for r in results if isinstance(r, SwitchTopology)]
+
+
 async def _get(engine, community, host, timeout, oid):
     from pysnmp.hlapi.asyncio import (
         CommunityData,
