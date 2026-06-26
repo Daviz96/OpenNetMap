@@ -1,6 +1,6 @@
 # Stato del Progetto — OpenNetMap
 **Data riepilogo:** 2026-06-25  
-**Branch attivo:** `sprint/8-topology-physical` (Sprint 1-7 mergiati; Sprint 8 implementato, PR da aprire)  
+**Branch attivo:** `main` (pulito — Sprint 1-8 tutti mergiati, PR #2..#12)  
 **Versione:** 0.1.0 (Alpha)
 
 ---
@@ -150,7 +150,7 @@ OpenNetMap/
 | Sprint 5 — Dashboard e UX | `sprint/5-dashboard` (PR #7 merged) | 135 test, coverage 70.24% |
 | Sprint 6 — Deployment Docker | `sprint/6-docker` (PR #9 merged) | 137 test, coverage 70.24% |
 | Sprint 7 — Topology Engine (logico) | `sprint/7-topology` (PR #10 merged) | 140 test, coverage 72.12% |
-| Sprint 8 — Topology Engine fisico L3 | `sprint/8-topology-physical` (PR da aprire) | 151 test, coverage ~69.5% |
+| Sprint 8 — Topology Engine fisico L3 | `sprint/8-topology-physical` (PR #12 merged) | 151 test, coverage ~69.5% |
 
 ---
 

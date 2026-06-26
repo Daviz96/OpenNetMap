@@ -9,18 +9,17 @@
 **Progetto:** OpenNetMap — tool Python per network discovery e inventory LAN  
 **Versione:** 0.1.0 (Alpha)  
 **Branch principale:** `main`  
-**Branch di lavoro attivo:** `sprint/8-topology-physical` (implementato e validato su rete reale, PR da aprire)
+**Branch di lavoro attivo:** nessuno — `main` pulito, Sprint 1-8 tutti mergiati (ultima PR #12)
 
 ---
 
 ## Struttura branch Git
 
 ```
-main  (Sprint 1-7 integrati — PR #2..#10)
-└── sprint/8-topology-physical  (Sprint 8 implementato e committato; PR NON ancora aperta)
+main  (Sprint 1-8 integrati — PR #2..#12)
 ```
 
-**Azione immediata suggerita:** aprire PR da `sprint/8-topology-physical` → `main`.
+**Azione immediata suggerita:** scegliere un follow-up (wireless client→AP via Central Management/VigorACS, LLDP/CDP, rifinitura visualizzazione topologia fisica) o un altro tema.
 
 > ⚠️ **Per riprendere da un'altra postazione:** leggi `docs/Claude docs/CONTESTO_PROGETTO.md` — contiene il contesto completo (memorie + stato) che NON è nel repo (le memorie auto sono locali alla macchina).
 
