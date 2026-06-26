@@ -28,6 +28,7 @@ OIDS_SCALAR = {
 # OID chiave per la mappa fisica endpoint → switch/porta.
 OIDS_TABLE = {
     "IF-MIB ifDescr (interfacce)": "1.3.6.1.2.1.2.2.1.2",
+    "IP-MIB ipNetToMediaPhysAddress (ARP MAC<->IP)": "1.3.6.1.2.1.4.22.1.2",
     "BRIDGE-MIB dot1dTpFdbPort (MAC->porta)": "1.3.6.1.2.1.17.4.3.1.2",
     "Q-BRIDGE dot1qTpFdbPort (MAC->porta/VLAN)": "1.3.6.1.2.1.17.7.1.2.2.1.2",
     "LLDP-MIB lldpRemSysName (vicini)": "1.0.8802.1.1.2.1.4.1.1.9",
@@ -125,15 +126,20 @@ async def probe(host: str, communities: list[str], timeout: float) -> None:
     print("\nVerdetto:")
     has_fdb = any("FdbPort" in k and v for k, v in available.items())
     has_lldp = any("lldp" in k.lower() and v for k, v in available.items())
+    has_arp = any("ipNetToMedia" in k and v for k, v in available.items())
     print(
         "  - MAC->porta: "
         + ("OK → mappa cablato endpoint->switch fattibile" if has_fdb else "assente")
     )
     print(
+        "  - ARP (MAC<->IP): "
+        + ("OK → correlazione MAC↔IP da questo apparato" if has_arp else "assente")
+    )
+    print(
         "  - LLDP: "
         + ("OK → gerarchia switch<->switch<->AP fattibile" if has_lldp else "assente")
     )
-    if not has_fdb and not has_lldp:
+    if not has_fdb and not has_lldp and not has_arp:
         print("  → Niente via SNMP standard: puntare su VigorACS / Central Management.")
 
 
