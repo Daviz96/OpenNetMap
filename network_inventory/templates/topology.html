@@ -4,13 +4,16 @@
 
 {% block content %}
   {% if topology.nodes %}
-  <p class="hint">{{ topology.nodes|length }} nodi · {{ topology.edges|length }} collegamenti. Trascina i nodi, zoom con la rotellina.</p>
+  <p class="hint">{{ topology.nodes|length }} nodi · {{ topology.edges|length }} collegamenti. Trascina i nodi, zoom con la rotellina, passa il mouse per i dettagli.</p>
   <div class="toolbar">
+    <select id="viewMode">
+      <option value="logica">Vista: Logica (stella)</option>
+      <option value="fisica">Vista: Fisica (cablato switch→porta)</option>
+    </select>
     <select id="filterType"><option value="">Tutti i tipi</option></select>
     <select id="filterVlan"><option value="">Tutte le VLAN</option></select>
-    <button type="button" id="toggleLayout">Layout: Fisico</button>
     <label class="hint" style="display:flex;align-items:center;gap:6px">
-      <input type="checkbox" id="physOnly"> Solo cablato fisico
+      <input type="checkbox" id="showLabels"> Etichette archi
     </label>
   </div>
   <p class="hint" id="legend"></p>
@@ -29,8 +32,7 @@
     network: "#1d4ed8", router: "#dc2626", switch: "#d97706", firewall: "#b91c1c",
     access_point: "#0891b2", host: "#2563eb", vlan: "#7c3aed", unknown: "#475569",
   };
-  // Stile archi per tipo di relazione.
-  function edgeStyle(rel) {
+  function edgeColor(rel) {
     switch (rel) {
       case "DEFAULT_GATEWAY":   return { color: "#f59e0b", width: 3 };
       case "UPLINK":
@@ -42,103 +44,121 @@
     }
   }
 
-  const nodes = new vis.DataSet((model.nodes || []).map(n => {
-    return {
-      id: n.id,
-      label: n.label || n.id,
-      level: typeof n.level === "number" ? n.level : 3,
-      title: [
-        n.type ? "Tipo: " + n.type : "",
-        n.ip ? "IP: " + n.ip : "",
-        n.vendor ? "Vendor: " + n.vendor : "",
-        n.vlan ? "VLAN: " + n.vlan : "",
-      ].filter(Boolean).join("\n"),
-      color: groupColors[n.type] || groupColors.unknown,
-      shape: (n.type === "network" || n.type === "vlan") ? "diamond" : "dot",
-      _type: n.type, _vlan: n.vlan || "",
-    };
-  }));
+  // Switch ed endpoint coinvolti nel cablato fisico (per la vista Fisica).
+  const physEdges = (model.edges || []).filter(e => e.relationship === "CONNECTED_ON_PORT");
+  const switchIds = new Set(physEdges.map(e => e.target));
+  const endpointIds = new Set(physEdges.map(e => e.source));
+
+  const nodes = new vis.DataSet((model.nodes || []).map(n => ({
+    id: n.id,
+    label: n.label || n.id,
+    title: [
+      n.type ? "Tipo: " + n.type : "",
+      n.ip ? "IP: " + n.ip : "",
+      n.vendor ? "Vendor: " + n.vendor : "",
+      n.vlan ? "VLAN: " + n.vlan : "",
+    ].filter(Boolean).join("\n"),
+    color: groupColors[n.type] || groupColors.unknown,
+    shape: (n.type === "network" || n.type === "vlan") ? "diamond" : "dot",
+    _type: n.type, _vlan: n.vlan || "",
+    _isSwitch: switchIds.has(n.id), _isEndpoint: endpointIds.has(n.id),
+  })));
+
   const edges = new vis.DataSet((model.edges || []).map((e, i) => {
-    const st = edgeStyle(e.relationship);
-    // Sui collegamenti fisici mostra la porta dello switch invece del nome relazione.
-    let label = e.relationship || "";
-    if (e.relationship === "CONNECTED_ON_PORT") {
-      const port = e.metadata && e.metadata.port ? e.metadata.port : "porta";
-      const vlan = e.metadata && e.metadata.vlan ? " · VLAN " + e.metadata.vlan : "";
-      label = port + vlan;
+    const st = edgeColor(e.relationship);
+    let info = e.relationship || "";
+    if (e.relationship === "CONNECTED_ON_PORT" && e.metadata) {
+      info = "porta " + (e.metadata.port || "?") +
+             (e.metadata.vlan ? " · VLAN " + e.metadata.vlan : "");
     }
     return {
-      id: "e" + i, from: e.source, to: e.target, label: label,
+      id: "e" + i, from: e.source, to: e.target,
+      title: info, label: "",
       color: { color: st.color }, width: st.width, dashes: st.dashes || false,
       arrows: st.arrows || "", font: { color: "#9fb3c8", size: 10 },
       smooth: { type: "continuous" },
-      _from: e.source, _to: e.target, _rel: e.relationship || "",
+      _from: e.source, _to: e.target, _rel: e.relationship || "", _info: info,
     };
   }));
 
   const container = document.getElementById("topology");
   const network = new vis.Network(container, { nodes: nodes, edges: edges }, {
-    nodes: { font: { color: "#e5edf6" }, size: 16 },
-    physics: {
-      stabilization: { enabled: true, iterations: 300, fit: true },
-      barnesHut: { gravitationalConstant: -12000, springLength: 180, springConstant: 0.04, avoidOverlap: 0.6 },
-    },
-    interaction: { hover: true, tooltipDelay: 120, dragNodes: true },
+    nodes: { font: { color: "#e5edf6", size: 12 }, size: 14 },
+    interaction: { hover: true, tooltipDelay: 100, dragNodes: true },
   });
-  network.once("stabilizationIterationsDone", () => network.setOptions({ physics: false }));
 
-  // --- Legenda colori per tipo ---
+  const viewMode = document.getElementById("viewMode");
+  const filterType = document.getElementById("filterType");
+  const filterVlan = document.getElementById("filterVlan");
+  const showLabels = document.getElementById("showLabels");
+
+  // --- Legenda + filtri ---
   const types = [...new Set((model.nodes || []).map(n => n._type || n.type).filter(Boolean))];
   document.getElementById("legend").innerHTML = types.map(t =>
     `<span class="badge" style="background:${groupColors[t] || groupColors.unknown};color:#fff">${t}</span>`
   ).join(" ") + ` <span class="badge" style="background:#34d399;color:#062">— cablato fisico</span>`;
-
-  // --- Popola i filtri ---
-  const filterType = document.getElementById("filterType");
   types.sort().forEach(t => filterType.add(new Option(t, t)));
-  const vlans = [...new Set((model.nodes || []).map(n => n.vlan).filter(Boolean))].sort();
-  const filterVlan = document.getElementById("filterVlan");
-  vlans.forEach(v => filterVlan.add(new Option("VLAN " + v, v)));
-  const physOnly = document.getElementById("physOnly");
+  [...new Set((model.nodes || []).map(n => n.vlan).filter(Boolean))].sort()
+    .forEach(v => filterVlan.add(new Option("VLAN " + v, v)));
 
-  function applyFilters() {
-    const t = filterType.value, v = filterVlan.value, phys = physOnly.checked;
-    const hiddenIds = new Set();
-    nodes.forEach(n => {
-      const structural = n._type === "network" || n._type === "vlan";
-      let visible = structural;
-      if (!structural) {
-        visible = (!t || n._type === t) && (!v || n._vlan === v);
-      }
-      nodes.update({ id: n.id, hidden: !visible });
-      if (!visible) hiddenIds.add(n.id);
-    });
-    edges.forEach(e => {
-      let hidden = hiddenIds.has(e._from) || hiddenIds.has(e._to);
-      // "Solo cablato fisico": mostra unicamente gli archi CONNECTED_ON_PORT.
-      if (phys && e._rel !== "CONNECTED_ON_PORT") hidden = true;
-      edges.update({ id: e.id, hidden: hidden });
-    });
+  function freezeAfterStable() {
+    network.once("stabilizationIterationsDone", () => network.setOptions({ physics: false }));
   }
-  filterType.addEventListener("change", applyFilters);
-  filterVlan.addEventListener("change", applyFilters);
-  physOnly.addEventListener("change", applyFilters);
 
-  // --- Toggle layout fisico <-> gerarchico ---
-  let hierarchical = false;
-  document.getElementById("toggleLayout").addEventListener("click", (ev) => {
-    hierarchical = !hierarchical;
-    ev.target.textContent = "Layout: " + (hierarchical ? "Gerarchico" : "Fisico");
-    if (hierarchical) {
+  function render() {
+    const mode = viewMode.value, t = filterType.value, v = filterVlan.value;
+
+    // Nodi visibili + livelli (per la gerarchia in vista Fisica).
+    const hidden = new Set();
+    nodes.forEach(n => {
+      let visible;
+      let level = undefined;
+      if (mode === "fisica") {
+        // Solo switch (in alto) ed endpoint cablati (sotto).
+        visible = n._isSwitch || n._isEndpoint;
+        level = n._isSwitch ? 0 : 1;
+      } else {
+        // Logica: tutto tranne nulla; le ancore restano sempre.
+        const structural = n._type === "network" || n._type === "vlan";
+        visible = structural || ((!t || n._type === t) && (!v || n._vlan === v));
+      }
+      if (mode === "fisica" && visible) {
+        visible = (!t || n._type === t || n._isSwitch) && (!v || n._vlan === v || n._isSwitch);
+      }
+      nodes.update({ id: n.id, hidden: !visible, level: level });
+      if (!visible) hidden.add(n.id);
+    });
+
+    // Archi visibili in base alla vista.
+    edges.forEach(e => {
+      const wantRel = mode === "fisica"
+        ? e._rel === "CONNECTED_ON_PORT"
+        : e._rel !== "CONNECTED_ON_PORT";
+      const vis_ = wantRel && !hidden.has(e._from) && !hidden.has(e._to);
+      edges.update({ id: e.id, hidden: !vis_, label: showLabels.checked ? e._info : "" });
+    });
+
+    // Layout: Fisica = gerarchico (switch→endpoint), Logica = force-directed.
+    if (mode === "fisica") {
       network.setOptions({
-        layout: { hierarchical: { enabled: true, direction: "UD", sortMethod: "directed", levelSeparation: 130, nodeSpacing: 140 } },
+        layout: { hierarchical: { enabled: true, direction: "UD", sortMethod: "directed", levelSeparation: 160, nodeSpacing: 18, treeSpacing: 40 } },
         physics: false,
       });
     } else {
-      network.setOptions({ layout: { hierarchical: { enabled: false } }, physics: { enabled: true } });
-      network.once("stabilizationIterationsDone", () => network.setOptions({ physics: false }));
+      network.setOptions({
+        layout: { hierarchical: { enabled: false } },
+        physics: { enabled: true, stabilization: { iterations: 250, fit: true },
+                   barnesHut: { gravitationalConstant: -12000, springLength: 180, avoidOverlap: 0.6 } },
+      });
+      freezeAfterStable();
     }
-  });
+  }
+
+  viewMode.addEventListener("change", render);
+  filterType.addEventListener("change", render);
+  filterVlan.addEventListener("change", render);
+  showLabels.addEventListener("change", render);
+  render();
 </script>
 {% endif %}
 {% endblock %}
