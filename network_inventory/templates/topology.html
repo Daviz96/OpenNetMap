@@ -9,6 +9,9 @@
     <select id="filterType"><option value="">Tutti i tipi</option></select>
     <select id="filterVlan"><option value="">Tutte le VLAN</option></select>
     <button type="button" id="toggleLayout">Layout: Fisico</button>
+    <label class="hint" style="display:flex;align-items:center;gap:6px">
+      <input type="checkbox" id="physOnly"> Solo cablato fisico
+    </label>
   </div>
   <p class="hint" id="legend"></p>
   <div id="topology"></div>
@@ -26,15 +29,16 @@
     network: "#1d4ed8", router: "#dc2626", switch: "#d97706", firewall: "#b91c1c",
     access_point: "#0891b2", host: "#2563eb", vlan: "#7c3aed", unknown: "#475569",
   };
-  // Stile archi per tipo di relazione (uplink/downlink evidenziati, VLAN tratteggiato).
+  // Stile archi per tipo di relazione.
   function edgeStyle(rel) {
     switch (rel) {
-      case "DEFAULT_GATEWAY": return { color: "#f59e0b", width: 3 };
+      case "DEFAULT_GATEWAY":   return { color: "#f59e0b", width: 3 };
       case "UPLINK":
-      case "DOWNLINK":        return { color: "#22d3ee", width: 2, arrows: "to" };
-      case "MEMBER_OF_VLAN":  return { color: "#a78bfa", width: 1, dashes: true };
-      case "LAYER3_NEIGHBOR": return { color: "#64748b", width: 1, dashes: true };
-      default:                return { color: "#3b4a60", width: 1 };
+      case "DOWNLINK":          return { color: "#22d3ee", width: 2, arrows: "to" };
+      case "CONNECTED_ON_PORT": return { color: "#34d399", width: 2, arrows: "to" };
+      case "MEMBER_OF_VLAN":    return { color: "#a78bfa", width: 1, dashes: true };
+      case "LAYER3_NEIGHBOR":   return { color: "#64748b", width: 1, dashes: true };
+      default:                  return { color: "#3b4a60", width: 1 };
     }
   }
 
@@ -56,11 +60,19 @@
   }));
   const edges = new vis.DataSet((model.edges || []).map((e, i) => {
     const st = edgeStyle(e.relationship);
+    // Sui collegamenti fisici mostra la porta dello switch invece del nome relazione.
+    let label = e.relationship || "";
+    if (e.relationship === "CONNECTED_ON_PORT") {
+      const port = e.metadata && e.metadata.port ? e.metadata.port : "porta";
+      const vlan = e.metadata && e.metadata.vlan ? " · VLAN " + e.metadata.vlan : "";
+      label = port + vlan;
+    }
     return {
-      id: "e" + i, from: e.source, to: e.target, label: e.relationship || "",
+      id: "e" + i, from: e.source, to: e.target, label: label,
       color: { color: st.color }, width: st.width, dashes: st.dashes || false,
       arrows: st.arrows || "", font: { color: "#9fb3c8", size: 10 },
-      smooth: { type: "continuous" }, _from: e.source, _to: e.target,
+      smooth: { type: "continuous" },
+      _from: e.source, _to: e.target, _rel: e.relationship || "",
     };
   }));
 
@@ -79,7 +91,7 @@
   const types = [...new Set((model.nodes || []).map(n => n._type || n.type).filter(Boolean))];
   document.getElementById("legend").innerHTML = types.map(t =>
     `<span class="badge" style="background:${groupColors[t] || groupColors.unknown};color:#fff">${t}</span>`
-  ).join(" ");
+  ).join(" ") + ` <span class="badge" style="background:#34d399;color:#062">— cablato fisico</span>`;
 
   // --- Popola i filtri ---
   const filterType = document.getElementById("filterType");
@@ -87,12 +99,12 @@
   const vlans = [...new Set((model.nodes || []).map(n => n.vlan).filter(Boolean))].sort();
   const filterVlan = document.getElementById("filterVlan");
   vlans.forEach(v => filterVlan.add(new Option("VLAN " + v, v)));
+  const physOnly = document.getElementById("physOnly");
 
   function applyFilters() {
-    const t = filterType.value, v = filterVlan.value;
+    const t = filterType.value, v = filterVlan.value, phys = physOnly.checked;
     const hiddenIds = new Set();
     nodes.forEach(n => {
-      // Network e VLAN restano sempre visibili come ancore strutturali.
       const structural = n._type === "network" || n._type === "vlan";
       let visible = structural;
       if (!structural) {
@@ -102,11 +114,15 @@
       if (!visible) hiddenIds.add(n.id);
     });
     edges.forEach(e => {
-      edges.update({ id: e.id, hidden: hiddenIds.has(e._from) || hiddenIds.has(e._to) });
+      let hidden = hiddenIds.has(e._from) || hiddenIds.has(e._to);
+      // "Solo cablato fisico": mostra unicamente gli archi CONNECTED_ON_PORT.
+      if (phys && e._rel !== "CONNECTED_ON_PORT") hidden = true;
+      edges.update({ id: e.id, hidden: hidden });
     });
   }
   filterType.addEventListener("change", applyFilters);
   filterVlan.addEventListener("change", applyFilters);
+  physOnly.addEventListener("change", applyFilters);
 
   // --- Toggle layout fisico <-> gerarchico ---
   let hierarchical = false;
