@@ -7,7 +7,7 @@ import threading
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-from network_inventory.scanner.mdns_scanner import scan_mdns
+from network_inventory.scanner.mdns_scanner import scan_mdns, scan_mdns_network
 
 
 class _FakeListener:
@@ -112,3 +112,40 @@ class TestScanMdns:
         target_ip = "192.168.1.10"
         result = self._run_with_events(target_ip, None)
         assert result == {}
+
+
+class TestScanMdnsNetwork:
+    def test_close_timeout_does_not_raise(self) -> None:
+        """Un TimeoutError da zc.close() non deve propagare (best-effort)."""
+        mock_zc = MagicMock()
+        mock_zc.close.side_effect = TimeoutError("shutdown")
+        mod = _make_zeroconf_module(mock_zc)
+        with patch.dict("sys.modules", {"zeroconf": mod}):
+            result = scan_mdns_network(timeout=0.01)
+        assert result == {}
+        mock_zc.close.assert_called_once()
+
+    def test_results_keyed_by_ip(self) -> None:
+        target_ip = "192.168.1.50"
+        info = _make_info(target_ip, 631, "nas.local.")
+        mock_zc = MagicMock()
+        mock_zc.get_service_info.return_value = info
+        captured: list[Any] = []
+
+        def fake_browser(zc: Any, stype_: str, listener: Any) -> MagicMock:
+            captured.append(listener)
+            return MagicMock()
+
+        mod = _make_zeroconf_module(mock_zc, browser_factory=fake_browser)
+
+        def fire(self: threading.Event, timeout: float | None = None) -> bool:
+            for lst in captured:
+                lst.add_service(mock_zc, "_ipp._tcp.local.", "NAS._ipp._tcp.local.")
+            return False
+
+        with patch.dict("sys.modules", {"zeroconf": mod}):
+            with patch.object(threading.Event, "wait", fire):
+                result = scan_mdns_network(timeout=0.01)
+
+        assert target_ip in result
+        assert result[target_ip]["hostname"] == "nas.local"

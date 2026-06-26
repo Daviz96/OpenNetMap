@@ -20,28 +20,34 @@ _SERVICE_TYPES = [
 ]
 
 
-def scan_mdns(ip: str, timeout: float = 2.0) -> dict[str, object]:
-    """Browse mDNS/Bonjour services on the local network and return entries for *ip*.
+def scan_mdns_network(timeout: float = 2.0) -> dict[str, dict[str, object]]:
+    """Browse mDNS services once for the whole segment, keyed by IP.
 
-    zeroconf is broadcast-oriented: we browse all known service types for
-    *timeout* seconds, collect every advertised service, then filter by the
-    resolved IP address to return only records belonging to the target host.
+    zeroconf is broadcast-oriented: a single browse sees every advertised
+    service on the local segment. This avoids creating one Zeroconf instance
+    per host (heavy and prone to shutdown timeouts under concurrency).
+
+    Returns ``{ip: {"hostname": ..., "services": [...]}}``.
     """
     try:
         from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
     except ImportError:
         return {}
 
-    found: dict[str, list[dict[str, object]]] = {}
+    results: dict[str, dict[str, object]] = {}
     lock = threading.Lock()
 
     class _Listener(ServiceListener):
         def add_service(self, zc: Any, stype: str, name: str) -> None:
-            info = zc.get_service_info(stype, name)
+            try:
+                info = zc.get_service_info(stype, name)
+            except Exception:
+                return
             if info is None:
                 return
-            addresses = [socket.inet_ntoa(a) for a in info.addresses]
-            if ip not in addresses:
+            try:
+                addresses = [socket.inet_ntoa(a) for a in info.addresses]
+            except OSError:
                 return
             entry: dict[str, object] = {
                 "name": name.replace(f".{stype}", "").strip("."),
@@ -50,9 +56,13 @@ def scan_mdns(ip: str, timeout: float = 2.0) -> dict[str, object]:
                 "server": info.server.rstrip(".") if info.server else None,
             }
             with lock:
-                found.setdefault("services", []).append(entry)
-                if info.server and "hostname" not in found:
-                    found["hostname"] = info.server.rstrip(".")
+                for addr in addresses:
+                    bucket = results.setdefault(addr, {})
+                    services = bucket.setdefault("services", [])
+                    assert isinstance(services, list)
+                    services.append(entry)
+                    if info.server and "hostname" not in bucket:
+                        bucket["hostname"] = info.server.rstrip(".")
 
         def remove_service(self, zc: Any, stype: str, name: str) -> None:
             pass
@@ -60,14 +70,30 @@ def scan_mdns(ip: str, timeout: float = 2.0) -> dict[str, object]:
         def update_service(self, zc: Any, stype: str, name: str) -> None:
             pass
 
-    zc = Zeroconf()
+    try:
+        zc = Zeroconf()
+    except Exception:
+        return {}
     try:
         browsers = [ServiceBrowser(zc, stype, _Listener()) for stype in _SERVICE_TYPES]
-        done = threading.Event()
-        done.wait(timeout=timeout)
-        for b in browsers:
-            b.cancel()
+        threading.Event().wait(timeout=timeout)
+        for browser in browsers:
+            try:
+                browser.cancel()
+            except Exception:
+                pass
+    except Exception:
+        pass
     finally:
-        zc.close()
+        # zc.close() può sollevare TimeoutError sotto carico: best-effort.
+        try:
+            zc.close()
+        except Exception:
+            pass
 
-    return dict(found)
+    return results
+
+
+def scan_mdns(ip: str, timeout: float = 2.0) -> dict[str, object]:
+    """Return mDNS info for a single *ip* (view over a network-wide browse)."""
+    return scan_mdns_network(timeout).get(ip, {})
